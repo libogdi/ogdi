@@ -1,5 +1,8 @@
 2004-02-19  Frank Warmerdam  <warmerdam@pobox.com>
 
+	* ogdi/c-api/client.c: ecs_DestroyServer() now does an ecs_CleanUp() on
+	cln_dummy_result to avoid noisy memory leak. 
+
 	* ogdi/drivers/vrf/feature.c: fixed leak of edge_rec.coords memory
 	in the bug 741854 fix in vrf_get_ring_coords().
 

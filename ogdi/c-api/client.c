@@ -18,7 +18,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.12  2003-08-27 05:26:36  warmerda
+ * Revision 1.13  2004-02-19 06:20:09  warmerda
+ * ecs_CleanUp() cln_dummy_result in ecs_DestroyServer()
+ *
+ * Revision 1.12  2003/08/27 05:26:36  warmerda
  * Call ecs_SplitURL(NULL) in cln_DestroyClient() to free static resources.
  * This makes use of memory checkers easier even though this wasn't a *real*
  * memory leak.
@@ -481,6 +484,7 @@ ecs_Result *cln_DestroyClient(ClientID)
 
   /* free regex resources for spliturl */
   ecs_SplitURL( NULL, NULL, NULL, NULL );
+  ecs_CleanUp( &cln_dummy_result );
 
   return msg;
 }
