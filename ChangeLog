@@ -1,5 +1,9 @@
 2001-01-09  Frank Warmerdam  <warmerdam@pobox.com>
 
+	* Fixed bug in reading and display of VALUE DESCRRIPTION TABLE's 
+	in the vrf_Getmetadata() call of the vrf driver.  See 
+     http://sourceforge.net/bugs/?func=detailbug&bug_id=128211&group_id=11181
+
 	* Renamed MAKEFILE to Makefile in external/rpc_win32/TEST, SERVICE, 
 	and TEST.  
 

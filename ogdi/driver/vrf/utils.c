@@ -505,7 +505,6 @@ vrf_GetMetadata(s)
 {
 
   int i,j;
-  int found = 0;
   char *buf1;
   char *buf2;
   char *bufname;
@@ -541,7 +540,7 @@ vrf_GetMetadata(s)
   buf1 = NULL;
 
   /* build the begining of metadatastring*/
-  sprintf (spriv->metadatastring,"{<Grassland>displaymetada { { CURRENT DATABASE:%s\n\nDATA HEADER TABLE(DHT):\n\n\0",spriv->database);
+  sprintf (spriv->metadatastring,"{<Grassland>displaymetada { { CURRENT DATABASE:%s\n\nDATA HEADER TABLE(DHT):\n\n",spriv->database);
 
 
   /* code pour recuperer les valeurs de DHT */
@@ -561,35 +560,35 @@ vrf_GetMetadata(s)
       test=table_pos("DATABASE_NAME",spriv->dhtTable);
       if (test >= 0) {
 	buf1 = justify((char*)get_table_element(table_pos("DATABASE_NAME",spriv->dhtTable), row, spriv->dhtTable, NULL, &count));
-	sprintf(spriv->metadatastring,"%sDatabase_name: %s\n\0",spriv->metadatastring,buf1);
+	sprintf(spriv->metadatastring,"%sDatabase_name: %s\n",spriv->metadatastring,buf1);
 	free(buf1); 
       }
 
       test=table_pos("DATABASE_DESC",spriv->dhtTable);
       if (test >= 0) {
 	buf1 = justify((char*)get_table_element(table_pos("DATABASE_DESC",spriv->dhtTable), row, spriv->dhtTable, NULL, &count));
-	sprintf(spriv->metadatastring,"%sDatabase_description: %s\n\0",spriv->metadatastring,buf1);
+	sprintf(spriv->metadatastring,"%sDatabase_description: %s\n",spriv->metadatastring,buf1);
 	free(buf1);
       }
 
       test=table_pos("MEDIA_STANDARD",spriv->dhtTable);
       if (test >= 0) {
 	buf1 = justify((char*)get_table_element(table_pos("MEDIA_STANDARD",spriv->dhtTable), row, spriv->dhtTable, NULL, &count));
-	sprintf(spriv->metadatastring,"%sMedia_Standard: %s\n\0",spriv->metadatastring,buf1);
+	sprintf(spriv->metadatastring,"%sMedia_Standard: %s\n",spriv->metadatastring,buf1);
 	free(buf1);	
       }
 
       test=table_pos("ORIGINATOR",spriv->dhtTable);
       if (test >= 0) {
 	buf1 = justify((char*)get_table_element(table_pos("ORIGINATOR",spriv->dhtTable), row, spriv->dhtTable, NULL, &count));
-	sprintf(spriv->metadatastring,"%sOriginator: %s\n\0",spriv->metadatastring,buf1);
+	sprintf(spriv->metadatastring,"%sOriginator: %s\n",spriv->metadatastring,buf1);
 	free(buf1);
       }
 
       test=table_pos("ADDRESSEE",spriv->dhtTable);
       if (test >= 0) {
 	buf1 = justify((char*)get_table_element(table_pos("ADDRESSEE",spriv->dhtTable), row, spriv->dhtTable, NULL, &count));
-	sprintf(spriv->metadatastring,"%sAddressee: %s\n\0",spriv->metadatastring,buf1);
+	sprintf(spriv->metadatastring,"%sAddressee: %s\n",spriv->metadatastring,buf1);
 	free(buf1);
       }
 
@@ -597,20 +596,20 @@ vrf_GetMetadata(s)
       test=table_pos("DOWNGRADE_DATE",spriv->dhtTable);
       if (test >= 0) {
 	get_table_element(table_pos("DOWNGRADE_DATE",spriv->dhtTable), row, spriv->dhtTable, (void *)&datee, &count);
-	sprintf(spriv->metadatastring,"%sDowngrade_date: %s\n\0",spriv->metadatastring,datee);
+	sprintf(spriv->metadatastring,"%sDowngrade_date: %s\n",spriv->metadatastring,datee);
       }
 
       test=table_pos("RELEASABILITY",spriv->dhtTable);
       if (test >= 0) {
 	buf1 = justify((char*)get_table_element(table_pos("RELEASABILITY",spriv->dhtTable), row, spriv->dhtTable, NULL, &count));
-	sprintf(spriv->metadatastring,"%sReleasability: %s\n\0",spriv->metadatastring,buf1);
+	sprintf(spriv->metadatastring,"%sReleasability: %s\n",spriv->metadatastring,buf1);
 	free(buf1);	
       }
 
       test = table_pos("OTHER_STD_NAME", spriv->dhtTable);
       if (test >= 0) {
 	buf1 = justify((char*)get_table_element(table_pos("OTHER_STD_NAME", spriv->dhtTable), row, spriv->dhtTable, NULL, &count));
-	sprintf(spriv->metadatastring,"%sOther_STD_name: %s\n\0",spriv->metadatastring,buf1);
+	sprintf(spriv->metadatastring,"%sOther_STD_name: %s\n",spriv->metadatastring,buf1);
 	free(buf1);	
       }
 
@@ -618,27 +617,27 @@ vrf_GetMetadata(s)
       test = table_pos("OTHER_STD_DATE",spriv->dhtTable);
       if (test >= 0) {
 	get_table_element(table_pos("OTHER_STD_DATE",spriv->dhtTable), row, spriv->dhtTable, (void *)&datee, &count);
-	sprintf(spriv->metadatastring,"%sOther_std_date: %s\n\0",spriv->metadatastring,datee);
+	sprintf(spriv->metadatastring,"%sOther_std_date: %s\n",spriv->metadatastring,datee);
       }
 
       test = table_pos("OTHER_STD_VER",spriv->dhtTable);
       if (test >= 0) {
 	buf1 = justify((char*)get_table_element(table_pos("OTHER_STD_VER",spriv->dhtTable), row, spriv->dhtTable, NULL, &count));
-	sprintf(spriv->metadatastring,"%sOther_STD_ver: %s\n\0",spriv->metadatastring,buf1);
+	sprintf(spriv->metadatastring,"%sOther_STD_ver: %s\n",spriv->metadatastring,buf1);
 	free(buf1);
       }
 
       test = table_pos("OTHER_STD_VER",spriv->dhtTable); 
       if (test >= 0) {
 	buf1 = justify((char*)get_table_element(table_pos("OTHER_STD_VER",spriv->dhtTable), row, spriv->dhtTable, NULL, &count));
-	sprintf(spriv->metadatastring,"%sEdition_number: %s\n\0",spriv->metadatastring,buf1);
+	sprintf(spriv->metadatastring,"%sEdition_number: %s\n",spriv->metadatastring,buf1);
 	free(buf1);	
       }
 
       test=table_pos("EDITION_DATE",spriv->dhtTable);
       if (test >= 0) {
 	get_table_element(table_pos("EDITION_DATE",spriv->dhtTable), row, spriv->dhtTable, (void *)&datee, &count);
-	sprintf(spriv->metadatastring,"%sEdition_date: %s\n\0",spriv->metadatastring,datee); 
+	sprintf(spriv->metadatastring,"%sEdition_date: %s\n",spriv->metadatastring,datee); 
       }
 
       free_row(row, spriv->dhtTable); 		
@@ -650,21 +649,21 @@ vrf_GetMetadata(s)
      code pour recuperer les valeurs de LAT 
      */
 
-  sprintf (spriv->metadatastring,"%s\n\n\nLIBRARY ATTRIBUTE TABLE(LAT):\n\n\0",spriv->metadatastring);
+  sprintf (spriv->metadatastring,"%s\n\n\nLIBRARY ATTRIBUTE TABLE(LAT):\n\n",spriv->metadatastring);
 
   for (i = 1; i <= spriv->latTable.nrows; ++i) {
     row = get_row(i, spriv->latTable);
     buf1 = justify((char*)get_table_element(1, row, spriv->latTable, NULL, &count));
-    sprintf(spriv->metadatastring,"%sCoverage name: %s\n\0",spriv->metadatastring,buf1);
+    sprintf(spriv->metadatastring,"%sCoverage name: %s\n",spriv->metadatastring,buf1);
     free(buf1);
     get_table_element(2, row, spriv->latTable, &buffloat, &count);
-    sprintf(spriv->metadatastring,"%sXMIN: %f\n\0",spriv->metadatastring,buffloat);
+    sprintf(spriv->metadatastring,"%sXMIN: %f\n",spriv->metadatastring,buffloat);
     get_table_element(3, row, spriv->latTable, &buffloat, &count);
-    sprintf(spriv->metadatastring,"%sYMIN: %f\n\0",spriv->metadatastring,buffloat);
+    sprintf(spriv->metadatastring,"%sYMIN: %f\n",spriv->metadatastring,buffloat);
     get_table_element(4, row, spriv->latTable, &buffloat, &count);
-    sprintf(spriv->metadatastring,"%sXMAX: %f\n\0",spriv->metadatastring,buffloat);
+    sprintf(spriv->metadatastring,"%sXMAX: %f\n",spriv->metadatastring,buffloat);
     get_table_element(5, row, spriv->latTable, &buffloat, &count);	
-    sprintf(spriv->metadatastring,"%sYMAX: %f\n\0",spriv->metadatastring,buffloat);	
+    sprintf(spriv->metadatastring,"%sYMAX: %f\n",spriv->metadatastring,buffloat);	
     free_row(row, spriv->latTable); 		
   }
 
@@ -677,7 +676,7 @@ vrf_GetMetadata(s)
   sprintf(buffer,"%s%slht",spriv->library,separator);
   if (muse_access(buffer,0) ==0)
     {
-      sprintf (spriv->metadatastring,"%sCURRENT DATABASE:%s\n\nLIBRARY LIBRARY HEADER TABLE(LHT):\n\n\0",spriv->metadatastring,spriv->database);
+      sprintf (spriv->metadatastring,"%sCURRENT DATABASE:%s\n\nLIBRARY LIBRARY HEADER TABLE(LHT):\n\n",spriv->metadatastring,spriv->database);
 
 #ifdef TESTOPENTABLE
       printf("open spriv->lhtTable:%s\n",buffer);
@@ -690,21 +689,21 @@ vrf_GetMetadata(s)
 	test=table_pos("PRODUCT_TYPE",spriv->lhtTable);
 	if (test >= 0) {
 	  buf1 = justify((char*)get_table_element(table_pos("PRODUCT_TYPE",spriv->lhtTable), row, spriv->lhtTable, NULL, &count));
-	  sprintf(spriv->metadatastring,"%sProduct_type: %s\n\0",spriv->metadatastring,buf1);
+	  sprintf(spriv->metadatastring,"%sProduct_type: %s\n",spriv->metadatastring,buf1);
 	  free(buf1);	
 	}
 
 	test=table_pos("LIBRARY_NAME",spriv->lhtTable);
 	if (test >= 0) {
 	  buf1 = justify((char*)get_table_element(table_pos("LIBRARY_NAME",spriv->lhtTable), row, spriv->lhtTable, NULL, &count));
-	  sprintf(spriv->metadatastring,"%sLibrary_name: %s\n\0",spriv->metadatastring,buf1);
+	  sprintf(spriv->metadatastring,"%sLibrary_name: %s\n",spriv->metadatastring,buf1);
 	  free(buf1);	
 	}
 
 	test=table_pos("DESCRIPTION",spriv->lhtTable);
 	if (test >= 0) {
 	  buf1 = justify((char*)get_table_element(table_pos("DESCRIPTION",spriv->lhtTable), row, spriv->lhtTable, NULL, &count));
-	  sprintf(spriv->metadatastring,"%sDescription: %s\n\0",spriv->metadatastring,buf1);
+	  sprintf(spriv->metadatastring,"%sDescription: %s\n",spriv->metadatastring,buf1);
 	  free(buf1); 
 	}
 
@@ -712,54 +711,54 @@ vrf_GetMetadata(s)
 	test=table_pos("SOURCE_SERIES",spriv->lhtTable);
 	if (test >= 0) {
 	  buf1 = justify((char*)get_table_element(table_pos("SOURCE_SERIES",spriv->lhtTable), row, spriv->lhtTable, NULL, &count));
-	  sprintf(spriv->metadatastring,"%sSource_series: %s\n\0",spriv->metadatastring,buf1);
+	  sprintf(spriv->metadatastring,"%sSource_series: %s\n",spriv->metadatastring,buf1);
 	  free(buf1);
 	}
 
 	test=table_pos("SOURCE_ID",spriv->lhtTable);
 	if (test >= 0) {
 	  buf1 = justify((char*)get_table_element(table_pos("SOURCE_ID",spriv->lhtTable), row, spriv->lhtTable, NULL, &count));
-	  sprintf(spriv->metadatastring,"%sSource_ID: %s\n\0",spriv->metadatastring,buf1);
+	  sprintf(spriv->metadatastring,"%sSource_ID: %s\n",spriv->metadatastring,buf1);
 	  free(buf1);
 	}
 
 	test=table_pos("SOURCE_EDITION",spriv->lhtTable);
 	if (test >= 0) {
 	  buf1 = justify((char*)get_table_element(table_pos("SOURCE_EDITION",spriv->lhtTable), row, spriv->lhtTable, NULL, &count));
-	  sprintf(spriv->metadatastring,"%sSource_edition: %s\n\0",spriv->metadatastring,buf1);
+	  sprintf(spriv->metadatastring,"%sSource_edition: %s\n",spriv->metadatastring,buf1);
 	  free(buf1);
 	}
 
 	test=table_pos("SOURCE_NAME",spriv->lhtTable);
 	if (test >= 0) {
 	  buf1 = justify((char*)get_table_element(table_pos("SOURCE_NAME",spriv->lhtTable), row, spriv->lhtTable, NULL, &count));
-	  sprintf(spriv->metadatastring,"%sSource_name: %s\n\0",spriv->metadatastring,buf1);
+	  sprintf(spriv->metadatastring,"%sSource_name: %s\n",spriv->metadatastring,buf1);
 	  free(buf1);
 	}
 
 	test=table_pos("SOURCE_DATE",spriv->lhtTable);
 	if (test >= 0) {
 	  get_table_element(table_pos("SOURCE_DATE",spriv->lhtTable), row, spriv->lhtTable, (void *)&datee, &count);
-	  sprintf(spriv->metadatastring,"%sSource_date: %s\n\0",spriv->metadatastring,datee);
+	  sprintf(spriv->metadatastring,"%sSource_date: %s\n",spriv->metadatastring,datee);
 	}
 
 	test=table_pos("DOWNGRADING",spriv->lhtTable);
 	if (test >= 0) {
 	  buf1 = justify((char*)get_table_element(table_pos("DOWNGRADING",spriv->lhtTable), row, spriv->lhtTable, NULL, &count));
-	  sprintf(spriv->metadatastring,"%sDowngrading: %s\n\0",spriv->metadatastring,buf1);
+	  sprintf(spriv->metadatastring,"%sDowngrading: %s\n",spriv->metadatastring,buf1);
 	  free(buf1);	
 	}
 
 	test=table_pos("DOWNGRADING_DATE",spriv->lhtTable);
 	if (test >= 0) {
 	  get_table_element(table_pos("DOWNGRADING_DATE_DATE",spriv->lhtTable), row, spriv->lhtTable, (void *)&datee, &count);
-	  sprintf(spriv->metadatastring,"%sDowngrading_date: %s\n\0",spriv->metadatastring,datee);
+	  sprintf(spriv->metadatastring,"%sDowngrading_date: %s\n",spriv->metadatastring,datee);
 	}
 	
 	test=table_pos("RELEASABILITY",spriv->lhtTable);
 	if (test >= 0) {
 	  buf1 = justify((char*)get_table_element(table_pos("RELEASABILITY",spriv->lhtTable), row, spriv->lhtTable, NULL, &count));
-	  sprintf(spriv->metadatastring,"%sReleasability: %s\n\0",spriv->metadatastring,buf1);
+	  sprintf(spriv->metadatastring,"%sReleasability: %s\n",spriv->metadatastring,buf1);
 	  free(buf1);	
 	}
 	free_row(row, spriv->lhtTable); 		
@@ -769,18 +768,18 @@ vrf_GetMetadata(s)
 
 
   /* code pour recuperer les valeurs dans CAT */
-  sprintf (spriv->metadatastring,"%s\n\n\nCOVERAGE ATTRIBUTE TABLE(CAT):\n\n\0",spriv->metadatastring);	
+  sprintf (spriv->metadatastring,"%s\n\n\nCOVERAGE ATTRIBUTE TABLE(CAT):\n\n",spriv->metadatastring);	
 
   for (i = 1; i <= spriv->catTable.nrows; ++i) {
     row = get_row(i, spriv->catTable);
     buf1 = justify( (char *) get_table_element(1, row, spriv->catTable, NULL, &count));
-    sprintf(spriv->metadatastring,"%sCoverage_name: %s\n\0",spriv->metadatastring,buf1);
+    sprintf(spriv->metadatastring,"%sCoverage_name: %s\n",spriv->metadatastring,buf1);
     free(buf1);
     buf1 = justify( (char *) get_table_element(2, row, spriv->catTable, NULL, &count));
-    sprintf(spriv->metadatastring,"%sDescription: %s\n\0",spriv->metadatastring,buf1);
+    sprintf(spriv->metadatastring,"%sDescription: %s\n",spriv->metadatastring,buf1);
     free(buf1);
     get_table_element(3, row, spriv->catTable, &buffint, &count);
-    sprintf(spriv->metadatastring,"%sLevel: %d\n\0",spriv->metadatastring,buffint);
+    sprintf(spriv->metadatastring,"%sLevel: %d\n",spriv->metadatastring,buffint);
   }
 
 
@@ -791,7 +790,7 @@ vrf_GetMetadata(s)
 
   if (muse_access(buffer,0) ==0)
     {
-      sprintf (spriv->metadatastring,"%s\n\n\nGEOGRAPHIC REFERENCE TABLE(GRT):\n\n\0",spriv->metadatastring);
+      sprintf (spriv->metadatastring,"%s\n\n\nGEOGRAPHIC REFERENCE TABLE(GRT):\n\n",spriv->metadatastring);
 #ifdef TESTOPENTABLE
       printf("open spriv->grtTable:%s\n",buffer);
 #endif
@@ -804,77 +803,77 @@ vrf_GetMetadata(s)
 	test=table_pos("DATA_TYPE",spriv->grtTable);
 	if (test >= 0) {
 	  buf1 = justify((char*)get_table_element(test, row, spriv->grtTable, NULL, &count));
-	  sprintf(spriv->metadatastring,"%sData_type: %s\n\0",spriv->metadatastring,buf1);
+	  sprintf(spriv->metadatastring,"%sData_type: %s\n",spriv->metadatastring,buf1);
 	  free(buf1);
 	}
 
 	test=table_pos("UNITS",spriv->grtTable);
 	if (test >= 0) {
 	  buf1 = justify((char*)get_table_element(test, row, spriv->grtTable, NULL, &count));
-	  sprintf(spriv->metadatastring,"%sUnits: %s\n\0",spriv->metadatastring,buf1);
+	  sprintf(spriv->metadatastring,"%sUnits: %s\n",spriv->metadatastring,buf1);
 	  free(buf1);	
 	}
 
 	test=table_pos("ELLIPSOID",spriv->grtTable);
 	if (test >= 0) {
 	  buf1 = justify((char*)get_table_element(test, row, spriv->grtTable, NULL, &count));
-	  sprintf(spriv->metadatastring,"%sEllipsoid: %s\n\0",spriv->metadatastring,buf1);
+	  sprintf(spriv->metadatastring,"%sEllipsoid: %s\n",spriv->metadatastring,buf1);
 	  free(buf1);
 	}
 
 	test=table_pos("ELLIPSOID_DETAIL",spriv->grtTable);
 	if (test >= 0) {
 	  buf1 = justify((char*)get_table_element(test, row, spriv->grtTable, NULL, &count));
-	  sprintf(spriv->metadatastring,"%sEllipsoid_detail: %s\n\0",spriv->metadatastring,buf1);
+	  sprintf(spriv->metadatastring,"%sEllipsoid_detail: %s\n",spriv->metadatastring,buf1);
 	  free(buf1);
 	}
 	
 	test=table_pos("VERT_DATUM_REF",spriv->grtTable);
 	if (test >= 0) {
 	  buf1 = justify((char*)get_table_element(test, row, spriv->grtTable, NULL, &count));
-	  sprintf(spriv->metadatastring,"%sVert_datum_ref: %s\n\0",spriv->metadatastring,buf1);
+	  sprintf(spriv->metadatastring,"%sVert_datum_ref: %s\n",spriv->metadatastring,buf1);
 	  free(buf1);	
 	}
 
 	test=table_pos("VERT_DATUM_CODE",spriv->grtTable);
 	if (test >= 0) {
 	  buf1 = justify((char*)get_table_element(test, row, spriv->grtTable, NULL, &count));
-	  sprintf(spriv->metadatastring,"%sVert_datum_code: %s\n\0",spriv->metadatastring,buf1);
+	  sprintf(spriv->metadatastring,"%sVert_datum_code: %s\n",spriv->metadatastring,buf1);
 	  free(buf1);	
 	}
 
 	test=table_pos("SOUND_DATUM_NAME",spriv->grtTable);
 	if (test >= 0) {
 	  buf1 = justify((char*)get_table_element(test, row, spriv->grtTable, NULL, &count));
-	  sprintf(spriv->metadatastring,"%sSound_datum_name: %s\n\0",spriv->metadatastring,buf1);
+	  sprintf(spriv->metadatastring,"%sSound_datum_name: %s\n",spriv->metadatastring,buf1);
 	  free(buf1);	
 	}
 
 	test=table_pos("SOUND_DATUM_CODE",spriv->grtTable);
 	if (test >= 0) {
 	  buf1 = justify((char*)get_table_element(test, row, spriv->grtTable, NULL, &count));
-	  sprintf(spriv->metadatastring,"%sSound_datum_code: %s\n\0",spriv->metadatastring,buf1);
+	  sprintf(spriv->metadatastring,"%sSound_datum_code: %s\n",spriv->metadatastring,buf1);
 	  free(buf1);	
 	}
 
 	test=table_pos("GEO_DATUM_NAME",spriv->grtTable);
 	if (test >= 0) {
 	  buf1 = justify((char*)get_table_element(test, row, spriv->grtTable, NULL, &count));
-	  sprintf(spriv->metadatastring,"%sGeo_datum_name: %s\n\0",spriv->metadatastring,buf1);
+	  sprintf(spriv->metadatastring,"%sGeo_datum_name: %s\n",spriv->metadatastring,buf1);
 	  free(buf1);	
 	}
 
 	test=table_pos("GEO_DATUM_CODE",spriv->grtTable);
 	if (test >= 0) {
 	  buf1 = justify((char*)get_table_element(test, row, spriv->grtTable, NULL, &count));
-	  sprintf(spriv->metadatastring,"%sGeo_datum_code: %s\n\0",spriv->metadatastring,buf1);
+	  sprintf(spriv->metadatastring,"%sGeo_datum_code: %s\n",spriv->metadatastring,buf1);
 	  free(buf1);	
 	}
 
 	test=table_pos("PROJECTION NAME",spriv->grtTable);
 	if (test >= 0) {
 	  buf1 = justify((char*)get_table_element(test, row, spriv->grtTable, NULL, &count));
-	  sprintf(spriv->metadatastring,"%sProjection_name: %s\n\0",spriv->metadatastring,buf1);
+	  sprintf(spriv->metadatastring,"%sProjection_name: %s\n",spriv->metadatastring,buf1);
 	  free(buf1);	
 	}
 	
@@ -889,7 +888,7 @@ vrf_GetMetadata(s)
   sprintf(buffer,"%s%sdqt",spriv->library,separator);
   if (muse_access(buffer,0) ==0)
     {
-      sprintf (spriv->metadatastring,"%s\n\n\nDATA QUALITY TABLE(DQT):\n\n\0",spriv->metadatastring);
+      sprintf (spriv->metadatastring,"%s\n\n\nDATA QUALITY TABLE(DQT):\n\n",spriv->metadatastring);
 #ifdef TESTOPENTABLE
       printf("open spriv->dqtTable:%s\n",buffer);
 #endif
@@ -901,42 +900,42 @@ vrf_GetMetadata(s)
 	test=table_pos("VPF_LEVEL",spriv->dqtTable);
 	if (test >= 0) {
 	  buf1 = justify((char*)get_table_element(test, row, spriv->dqtTable, NULL, &count));
-	  sprintf(spriv->metadatastring,"%sVpf_level: %s\n\0",spriv->metadatastring,buf1);
+	  sprintf(spriv->metadatastring,"%sVpf_level: %s\n",spriv->metadatastring,buf1);
 	  free(buf1);
 	}
 
 	test=table_pos("VPF_LEVEL_NAME",spriv->dqtTable);
 	if (test >= 0) {
 	  buf1 = justify((char*)get_table_element(test, row, spriv->dqtTable, NULL, &count));
-	  sprintf(spriv->metadatastring,"%sVpf_level_name: %s\n\0",spriv->metadatastring,buf1);
+	  sprintf(spriv->metadatastring,"%sVpf_level_name: %s\n",spriv->metadatastring,buf1);
 	  free(buf1);
 	}
 
 	test=table_pos("FEATURE_COMPLETE",spriv->dqtTable);
 	if (test >= 0) {
 	  buf1 = justify((char*)get_table_element(test, row, spriv->dqtTable, NULL, &count));
-	  sprintf(spriv->metadatastring,"%sFeature_complete: %s\n\0",spriv->metadatastring,buf1);
+	  sprintf(spriv->metadatastring,"%sFeature_complete: %s\n",spriv->metadatastring,buf1);
 	  free(buf1);
 	}
 
 	test=table_pos("ATTRIB_COMPLETE",spriv->dqtTable);
 	if (test >= 0) {
 	  buf1 = justify((char*)get_table_element(test, row, spriv->dqtTable, NULL, &count));
-	  sprintf(spriv->metadatastring,"%sAttrib_complete: %s\n\0",spriv->metadatastring,buf1);
+	  sprintf(spriv->metadatastring,"%sAttrib_complete: %s\n",spriv->metadatastring,buf1);
 	  free(buf1);	
 	}
 
 	test=table_pos("LOGICAL_CONSIST",spriv->dqtTable);
 	if (test >= 0) {
 	  buf1 = justify((char*)get_table_element(test, row, spriv->dqtTable, NULL, &count));
-	  sprintf(spriv->metadatastring,"%sLogical_consist: %s\n\0",spriv->metadatastring,buf1);
+	  sprintf(spriv->metadatastring,"%sLogical_consist: %s\n",spriv->metadatastring,buf1);
 	  free(buf1);
 	}
 
 	test=table_pos("EDITION_NUM",spriv->dqtTable);
 	if (test >= 0) {
 	  buf1 = justify((char*)get_table_element(test, row, spriv->dqtTable, NULL, &count));
-	  sprintf(spriv->metadatastring,"%sEdition_num: %s\n\0",spriv->metadatastring,buf1);
+	  sprintf(spriv->metadatastring,"%sEdition_num: %s\n",spriv->metadatastring,buf1);
 	  free(buf1);
 	}
 
@@ -944,20 +943,20 @@ vrf_GetMetadata(s)
 	test=table_pos("CREATION_DATE",spriv->dqtTable);
 	if (test >= 0) {
 	  get_table_element(table_pos("CREATION_DATE",spriv->dqtTable), row, spriv->dqtTable, (void *)&datee, &count);
-	  sprintf(spriv->metadatastring,"%sCration date: %s\n\0",spriv->metadatastring,datee);
+	  sprintf(spriv->metadatastring,"%sCration date: %s\n",spriv->metadatastring,datee);
 	}
 
 	test=table_pos("REVISION_DATE",spriv->dqtTable);
 	if (test >= 0) {
 	  get_table_element(table_pos("REVISION_DATE",spriv->dqtTable), row, spriv->dqtTable, (void *)&datee, &count);
-	  sprintf(spriv->metadatastring,"%sRevision date: %s\n\0",spriv->metadatastring,datee);
+	  sprintf(spriv->metadatastring,"%sRevision date: %s\n",spriv->metadatastring,datee);
 	}
 	
 
 	test=table_pos("SPEC_NAME",spriv->dqtTable);
 	if (test >= 0) {
 	  buf1 = justify((char*)get_table_element(test, row, spriv->dqtTable, NULL, &count));
-	  sprintf(spriv->metadatastring,"%sSpec_name: %s\n\0",spriv->metadatastring,buf1);
+	  sprintf(spriv->metadatastring,"%sSpec_name: %s\n",spriv->metadatastring,buf1);
 	  free(buf1);	
 	}
 
@@ -965,110 +964,110 @@ vrf_GetMetadata(s)
 	test=table_pos("SPEC_DATE",spriv->dqtTable);
 	if (test >= 0) {
 	  get_table_element(table_pos("SPEC_DATE",spriv->dqtTable), row, spriv->dqtTable, (void *)&datee, &count);
-	  sprintf(spriv->metadatastring,"%sSpecification date: %s\n\0",spriv->metadatastring,datee);
+	  sprintf(spriv->metadatastring,"%sSpecification date: %s\n",spriv->metadatastring,datee);
 	}
 
 	test=table_pos("EARLIEST_SOURCE",spriv->dqtTable);
 	if (test >= 0) {
 	  get_table_element(table_pos("EARLIEST_SOURCE",spriv->dqtTable), row, spriv->dqtTable, (void *)&datee, &count);
-	  sprintf(spriv->metadatastring,"%sEarliest source: %s\n\0",spriv->metadatastring,datee);
+	  sprintf(spriv->metadatastring,"%sEarliest source: %s\n",spriv->metadatastring,datee);
 	}
 
 	test=table_pos("LATEST_SOURCE",spriv->dqtTable);
 	if (test >= 0) {
 	  get_table_element(table_pos("LATEST_SOURCE",spriv->dqtTable), row, spriv->dqtTable, (void *)&datee, &count);
-	  sprintf(spriv->metadatastring,"%sLatest source: %s\n\0",spriv->metadatastring,datee);
+	  sprintf(spriv->metadatastring,"%sLatest source: %s\n",spriv->metadatastring,datee);
 	}
 
 
 	test=table_pos("QUANT_ATT_ACC",spriv->dqtTable);
 	if (test >= 0) {
 	  buf1 = justify((char*)get_table_element(test, row, spriv->dqtTable, NULL, &count));
-	  sprintf(spriv->metadatastring,"%sQuant_att_acc: %s\n\0",spriv->metadatastring,buf1);
+	  sprintf(spriv->metadatastring,"%sQuant_att_acc: %s\n",spriv->metadatastring,buf1);
 	  free(buf1);
 	}
 
 	test=table_pos("QUAL_ATT_ACC",spriv->dqtTable);
 	if (test >= 0) {
 	  buf1 = justify((char*)get_table_element(test, row, spriv->dqtTable, NULL, &count)); 
-	  sprintf(spriv->metadatastring,"%sQual_att_acc: %s\n\0",spriv->metadatastring,buf1);
+	  sprintf(spriv->metadatastring,"%sQual_att_acc: %s\n",spriv->metadatastring,buf1);
 	  free(buf1);
 	}
 
 	test=table_pos("COLLECTION_SPEC",spriv->dqtTable);
 	if (test >= 0) {
 	  buf1 = justify((char*)get_table_element(test, row, spriv->dqtTable, NULL, &count)); 
-	  sprintf(spriv->metadatastring,"%sCollection_spec: %s\n\0",spriv->metadatastring,buf1);
+	  sprintf(spriv->metadatastring,"%sCollection_spec: %s\n",spriv->metadatastring,buf1);
 	  free(buf1);
 	}
 
 	test=table_pos("SOURCE_FILE_NAME",spriv->dqtTable);
 	if (test >= 0) {
 	  buf1 = justify((char*)get_table_element(test, row, spriv->dqtTable, NULL, &count)); 
-	  sprintf(spriv->metadatastring,"%sSource_file_name: %s\n\0",spriv->metadatastring,buf1);
+	  sprintf(spriv->metadatastring,"%sSource_file_name: %s\n",spriv->metadatastring,buf1);
 	  free(buf1);
 	}
 
 	test=table_pos("ABS_HORIZ_ACC",spriv->dqtTable);
 	if (test >= 0) {
 	  buf1 = justify((char*)get_table_element(test, row, spriv->dqtTable, NULL, &count)); 
-	  sprintf(spriv->metadatastring,"%sAbs_horiz_acc: %s\n\0",spriv->metadatastring,buf1);
+	  sprintf(spriv->metadatastring,"%sAbs_horiz_acc: %s\n",spriv->metadatastring,buf1);
 	  free(buf1);
 	}
 
 	test=table_pos("ABS_HORIZ_UNITS",spriv->dqtTable);
 	if (test >= 0) {
 	  buf1 = justify((char*)get_table_element(test, row, spriv->dqtTable, NULL, &count)); 
-	  sprintf(spriv->metadatastring,"%sAbs_horiz_units: %s\n\0",spriv->metadatastring,buf1);
+	  sprintf(spriv->metadatastring,"%sAbs_horiz_units: %s\n",spriv->metadatastring,buf1);
 	  free(buf1);
 	}
 
 	test=table_pos("ABS_VERT_ACC",spriv->dqtTable);
 	if (test >= 0) {
 	  buf1 = justify((char*)get_table_element(test, row, spriv->dqtTable, NULL, &count)); 
-	  sprintf(spriv->metadatastring,"%sAbs_vert_acc: %s\n\0",spriv->metadatastring,buf1);
+	  sprintf(spriv->metadatastring,"%sAbs_vert_acc: %s\n",spriv->metadatastring,buf1);
 	  free(buf1);
 	}
 
 	test=table_pos("ABS_VERT_UNITS",spriv->dqtTable);
 	if (test >= 0) {
 	  buf1 = justify((char*)get_table_element(test, row, spriv->dqtTable, NULL, &count)); 
-	  sprintf(spriv->metadatastring,"%sAbs_vert_units: %s\n\0",spriv->metadatastring,buf1);
+	  sprintf(spriv->metadatastring,"%sAbs_vert_units: %s\n",spriv->metadatastring,buf1);
 	  free(buf1);
 	}
 
 	test=table_pos("REL_HORIZ_ACC",spriv->dqtTable);
 	if (test >= 0) {
 	  buf1 = justify((char*)get_table_element(test, row, spriv->dqtTable, NULL, &count)); 
-	  sprintf(spriv->metadatastring,"%s:Rel_horiz_acc: %s\n\0",spriv->metadatastring,buf1);
+	  sprintf(spriv->metadatastring,"%s:Rel_horiz_acc: %s\n",spriv->metadatastring,buf1);
 	  free(buf1);
 	}
 
 	test=table_pos("REL_HORIZ_UNITS",spriv->dqtTable);
 	if (test >= 0) {
 	  buf1 = justify((char*)get_table_element(test, row, spriv->dqtTable, NULL, &count)); 
-	  sprintf(spriv->metadatastring,"%s:Rel_horiz_units: %s\n\0",spriv->metadatastring,buf1);
+	  sprintf(spriv->metadatastring,"%s:Rel_horiz_units: %s\n",spriv->metadatastring,buf1);
 	  free(buf1);
 	}
 
 	test=table_pos("REL_VERT_ACC",spriv->dqtTable);
 	if (test >= 0) {
 	  buf1 = justify((char*)get_table_element(test, row, spriv->dqtTable, NULL, &count)); 
-	  sprintf(spriv->metadatastring,"%s:Rel_vert_acc %s\n\0",spriv->metadatastring,buf1);
+	  sprintf(spriv->metadatastring,"%s:Rel_vert_acc %s\n",spriv->metadatastring,buf1);
 	  free(buf1);
 	}
 
 	test=table_pos("REL_VERT_UNITS",spriv->dqtTable);
 	if (test >= 0) {
 	  buf1 = justify((char*)get_table_element(test, row, spriv->dqtTable, NULL, &count)); 
-	  sprintf(spriv->metadatastring,"%s:Rel_vert_units: %s\n\0",spriv->metadatastring,buf1);
+	  sprintf(spriv->metadatastring,"%s:Rel_vert_units: %s\n",spriv->metadatastring,buf1);
 	  free(buf1);
 	}
 
 	test=table_pos("COMMENTS",spriv->dqtTable);
 	if (test >= 0) {
 	  buf1 = justify((char*)get_table_element(test, row, spriv->dqtTable, NULL, &count)); 
-	  sprintf(spriv->metadatastring,"%sComments: %s\n\0",spriv->metadatastring,buf1);
+	  sprintf(spriv->metadatastring,"%sComments: %s\n",spriv->metadatastring,buf1);
 	  free(buf1);
 	}
 	
@@ -1080,7 +1079,7 @@ vrf_GetMetadata(s)
 
   /*ferme la premiere partie de la chaine*/
 
-  sprintf(spriv->metadatastring,"%s} } } { \0",spriv->metadatastring);
+  sprintf(spriv->metadatastring,"%s} } } { ",spriv->metadatastring);
 
 
   /* 
@@ -1099,12 +1098,12 @@ vrf_GetMetadata(s)
 
     /*ajoute class et nom coverage*/
     covname = justify( (char *) get_table_element(1, rowcat, spriv->catTable, NULL, &count));
-    sprintf(spriv->metadatastring,"%s family %s class\0",spriv->metadatastring,covname);
+    sprintf(spriv->metadatastring,"%s family %s class",spriv->metadatastring,covname);
 
     /*ajoute description et debut du covinfo*/
     buf1 = justify( (char *) get_table_element(2, rowcat, spriv->catTable, NULL, &count));
 
-    sprintf(spriv->metadatastring,"%s {%s} {<Grassland>displaymetadata {\0",spriv->metadatastring, buf1);
+    sprintf(spriv->metadatastring,"%s {%s} {<Grassland>displaymetadata {",spriv->metadatastring, buf1);
     free(buf1);
 
     /********/
@@ -1158,7 +1157,7 @@ vrf_GetMetadata(s)
 		      {
 			if (strcmp(buf1,bufname)==0)
 			  {
-			    sprintf(spriv->metadatastring,"%s { %s { %s } } \0",spriv->metadatastring,bufname,bufdesc);
+			    sprintf(spriv->metadatastring,"%s { %s { %s } } ",spriv->metadatastring,bufname,bufdesc);
 			    flag=1;
 			  }
 		      }
@@ -1171,7 +1170,7 @@ vrf_GetMetadata(s)
 	vpf_close_table(&(spriv->fcaTable));		
     }
     
-    sprintf(spriv->metadatastring,"%s } {\0",spriv->metadatastring);
+    sprintf(spriv->metadatastring,"%s } {",spriv->metadatastring);
     vpf_close_table(&(spriv->fcsTable));
  
 
@@ -1186,7 +1185,7 @@ vrf_GetMetadata(s)
 	if (muse_access(buffer,0) ==0)
 	  {
 	    existtableflag=1;
-	    sprintf(spriv->metadatastring,"%s \nVALUE DESCRIPTION TABLE (%s.vdt)\n\n\0",spriv->metadatastring,tab[j]);
+	    sprintf(spriv->metadatastring,"%s \nVALUE DESCRIPTION TABLE (%s.vdt)\n\n",spriv->metadatastring,tab[j]);
 	
 	
 #ifdef TESTOPENTABLE
@@ -1219,22 +1218,35 @@ vrf_GetMetadata(s)
 		if ((strnicmp ("char",tab[j],5)) ==0) {
 		  tval = (char *)get_table_element(val_pos,row,table,NULL,&n);
 		  sprintf(buffer,"    %s =  %s  \n",tval,des_buf);
-		  sprintf(spriv->metadatastring,"%s%s\0",spriv->metadatastring,buffer);
+		  sprintf(spriv->metadatastring,"%s%s",spriv->metadatastring,buffer);
 		  free(tval);
 		}
 	      
-		if ((strnicmp ("int",tab[j],6)) ==0) {
-		  get_table_element(val_pos,row,table,&intval,&n);   
-		  /*sprintf(buffer,"    %12ld =  %s  \n",ival,des_buf);*/
-		  sprintf(buffer,"    %12ld =  %s  \n",intval,des_buf);
-		  sprintf(spriv->metadatastring,"%s%s\0",spriv->metadatastring,buffer);
+		if ((strnicmp ("int",tab[j],6)) ==0
+                    && table.header[val_pos].type == 'I' ) {
+                    get_table_element(val_pos,row,table,&intval,&n);   
+                    sprintf(buffer,"    %12ld =  %s  \n",
+                            (long)intval,des_buf);
+                    sprintf(spriv->metadatastring,"%s%s",
+                            spriv->metadatastring,buffer);
+		}		 
+
+		if ((strnicmp ("int",tab[j],6)) ==0
+                    && table.header[val_pos].type == 'S' ) {
+                    short	short_val;
+
+                    get_table_element(val_pos,row,table,&short_val,&n);   
+                    sprintf(buffer,"    %12ld =  %s  \n",
+                            (long)short_val,des_buf);
+                    sprintf(spriv->metadatastring,"%s%s",
+                            spriv->metadatastring,buffer);
 		}		 
 
 
 		if ((strnicmp ("float",tab[j],6) ==0)) {
 		  get_table_element(val_pos,row,table,&fval,&n);
 		  sprintf(buffer,"    %12f =  %s  \n",fval,des_buf);
-		  sprintf(spriv->metadatastring,"%s%s\0",spriv->metadatastring,buffer);
+		  sprintf(spriv->metadatastring,"%s%s",spriv->metadatastring,buffer);
 		}
 	    
 	    
@@ -1256,13 +1268,13 @@ vrf_GetMetadata(s)
       }  /**for j=1,j<=3**/
 
     if (existtableflag==0)
-      sprintf(spriv->metadatastring,"%snodata\0",spriv->metadatastring);
+      sprintf(spriv->metadatastring,"%snodata",spriv->metadatastring);
 
     /* ferme la chaine covinfo*/
-    sprintf(spriv->metadatastring,"%s} } } \0",spriv->metadatastring);	  
+    sprintf(spriv->metadatastring,"%s} } } ",spriv->metadatastring);	  
   } /**(i = 1; i <= spriv->catTable.nrows**/
   /*ferme la chaine generale*/
-  sprintf(spriv->metadatastring,"%s }\0",spriv->metadatastring);
+  sprintf(spriv->metadatastring,"%s }",spriv->metadatastring);
   /*printf ("%s",spriv->metadatastring);*/
   vpf_close_table(&(spriv->lhtTable));
 
@@ -1458,7 +1470,6 @@ void vrf_AllFClass(s,coverage)
   row_type row;
   unsigned int i, j, n, k, count=0;
   char *temp;
-  char namesep[3] = {": "};
   char *name, *fclass, **list;
   char ftype[8] = {'A', 'L', 'T', 'P', 'a', 'l', 't', 'p' };
   BOOLEAN found;
