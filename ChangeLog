@@ -1,3 +1,8 @@
+2004-03-29  Frank Warmerdam  <warmerdam@pobox.com>
+
+	* ogdi/drivers/rpf/utils.c: Check for FSDEVG field is present in 
+	TOC file.  As per Bug 917678.
+
 2004-03-26  Frank Warmerdam  <warmerdam@pobox.com>
 
 	* ogdi/drivers/rpf/rpf.c: Fixed computation of nbfeature in 
