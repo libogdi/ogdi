@@ -17,7 +17,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.5  2001-06-13 17:33:59  warmerda
+ * Revision 1.6  2001-06-21 20:30:15  warmerda
+ * added ECS_CVSID
+ *
+ * Revision 1.5  2001/06/13 17:33:59  warmerda
  * upgraded source headers
  *
  */
@@ -25,6 +28,8 @@
 
 #include "ecs.h"
 #include "vrf.h"
+
+ECS_CVSID("$Id$");
 
 vpf_projection_type NOPROJ = {DDS, 0.0, 0.0, 0.0, 0.0, 0, 0.0, 0.0,
                               NULL, NULL, "Decimal Degrees     "};

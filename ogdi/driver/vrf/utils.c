@@ -17,13 +17,18 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.8  2001-06-13 17:33:59  warmerda
+ * Revision 1.9  2001-06-21 20:30:15  warmerda
+ * added ECS_CVSID
+ *
+ * Revision 1.8  2001/06/13 17:33:59  warmerda
  * upgraded source headers
  *
  */
 
 #include "ecs.h"
 #include "vrf.h"
+
+ECS_CVSID("$Id$");
 
 #ifdef _WINDOWS
 #define SEPARATOR '\\'
