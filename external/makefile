@@ -44,6 +44,6 @@ $(subdirs):
 #
 .PHONY: $(STANDARD_TARGETS)
 $(STANDARD_TARGETS):
-	for i in $(subdirs); do \
+	@for i in $(subdirs); do \
 	  $(MAKE) --directory $$i $@; \
 	done
