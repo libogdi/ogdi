@@ -17,7 +17,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.5  2001-06-13 17:33:59  warmerda
+ * Revision 1.6  2001-06-20 21:49:31  warmerda
+ * added improved query support (swq)
+ *
+ * Revision 1.5  2001/06/13 17:33:59  warmerda
  * upgraded source headers
  *
  */
@@ -369,6 +372,10 @@ int  vrf_get_ring_coords _ANSI_ARGS_((ecs_Server *s, RING *ring, int32 face_id,
 int32 vrf_next_face_edge _ANSI_ARGS_((edge_rec_type *edge_rec,int32 *prevnode, int32 face_id));
 char *vrf_get_ObjAttributes _ANSI_ARGS_((vpf_table_type table,int32 row_pos));
 int  vrf_checkLayerTables _ANSI_ARGS_((ecs_Server *s,ecs_Layer *l));
+
+/* vrfswq.c */
+
+set_type query_table2( char *expression, vpf_table_type table );
 
 /* layer oriented method definition */
 

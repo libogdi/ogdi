@@ -17,7 +17,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.7  2001-06-13 17:33:59  warmerda
+ * Revision 1.8  2001-06-20 21:49:31  warmerda
+ * added improved query support (swq)
+ *
+ * Revision 1.7  2001/06/13 17:33:59  warmerda
  * upgraded source headers
  *
  */
@@ -440,7 +443,7 @@ ecs_Result *dyn_SelectLayer(s,sel)
   }
 
 
-  lpriv->feature_rows = query_table(lpriv->expression,lpriv->featureTable);
+  lpriv->feature_rows = query_table2(lpriv->expression,lpriv->featureTable);
 
   /* process result */
 

@@ -14,7 +14,7 @@
 TOBEGEN	= vrf
 TARGETGEN=$(DYNAGEN)
 
-SOURCES = vrf.c utils.c feature.c object.c open.c 
+SOURCES = vrf.c utils.c feature.c object.c open.c swq.c vrfswq.c
 
 INCLUDES = $(CURRENT_INCLUDE) $(GENERAL_INCLUDE) $(OGDI_INCLUDE) $(VPF_INCLUDE) $(PROJ_INCLUDE) $(GLUTIL_INCLUDE)
 CFLAGS 	= $(INCLUDES) $(COMMON_CFLAGS)
