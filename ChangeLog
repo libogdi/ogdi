@@ -1,3 +1,7 @@
+2001-06-25  Frank Warmerdam  <warmerdam@pobox.com>
+
+	* ogdi/driver/adrg/adrg.c:Made cleanup safer if verifyLocation() fails.
+
 2001-06-23  Frank Warmerdam  <warmerdam@pobox.com>
 
 	* NEWS: added file.
