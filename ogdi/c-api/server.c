@@ -325,6 +325,8 @@ ecs_Result *svr_DestroyServer(s)
     ecs_CleanUp(msg);
   }
 
+  if (s->url != NULL)
+    free (s->url);
   if (s->projection != NULL)
     free(s->projection);
   if (s->hostname != NULL)
