@@ -17,7 +17,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.8  2001-04-10 16:18:28  warmerda
+ * Revision 1.9  2001-04-19 05:04:12  warmerda
+ * fixed roundoff issues with computing nbfeature
+ *
+ * Revision 1.8  2001/04/10 16:18:28  warmerda
  * added ogdi_server_capabilities, and ogdi_capabilities support
  *
  * Revision 1.7  2001/04/10 14:29:43  warmerda
@@ -262,11 +265,14 @@ ecs_Result *dyn_SelectLayer(s,sel)
   }
 
   s->currentLayer = layer;
-  s->layer[layer].nbfeature = (int) ((s->currentRegion.north - s->currentRegion.south)/s->currentRegion.ns_res);
+  s->layer[layer].nbfeature = (int) 
+      ((s->currentRegion.north - s->currentRegion.south)
+       /s->currentRegion.ns_res + 0.5);
 
   ecs_SetGeoRegion(&(s->result),s->globalRegion.north, s->globalRegion.south, 
-		   s->globalRegion.east, s->globalRegion.west, s->globalRegion.ns_res, 
-		   s->globalRegion.ew_res);
+		   s->globalRegion.east, s->globalRegion.west, 
+                   s->globalRegion.ns_res, s->globalRegion.ew_res);
+
   ecs_SetSuccess(&(s->result));
   return &(s->result);
 }
@@ -372,7 +378,7 @@ ecs_Result *dyn_SelectRegion(s,gr)
 
   if (s->currentLayer != -1) {
     _rewindRasterLayer(s,&(s->layer[s->currentLayer]));
-    s->layer[s->currentLayer].nbfeature = (int) ((s->currentRegion.north - s->currentRegion.south)/s->currentRegion.ns_res);
+    s->layer[s->currentLayer].nbfeature = (int) ((s->currentRegion.north - s->currentRegion.south)/s->currentRegion.ns_res + 0.5);
   }
 
   ecs_SetSuccess(&(s->result));
