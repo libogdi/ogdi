@@ -76,6 +76,14 @@ CURRENT_DIR	= ./
 VPF_DIR		= $(topdir)/vpflib
 
 #
+#	The following can be internal or external depending on whether we
+#	want to use the built-in versions of these libraries.
+#
+EXPAT_SETTING	=	internal
+ZLIB_SETTING	=	internal
+PROJ_SETTING	=	internal
+
+#
 # Standard location of include files.
 #
 
