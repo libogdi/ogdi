@@ -17,7 +17,12 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.2  2001-04-09 15:04:34  warmerda
+ * Revision 1.3  2003-08-27 05:27:21  warmerda
+ * Modified ecs_SplitURL() so that calling with a NULL url indicates it
+ * should free the resources associated with the static regular expressions.
+ * This makes memory leak debugging with OGDI more convenient.
+ *
+ * Revision 1.2  2001/04/09 15:04:34  warmerda
  * applied new source headers
  *
  */
@@ -126,6 +131,17 @@ int ecs_SplitURL(url,machine,server,path)
   static int compiled = 0;
   static ecs_regexp *local,*remote;
   int msg;
+
+  if( url == NULL ) { /* Cleanup */
+      if( compiled ) {
+          compiled = 0;
+          free( local );
+          free( remote );
+          local = NULL;
+          remote = NULL;
+      }
+      return FALSE;
+  }
 
   if (!compiled) {
     remote = EcsRegComp("gltp://([0-9a-zA-Z\\.\\-]+)/([0-9a-zA-Z\\.]+)(.*)");
