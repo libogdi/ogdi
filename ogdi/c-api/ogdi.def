@@ -152,3 +152,9 @@ EXPORTS
 	ecs_TileClearBuffer
 	cln_BlockOGDI
 	cln_UnBlockOGDI
+	cln_GetVersion
+	cln_CheckExtension
+	cln_GetLayerCapabilities
+	cln_LoadCapabilities
+	ecs_GetRGBFromPixel
+	ecs_GetPixelFromRGB
