@@ -20,7 +20,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.11  2002-02-08 21:22:58  warmerda
+ * Revision 1.12  2002-02-21 15:54:17  warmerda
+ * fixed bug with declaration of dst
+ *
+ * Revision 1.11  2002/02/08 21:22:58  warmerda
  * fixed serious bug importing floating point fields of unknown precision
  *
  * Revision 1.10  2001/12/11 18:34:18  warmerda
@@ -757,7 +760,8 @@ static int RecomputeRegion( const char * output_projection,
 
 {
     ecs_Result *result;
-    projPJ      src, dst;
+    projPJ      src;
+    projPJ      dst;
     projUV      corners[4];
     ecs_Region  out_region;
     int         iCorner, src_xsize, src_ysize, max_dim;
