@@ -16,7 +16,11 @@ include $(TOPDIR)/config/common.mak
 #
 # Sub-directories that need to be built
 #
-subdirs	= zlib
+subdirs	= 
+
+ifeq ($(ZLIB_SETTING),internal)
+subdirs := zlib $(subdirs) 
+endif
 
 ifeq ($(TARGET),win32)
 subdirs += rpc_win32
