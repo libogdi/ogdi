@@ -1,5 +1,7 @@
 2003-12-15  Frank Warmerdam  <warmerdam@pobox.com>
 
+	* config/darwin.cfg: new configuration file for MacOS 10.3.
+
 	* vpflib/ coorgeom.c, vpfprim.c, vpftable.h, xvt.h:
 	Avoid use of obsolete values.h and malloc.h in order to compile
 	properly on MacOS 10.3.  Submitted by Greg Allen.
