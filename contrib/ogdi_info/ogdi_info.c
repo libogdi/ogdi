@@ -20,7 +20,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.3  2001-02-19 04:46:13  warmerda
+ * Revision 1.4  2001-04-09 16:06:53  warmerda
+ * added -no-proj support
+ *
+ * Revision 1.3  2001/02/19 04:46:13  warmerda
  * use projUV, not UV
  *
  * Revision 1.2  2000/11/23 19:10:36  warmerda
@@ -33,6 +36,7 @@
 
 static int	ClientID = -1;
 static int      bNoDict = FALSE;
+static int      bNoProj = FALSE;
 static int      nSampleFrequency = 1;
 
 /************************************************************************/
@@ -175,7 +179,7 @@ static int AccessURL( char * url, ecs_Region * region )
 
 {
     ecs_Result *result;
-    PJ	       *proj_defn;
+    PJ	       *proj_defn = NULL;
     projUV     proj_pnt;
 
 /* -------------------------------------------------------------------- */
@@ -205,7 +209,8 @@ static int AccessURL( char * url, ecs_Region * region )
     printf( "Projection = `%s'\n", ECSTEXT(result) );
 
 #ifndef _WINDOWS    
-    proj_defn = cln_ProjInit( ECSTEXT(result) );
+    if( !bNoProj )
+        proj_defn = cln_ProjInit( ECSTEXT(result) );
 #endif
     
 /* -------------------------------------------------------------------- */
@@ -546,6 +551,21 @@ static void DumpLayer( const char * options, ecs_Region * region,
 }
 
 /************************************************************************/
+/*                               Usage()                                */
+/************************************************************************/
+
+static void Usage()
+
+{
+    printf("Usage: ogdi_info [-no-dict] [-no-proj]\n"
+           "                 -u url -l layername -f family\n" );
+    printf("                 [-r north south east west] -dl \n" );
+    printf("                 [-cs easting northing] \n" );
+    printf("                 [-id object_id] [-sf sample_frequency] \n" );
+    exit( 1 );
+}
+
+/************************************************************************/
 /*                                main()                                */
 /************************************************************************/
 
@@ -558,15 +578,6 @@ int main( int argc, char ** argv )
     ecs_Result *result;
     int		i;
 
-    if( argc == 1 )
-    {
-        printf("Usage: ogdi_info [-no-dict] -u url -l layername -f family\n" );
-        printf("                 [-r north south east west] -dl \n" );
-        printf("                 [-cs easting northing] \n" );
-        printf("                 [-id object_id] [-sf sample_frequency] \n" );
-        exit( 1 );
-    }
-
 /* -------------------------------------------------------------------- */
 /*      Handle commandline arguments.                                   */
 /* -------------------------------------------------------------------- */
@@ -575,8 +586,18 @@ int main( int argc, char ** argv )
         if( strcmp(argv[i],"-dl") == 0 ) {
             DumpLayer( "", region, layer, featureType );
         }
+        else if( strcmp(argv[i], "-no-proj") == 0 ) {
+            bNoProj = TRUE;
+        }
+        else if( strcmp(argv[i], "-no-dict") == 0 ) {
+            bNoDict = TRUE;
+        }
+        else if( strcmp(argv[i], "-dict") == 0 ) {
+            DumpDict( argv[++i] );
+        }
         else if( i == argc - 1 ) {
             /* skip ... the rest require arguments.  */
+            Usage();
         }
         else if( strcmp(argv[i],"-u") == 0 ) {
             AccessURL( argv[++i], &reg );
@@ -587,12 +608,6 @@ int main( int argc, char ** argv )
         }
         else if( strcmp(argv[i], "-sf") == 0 ) {
             nSampleFrequency = atoi(argv[++i]);
-        }
-        else if( strcmp(argv[i], "-no-dict") == 0 ) {
-            bNoDict = TRUE;
-        }
-        else if( strcmp(argv[i], "-dict") == 0 ) {
-            DumpDict( argv[++i] );
         }
         else if( strcmp(argv[i], "-f") == 0 ) {
             if( strcmp(argv[i+1],"Point") == 0 )
@@ -627,6 +642,8 @@ int main( int argc, char ** argv )
             IdSearch( layer, featureType, argv[i+1] );
             i += 1;
         }
+        else
+            Usage();
     }
 
 /* -------------------------------------------------------------------- */
