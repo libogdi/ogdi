@@ -18,7 +18,11 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.4  2004-10-25 19:09:06  warmerda
+ * Revision 1.5  2004-10-25 21:24:43  warmerda
+ * Fixed case of 1 character wide fields as per Stephane's submission
+ * in bug 809737.
+ *
+ * Revision 1.4  2004/10/25 19:09:06  warmerda
  * Fixed so that string comparisons on fields long than 1 character
  * work.  Also fixed so that trailing spaces are trimmed off string
  * values before comparing.
@@ -85,24 +89,39 @@ int vrf_swq_evaluator( swq_field_op *op, void *raw_info )
     vpf_table_type  table = info->table;
 
 /* -------------------------------------------------------------------- */
-/*      String field comparison.   We trim the spaces from the field    */
-/*      contents.                                                       */
+/*      String field comparison.
 /* -------------------------------------------------------------------- */
     if( table.header[op->field_index].type == 'T' )
     {
         int	ret_result, i;
 
-        tptr = (char *)get_table_element( op->field_index, row, table,
-                                          NULL, &count );
-        for( i = strlen(tptr)-1; i >= 0 && tptr[i] == ' '; i-- )
-            tptr[i] = '\0';
+        /* count=1 is a special case because the value is returned into 
+           a char instead of returning an allocated string */
+	if (table.header[op->field_index].count == 1) {
+	  
+            char cval;
+            get_table_element( op->field_index, row, table, &cval, &count );
 
-        if( op->operation == SWQ_EQ )
-            ret_result = (strcasecmp(tptr,op->string_value) == 0);
-        else
-            ret_result = (strcasecmp(tptr,op->string_value) != 0);
+            if( op->operation == SWQ_EQ )
+                ret_result = (cval == op->string_value[0]);
+            else
+                ret_result = (cval != op->string_value[0]);
+
+	} else {
+            tptr = (char *)get_table_element( op->field_index, row, table,
+                                              NULL, &count );
+
+            /* trim whitepsace */
+            for( i = strlen(tptr)-1; i >= 0 && tptr[i] == ' '; i-- )
+                tptr[i] = '\0';
+
+            if( op->operation == SWQ_EQ )
+                ret_result = (strcasecmp(tptr,op->string_value) == 0);
+            else
+                ret_result = (strcasecmp(tptr,op->string_value) != 0);
             
-        xvt_free(tptr);
+            xvt_free(tptr);
+        }
 
         return ret_result;
     }
