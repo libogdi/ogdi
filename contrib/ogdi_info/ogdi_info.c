@@ -20,7 +20,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.4  2001-04-09 16:06:53  warmerda
+ * Revision 1.5  2001-04-10 14:41:47  warmerda
+ * Added support for reporting Image values.
+ *
+ * Revision 1.4  2001/04/09 16:06:53  warmerda
  * added -no-proj support
  *
  * Revision 1.3  2001/02/19 04:46:13  warmerda
@@ -78,7 +81,8 @@ const char * DecToDMS( double dfAngle )
 /*                          DumpRasterObject()                          */
 /************************************************************************/
 
-static void DumpRasterObject( ecs_Result * result, ecs_Family featureType )
+static void DumpRasterObject( ecs_Result * result, ecs_Family featureType,
+                              int nDataType )
 
 {
     int		i, xsize;
@@ -95,6 +99,24 @@ static void DumpRasterObject( ecs_Result * result, ecs_Family featureType )
         if( featureType == Matrix )
         {
             printf( "%d ", ECSRASTER(result)[i] );
+        }
+        else if( featureType == Image )
+        {
+            if( nDataType == 1 )
+                printf( "%d,%d,%d ", 
+                        ((unsigned char *) ECSRASTER(result))[i*3],
+                        ((unsigned char *) ECSRASTER(result))[i*3]+1,
+                        ((unsigned char *) ECSRASTER(result))[i*3]+2 );
+            else if( nDataType == 2 )
+                printf( "%d ", ((unsigned char *) ECSRASTER(result))[i] );
+            else if( nDataType == 3 )
+                printf( "%d ", ((unsigned short *) ECSRASTER(result))[i] );
+            else if( nDataType == 4 )
+                printf( "%d ", ((short *) ECSRASTER(result))[i] );
+            else if( nDataType == 5 )
+                printf( "%d ", ((int *) ECSRASTER(result))[i] );
+            else
+                printf( "?? " );
         }
     }
 
@@ -315,7 +337,7 @@ static void IdSearch( char * layer, ecs_Family featureType,
 
     if( featureType == Matrix || featureType == Image )
     {
-        DumpRasterObject( result, featureType );
+        DumpRasterObject( result, featureType, 5 );
     }
     else
     {
@@ -485,6 +507,7 @@ static void DumpLayer( const char * options, ecs_Region * region,
     if( featureType == Matrix || featureType == Image ) {
         int		i;
         int             nSampleCounter = 0;
+        int		nDataType = 5;
         
         printf( "RasterInfo:\n" );
 
@@ -498,6 +521,7 @@ static void DumpLayer( const char * options, ecs_Region * region,
         printf( "width = %d", ECSRASTERINFO(result).width );
         if( featureType == Image )
         {
+            nDataType = ECSRASTERINFO(result).width;
             if( ECSRASTERINFO(result).width == 1 )
                 printf( " (RGB)" );
             else if( ECSRASTERINFO(result).width == 2 )
@@ -533,7 +557,7 @@ static void DumpLayer( const char * options, ecs_Region * region,
 
             if( ++nSampleCounter >= nSampleFrequency )
             {
-                DumpRasterObject( result, featureType );
+                DumpRasterObject( result, featureType, nDataType );
                 nSampleCounter = 0;
             }
 
