@@ -1,8 +1,9 @@
-/*
- * object.c --
+/******************************************************************************
  *
- * Implementation of DTED Server getObject* functions
- *
+ * Component: OGDI DTED Driver
+ * Purpose: Implementation of DTED Server getObject* functions
+ * 
+ ******************************************************************************
  * Copyright (C) 1995 Logiciels et Applications Scientifiques (L.A.S.) Inc
  * Permission to use, copy, modify and distribute this software and
  * its documentation for any purpose and without fee is hereby granted,
@@ -13,10 +14,21 @@
  * without specific, written prior permission. L.A.S. Inc. makes no
  * representations about the suitability of this software for any purpose.
  * It is provided "as is" without express or implied warranty.
+ ******************************************************************************
+ *
+ * $Log$
+ * Revision 1.5  2001-04-10 14:29:43  warmerda
+ * Upgraded with changes from DND (hand applied to avoid losing bug fixes).
+ * Patch also includes change to exclude zero elevations when computing
+ * mincat/maxcat.
+ * New style headers also applied.
+ *
  */
 
 #include "ecs.h"
 #include "dted.h"
+
+ECS_CVSID("$Id$");
 
 /*
  *  --------------------------------------------------------------------------
@@ -54,6 +66,9 @@ void _getNextObjectRaster(s,l)
   if (!ecs_TileGetLine(s, &(spriv->t), &start, &end)) {
     ecs_SetError(&(s->result),1,"Unable to retrieve a line.");
     return;
+  }
+  if (l->sel.F == Image) {
+    s->result.res.ecs_ResultUnion_u.dob.geom.family = Image;    
   }
   
   l->index++;
@@ -210,6 +225,7 @@ int _getRawValue(ecs_Server *s, ecs_TileStructure *t, int xtile,
 int _calcPosValue(ecs_Server *s, ecs_TileStructure *t, int xtile,
 		  int ytile, int xpixel, int ypixel, int *cat ) {
   ServerPrivateData *spriv=s->priv;
+  LayerPrivateData *lpriv = (LayerPrivateData *)s->layer[s->currentLayer].priv;
   ecs_Region tile;
   double tile_width;
   double tile_height;
@@ -242,21 +258,23 @@ int _calcPosValue(ecs_Server *s, ecs_TileStructure *t, int xtile,
 
   _getRawValue(s,t,xtile,ytile,xpixel,ypixel,cat);
 
-  /* catch stragglers */
-  if (*cat < spriv->mincat) {
-    *cat = spriv->mincat;
-  }
-  if (*cat > spriv->maxcat) {
-    *cat=spriv->maxcat;
-  }
-  *cat = *cat - spriv->mincat;  /* ensure non-negative */
-
-  if (spriv->maxcat-spriv->mincat > 215) {
-    *cat = *cat * 215/(spriv->maxcat-spriv->mincat) +1;
-  }
-  if (*cat > 216) { 
-    *cat = 216;
-  }
+  if (lpriv->family == Matrix) {
+    /* catch stragglers */
+    if (*cat < spriv->mincat) {
+      *cat = spriv->mincat;
+    }
+    if (*cat > spriv->maxcat) {
+      *cat=spriv->maxcat;
+    }
+    *cat = *cat - spriv->mincat;  /* ensure non-negative */
+    
+    if (spriv->maxcat-spriv->mincat > 215) {
+      *cat = *cat * 215/(spriv->maxcat-spriv->mincat) +1;
+    }
+    if (*cat > 216) { 
+      *cat = 216;
+    }
+  } 
   return TRUE;
 }
 

@@ -1,8 +1,9 @@
-/*
- * dted.h --
+/******************************************************************************
  *
- * Data structure definition for DTED server
- *
+ * Component: OGDI DTED Driver
+ * Purpose: Structure and function declarations for DTED Driver.
+ * 
+ ******************************************************************************
  * Copyright (C) 1995 Logiciels et Applications Scientifiques (L.A.S.) Inc
  * Permission to use, copy, modify and distribute this software and
  * its documentation for any purpose and without fee is hereby granted,
@@ -13,6 +14,15 @@
  * without specific, written prior permission. L.A.S. Inc. makes no
  * representations about the suitability of this software for any purpose.
  * It is provided "as is" without express or implied warranty.
+ ******************************************************************************
+ *
+ * $Log$
+ * Revision 1.4  2001-04-10 14:29:43  warmerda
+ * Upgraded with changes from DND (hand applied to avoid losing bug fixes).
+ * Patch also includes change to exclude zero elevations when computing
+ * mincat/maxcat.
+ * New style headers also applied.
+ *
  */
 
 #include "ecs.h"
@@ -61,6 +71,7 @@ typedef struct {
 
   unsigned char *matrixbuffer; /* dted matrix itself */
   int isInRam;
+  ecs_Family family;
 
 } LayerPrivateData;
 

@@ -1,8 +1,9 @@
-/*
- * dted.c --
+/******************************************************************************
  *
- * Implementation of DTED Driver
- *
+ * Component: OGDI DTED Driver
+ * Purpose: External (dyn_*) entry points for DTED driver.
+ * 
+ ******************************************************************************
  * Copyright (C) 1995 Logiciels et Applications Scientifiques (L.A.S.) Inc
  * Permission to use, copy, modify and distribute this software and
  * its documentation for any purpose and without fee is hereby granted,
@@ -13,10 +14,21 @@
  * without specific, written prior permission. L.A.S. Inc. makes no
  * representations about the suitability of this software for any purpose.
  * It is provided "as is" without express or implied warranty.
+ ******************************************************************************
+ *
+ * $Log$
+ * Revision 1.7  2001-04-10 14:29:43  warmerda
+ * Upgraded with changes from DND (hand applied to avoid losing bug fixes).
+ * Patch also includes change to exclude zero elevations when computing
+ * mincat/maxcat.
+ * New style headers also applied.
+ *
  */
 
 #include "dted.h"
 #include "datadict.h"
+
+ECS_CVSID("$Id$");
 
 /* layer oriented functions are keeped in data structure to simplify code */
 
@@ -26,7 +38,7 @@ LayerMethod dted_layerMethod[11] = {
   /* Line */	{ NULL, NULL, NULL, NULL, NULL, NULL },
   /* Point */	{ NULL, NULL, NULL, NULL, NULL, NULL },
   /* Matrix */	{ NULL, NULL, _rewindRasterLayer, _getNextObjectRaster, _getObjectRaster, _getObjectIdRaster },
-  /* Image */	{ NULL, NULL, NULL, NULL, NULL, NULL },
+  /* Image */	{ NULL, NULL, _rewindRasterLayer, _getNextObjectRaster, _getObjectRaster, _getObjectIdRaster },
   /* Text */	{ NULL, NULL, NULL, NULL, NULL, NULL },
   /* Edge */	{ NULL, NULL, NULL, NULL, NULL, NULL },
   /* Face */	{ NULL, NULL, NULL, NULL, NULL, NULL },
@@ -196,7 +208,7 @@ ecs_Result *dyn_SelectLayer(s,sel)
   /*  char *dtedfilename; */
   ServerPrivateData *spriv = s->priv;
 
-  if (sel->F != Matrix) {
+  if (sel->F != Matrix && sel->F != Image) {
     ecs_SetError(&(s->result),1,"Invalid layer type");
     return &(s->result);
   }
@@ -238,6 +250,7 @@ ecs_Result *dyn_SelectLayer(s,sel)
   lpriv->ewdir = NULL;
   lpriv->nsfile = NULL;
   lpriv->matrixbuffer = NULL;
+  lpriv->family = sel->F;
 
   if (!_parse_request(s,sel->Select,&(lpriv->isInRam))) {
     _freelayerpriv(layer);
@@ -411,73 +424,80 @@ ecs_Result *dyn_GetNextObject(s)
 ecs_Result *dyn_GetRasterInfo(s)
      ecs_Server *s;
 {
-  int k;
-  int intensity;
-  char buffer[256];
-  LayerPrivateData *lpriv;
-  int limit1,limit2;
-  int max, min, range;
-  double m,b;
+    int k;
+    int intensity;
+    char buffer[256];
+    LayerPrivateData *lpriv;
+    int limit1,limit2;
+    int max, min, range;
+    double m,b;
 
-  ServerPrivateData *spriv = s->priv;
-  lpriv = (LayerPrivateData *) s->layer[s->currentLayer].priv;
+    ServerPrivateData *spriv = s->priv;
+    lpriv = (LayerPrivateData *) s->layer[s->currentLayer].priv;
 
-  /* rules for re-categorization:
-     1) if there are more than 216 categories, rescale to 1-216.
-     2) else recategorize to 1 to (maxcat-mincat) + 1.
-  */
+    if (lpriv->family == Matrix) {
+        /* rules for re-categorization:
+           1) if there are more than 216 categories, rescale to 1-216.
+           2) else recategorize to 1 to (maxcat-mincat) + 1.
+        */
 
-  range=spriv->maxcat-spriv->mincat;
-  min=1;
-  if (range<216) {
-    max=range+1;
-  } else {
-    max=216;
-  }
-  limit1 = (int) (((max - min) / 3.0) + min);
-  limit2 = (int) ((2*(max - min) / 3.0) + min);
+        range=spriv->maxcat-spriv->mincat;
+        min=1;
+        if (range<216) {
+            max=range+1;
+        } else {
+            max=216;
+        }
+        limit1 = (int) (((max - min) / 3.0) + min);
+        limit2 = (int) ((2*(max - min) / 3.0) + min);
 
-  /* Put table contain in RasterInfo here */
+        /* Put table contain in RasterInfo here */
 
-  ecs_SetRasterInfo(&(s->result),100, 100);
-  for (k=min;k<=max;k++) {
-    if (spriv->maxcat-spriv->mincat<216) {
-      sprintf(buffer, "%d", k+spriv->mincat);
+        ecs_SetRasterInfo(&(s->result),100, 100);
+        for (k=min;k<=max;k++) {
+            if (spriv->maxcat-spriv->mincat<216) {
+                sprintf(buffer, "%d", k+spriv->mincat);
+            } else {
+                sprintf(buffer,"%d",(k-1)*(spriv->maxcat-spriv->mincat)/215 + spriv->mincat);
+            }
+            m = 242.0 / (limit1 - min);
+
+            if (k < limit1) {
+                b = 255-m*limit1;
+                intensity = (int) (m*((double) k)+b);
+                if (intensity >= 255)
+                    intensity = 255;
+                if (intensity <= 13)
+                    intensity = 13;
+                ecs_AddRasterInfoCategory(&(s->result),k,0,0,intensity,buffer,0);
+            } else {
+                if (k > limit2) {
+                    b = 255-m*max;
+                    intensity = (int) (m*((double) k)+b);
+                    if (intensity >= 255)
+                        intensity = 255;
+                    if (intensity <= 13)
+                        intensity = 13;
+                    ecs_AddRasterInfoCategory(&(s->result),k,intensity,0,0,buffer,0);
+                } else {
+                    b = 255-m*limit2;
+                    intensity = (int) (m*((double) k)+b);
+                    if (intensity >= 255)
+                        intensity = 255;
+                    if (intensity <= 13)
+                        intensity = 13;
+                    ecs_AddRasterInfoCategory(&(s->result),k,0,intensity,0,buffer,0);
+                }
+            }
+        }
     } else {
-      sprintf(buffer,"%d",(k-1)*(spriv->maxcat-spriv->mincat)/215 + spriv->mincat);
+        ecs_SetRasterInfo(&(s->result),5,0);
+        ecs_AddRasterInfoCategory(&(s->result),1, 255, 255, 255,"No data",0);
+        s->result.res.ecs_ResultUnion_u.ri.mincat = spriv->mincat;
+        s->result.res.ecs_ResultUnion_u.ri.maxcat = spriv->maxcat;
     }
-    m = 242.0 / (limit1 - min);
-
-    if (k < limit1) {
-      b = 255-m*limit1;
-      intensity = (int) (m*((double) k)+b);
-      if (intensity >= 255)
-	intensity = 255;
-      if (intensity <= 13)
-	intensity = 13;
-      ecs_AddRasterInfoCategory(&(s->result),k,0,0,intensity,buffer,0);
-    } else {
-      if (k > limit2) {
-	b = 255-m*max;
-	intensity = (int) (m*((double) k)+b);
-	if (intensity >= 255)
-	  intensity = 255;
-	if (intensity <= 13)
-	  intensity = 13;
-	ecs_AddRasterInfoCategory(&(s->result),k,intensity,0,0,buffer,0);
-      } else {
-	b = 255-m*limit2;
-	intensity = (int) (m*((double) k)+b);
-	if (intensity >= 255)
-	  intensity = 255;
-	if (intensity <= 13)
-	  intensity = 13;
-	ecs_AddRasterInfoCategory(&(s->result),k,0,intensity,0,buffer,0);
-      }
-    }
-  }
-  ecs_SetSuccess(&(s->result));
-  return &(s->result);
+    ecs_SetSuccess(&(s->result));
+    return &(s->result);
 }
 
 
