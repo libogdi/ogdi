@@ -495,7 +495,8 @@ int _initRegionWithDefault(s)
 
   while (structure1 != NULL) {
     if (!((strcmp(structure1->d_name,".") == 0) || 
-	  (strcmp(structure1->d_name,"..") == 0))) {
+	  (strcmp(structure1->d_name,"..") == 0)||
+          (strcmp(structure1->d_name,"CVS") == 0))) {
 
       /* Extraction des donnees du repertoire structure1->d_name */
      
@@ -556,7 +557,8 @@ int _initRegionWithDefault(s)
       
       while (structure2 != NULL) {
 	if (!((strcmp(structure2->d_name,".") == 0) || 
-	      (strcmp(structure2->d_name,"..") == 0))) {
+              (strcmp(structure2->d_name,"..") == 0)||
+              (strcmp(structure2->d_name,"CVS") == 0))) {
 	  if (!EcsRegExec(regnum,structure2->d_name,NULL)) {
 	    sprintf(buffer,"Badly formed dted file name: %s. The number is incorrect",structure2->d_name);
 	    ecs_SetError(&(s->result),1,buffer);
@@ -669,13 +671,13 @@ int _readDMED (ecs_Server *s) {
 
   return TRUE;
 }
-#if 0
+
 int _readValuesFromDirList(ecs_Server *s) {
   char buffer[256];
   struct dirent *structure1;
   DIR *dirlist1;
   struct dirent *structure2;
-  DIR *dirlist2;
+  DIR *dirlist2 = NULL;
   static int compiled = 0;
   static ecs_regexp *reglet;
   static ecs_regexp *regnum;
@@ -702,280 +704,8 @@ int _readValuesFromDirList(ecs_Server *s) {
 
   while (structure1 != NULL) {
     if (!((strcmp(structure1->d_name,".") == 0) || 
-	  (strcmp(structure1->d_name,"..") == 0))) {
-
-      /* Extraction des donnees du repertoire structure1->d_name */
-
-      if (!EcsRegExec(regnum,structure1->d_name,NULL)) {
-	sprintf(buffer,"Badly formed dted directory name: %s. The number is incorrect",structure1->d_name);
-	ecs_SetError(&(s->result),1,buffer);
-	closedir(dirlist1);
-	closedir(dirlist2);
-	return 0;
-      }
-      if (!EcsRegExec(reglet,structure1->d_name,NULL)) {
-	sprintf(buffer,"Badly formed dted directory name: %s. No letters",structure1->d_name);
-	ecs_SetError(&(s->result),1,buffer);
-	closedir(dirlist1);
-	closedir(dirlist2);
-	return 0;
-      }
-
-      if (!ecs_GetRegex(regnum,0,&number)) {
-	ecs_SetError(&(s->result),1,"Not enough memory to allocate server");  
-	closedir(dirlist1);
-	closedir(dirlist2);
-	return 0;
-      }
-      if (!ecs_GetRegex(reglet,0,&letter)) {
-	ecs_SetError(&(s->result),1,"Not enough memory to allocate server");  
-	free(number);
-	closedir(dirlist1);
-	closedir(dirlist2);
-	return 0;
-      }
-
-      x = atoi(number);
-      if (x > 1000) {
-	x = x / 10000;
-      }
-      if ((letter[0] == 'w') || (letter[0] == 'W'))
-	x = -x;
-
-      if (first) {
-	s->globalRegion.west = (double) x;
-	s->globalRegion.east = (double) x;
-      } else {
-	if ((double) x > s->globalRegion.east) {
-	  if ((x - s->globalRegion.east) > increment_x)
-	    increment_x = x - s->globalRegion.east;
-	  s->globalRegion.east = (double) x;
-	}
-	if ((double) x < s->globalRegion.west) {
-	  if ((s->globalRegion.west - x) > increment_x)
-	    increment_x = s->globalRegion.west - x;
-	  s->globalRegion.west = (double) x;
-	}
-      }
-
-      free(number);
-      free(letter);
-
-
-      /* record the ewdirs */
-#if 0
-      printf("ewdir= %s\n", structure1->d_name);
-#endif
-      nb_ewdir++;
-      dirlist = (EWDir **) realloc (dirlist, sizeof(EWDir *)* nb_ewdir);
-      if (!dirlist) {
-	ecs_SetError(&(s->result),1,"Not enough memory to allocate server");  
-	return FALSE;
-      }
-      dirlist[nb_ewdir-1]= (EWDir *) malloc (sizeof(EWDir));
-
-      if (! dirlist[nb_ewdir-1]) {
-	ecs_SetError(&(s->result),1,"Not enough memory to allocate server");  
-	return FALSE;	
-      }
-      strcpy(dirlist[nb_ewdir-1]->name,structure1->d_name);
-      dirlist[nb_ewdir-1]->nb_files=0;
-      dirlist[nb_ewdir-1]->nsfile=NULL;
-
-      sprintf(buffer,"%s/%s",spriv->pathname,structure1->d_name);
-
-      /* parse the subdirectory */
-      dirlist2 = opendir(buffer);
-      structure2 = (struct dirent *) readdir(dirlist2);
-      
-      while (structure2 != NULL) {
-	if (!((strcmp(structure2->d_name,".") == 0) || 
-	      (strcmp(structure2->d_name,"..") == 0))) {
-	  if ((strncasecmp("dt", &(structure2->d_name[strlen(structure2->d_name)-4]),2)) == 0) {
-	    
-	    if (!EcsRegExec(regnum,structure2->d_name,NULL)) {
-	      sprintf(buffer,"Badly formed dted file name: %s. The number is incorrect",structure2->d_name);
-	      ecs_SetError(&(s->result),1,buffer);
-	      closedir(dirlist1);
-	      closedir(dirlist2);
-	      return 0;
-	    }
-	    if (!EcsRegExec(reglet,structure2->d_name,NULL)) {
-	      sprintf(buffer,"Badly formed dted file name: %s. No letters",structure2->d_name);
-	      ecs_SetError(&(s->result),1,buffer);
-	      closedir(dirlist1);
-	      closedir(dirlist2);
-	      return 0;
-	    }
-#if 0	  
-	    printf("nsdir= %s\n", structure2->d_name);
-#endif
-	    dirlist[nb_ewdir-1]->nsfile=(NSFile *) realloc (dirlist[nb_ewdir-1]->nsfile, (sizeof(NSFile) * (++dirlist[nb_ewdir-1]->nb_files)));
-	    if (!dirlist[nb_ewdir-1]->nsfile) {
-	      ecs_SetError(&(s->result),1,"Not enough memory to allocate server");  
-	      return FALSE;
-	    }
-	    
-	    strcpy(dirlist[nb_ewdir-1]->nsfile[dirlist[nb_ewdir-1]->nb_files-1].name,structure2->d_name);
-	    
-	    if (!ecs_GetRegex(regnum,0,&number)) {
-	      ecs_SetError(&(s->result),1,"Not enough memory to allocate server");  
-	      closedir(dirlist1);
-	      closedir(dirlist2);
-	      return 0;
-	    }
-	    if (!ecs_GetRegex(reglet,0,&letter)) {
-	      ecs_SetError(&(s->result),1,"Not enough memory to allocate server");  
-	      free(number);
-	      closedir(dirlist1);
-	      closedir(dirlist2);	    
-	      return 0;
-	    }
-	    y = atoi(number);
-	    if (y > 1000) {
-	      y = y / 10000;
-	    }
-	    if ((letter[0] == 's') || (letter[0] == 'S'))
-	      y = -y;
-	    
-	    dirlist[nb_ewdir-1]->nsfile[dirlist[nb_ewdir-1]->nb_files-1].coord=y;
-	    dirlist[nb_ewdir-1]->coord=x;
-	    
-	    
-	    free(number);
-	    free(letter);
-	    if (first) {
-	      s->globalRegion.north = (double) y;
-	      s->globalRegion.south = (double) y;
-	      first = FALSE;
-	    } else {
-	      if ((double) y > s->globalRegion.north) {
-		if ((y - s->globalRegion.north) > increment_y)
-		  increment_y = y - s->globalRegion.north;
-		s->globalRegion.north = (double) y;
-	      }
-	      if ((double) y < s->globalRegion.south) {
-		if ((s->globalRegion.south - y) > increment_y)
-		  increment_y = s->globalRegion.south - y;
-		s->globalRegion.south = (double) y;
-	      }
-	    }
-	  
-	    structure2 = (struct dirent *) readdir(dirlist2);
-	closedir(dirlist2);
-
-	  }
-	}
-
-      }
-    }
-
-    structure1 = (struct dirent *) readdir(dirlist1);
-  }
-  
-  closedir(dirlist1);
-
-  s->globalRegion.east += increment_x;
-  s->globalRegion.north += increment_y;
-  
-  /* these values are not used for anything, since the res is not constant */
-  s->globalRegion.ns_res = (s->globalRegion.north - s->globalRegion.south)/2000.0;
-  s->globalRegion.ew_res = (s->globalRegion.east - s->globalRegion.west)/2000.0;
-  
-  /* allocate the directory structure in spriv*/
-  
-  spriv->xtiles=(int) (s->globalRegion.east- s->globalRegion.west);
-  spriv->ytiles=(int) (s->globalRegion.north- s->globalRegion.south);
-#if 0  
-  printf("xtiles=%d, ytiles=%d", spriv->xtiles, spriv->ytiles);
-#endif  
-  spriv->ewdir=(EWDir *) (malloc (sizeof(EWDir) * spriv->xtiles));
-  if (spriv->ewdir == NULL) {
-    ecs_SetError(&(s->result),1,"Not enough memory to allocate server");  
-    return FALSE;
-  }
-  
-  for (i=0; i<(int) spriv->xtiles; i++) {
-    spriv->ewdir[i].nsfile=(NSFile *) malloc (sizeof(NSFile) * spriv->ytiles);
-    if (spriv->ewdir[i].nsfile == NULL) {
-      ecs_SetError(&(s->result),1,"Not enough memory to allocate server");  
-      return FALSE;
-    }
-    for (j=0; j< (int) spriv->ytiles; j++) {
-      spriv->ewdir[i].nsfile[j].used=0;
-      spriv->ewdir[i].nsfile[j].filehandle=NULL;
-    }
-  }
-  
-  
-  
-  /* sort the list of files we got into the 2d array of files */
-  for (x=0; x < nb_ewdir; x++) {
-    tile_x=(int) (dirlist[x]->coord - s->globalRegion.west);
-    for (y=0; y < dirlist[x]->nb_files; y++) {
-      /* there is a -1 because it is compared with the SW corner */
-      
-      tile_y=(int) (s->globalRegion.north - dirlist[x]->nsfile[y].coord -1 ); 
-      strcpy(spriv->ewdir[tile_x].nsfile[tile_y].name,dirlist[x]->nsfile[y].name);
-      spriv->ewdir[tile_x].nsfile[tile_y].used=1;
-      
-    }
-    strcpy(spriv->ewdir[tile_x].name,dirlist[x]->name);
-  }
-  
-  /* free the memory */
-  
-  for (y=0; y < nb_ewdir; y++) {
-    if (! dirlist[y]->nsfile)
-      free(dirlist[y]->nsfile);
-    free(dirlist[y]);
-  }
-  
-  if (!dirlist) 
-    free(dirlist);
-  
-  /* set the layer name based on the region */
-  
-  sprintf(buffer, "%s","DTED");
-  strcpy(spriv->layername, buffer);
-  
-  return 1;
-}
-#endif
-
-int _readValuesFromDirList(ecs_Server *s) {
-  char buffer[256];
-  struct dirent *structure1;
-  DIR *dirlist1;
-  struct dirent *structure2;
-  DIR *dirlist2;
-  static int compiled = 0;
-  static ecs_regexp *reglet;
-  static ecs_regexp *regnum;
-  int x,y, i,j, tile_x, tile_y;
-  char *letter;
-  char *number;
-  int first = TRUE;
-  ServerPrivateData *spriv = s->priv;
-  double increment_x = 1.0;
-  double increment_y = 1.0;
-  
-  EWDir ** dirlist = NULL;
-  int nb_ewdir=0;
-
-  if (!compiled) {
-    reglet = EcsRegComp("([A-Za-z])");
-    regnum = EcsRegComp("([0-9]+)");
-    compiled = 1;
-  }
-
-  dirlist1 = opendir(spriv->pathname);
-  structure1 = (struct dirent *) readdir(dirlist1);
-  ecs_SetText(&(s->result)," "); /* make sure an empty list is returned in all case */
-
-  while (structure1 != NULL) {
-    if (!((strcmp(structure1->d_name,".") == 0) || 
-	  (strcmp(structure1->d_name,"..") == 0))) {
+	  (strcmp(structure1->d_name,"..") == 0)||
+	  (strcmp(structure1->d_name,"CVS") == 0))) {
 
       /* Extraction des donnees du repertoire structure1->d_name */
      
@@ -983,28 +713,32 @@ int _readValuesFromDirList(ecs_Server *s) {
 	sprintf(buffer,"Badly formed dted directory name: %s. The number is incorrect",structure1->d_name);
 	ecs_SetError(&(s->result),1,buffer);
 	closedir(dirlist1);
-	closedir(dirlist2);
+        if( dirlist2 != NULL )
+            closedir(dirlist2);
 	return 0;
       }
       if (!EcsRegExec(reglet,structure1->d_name,NULL)) {
 	sprintf(buffer,"Badly formed dted directory name: %s. No letters",structure1->d_name);
 	ecs_SetError(&(s->result),1,buffer);
 	closedir(dirlist1);
-	closedir(dirlist2);
+        if( dirlist2 != NULL )
+            closedir(dirlist2);
 	return 0;
       }
 
       if (!ecs_GetRegex(regnum,0,&number)) {
 	ecs_SetError(&(s->result),1,"Not enough memory to allocate server");  
 	closedir(dirlist1);
-	closedir(dirlist2);
+        if( dirlist2 != NULL )
+            closedir(dirlist2);
 	return 0;
       }
       if (!ecs_GetRegex(reglet,0,&letter)) {
 	ecs_SetError(&(s->result),1,"Not enough memory to allocate server");  
 	free(number);
 	closedir(dirlist1);
-	closedir(dirlist2);
+        if( dirlist2 != NULL )
+            closedir(dirlist2);
 	return 0;
       }
 
@@ -1063,20 +797,23 @@ int _readValuesFromDirList(ecs_Server *s) {
       while (structure2 != NULL) {
 
 	if (!((strcmp(structure2->d_name,".") == 0) || 
-	      (strcmp(structure2->d_name,"..") == 0))) 
+	      (strcmp(structure2->d_name,"..") == 0)||
+	      (strcmp(structure2->d_name,"CVS") == 0))) 
 	  if ((strlen(structure2->d_name) > 4) && (strncasecmp("dt", &(structure2->d_name[strlen(structure2->d_name)-3]),2)) == 0) {
 	    if (!EcsRegExec(regnum,structure2->d_name,NULL)) {
 	      sprintf(buffer,"Badly formed dted file name: %s. The number is incorrect",structure2->d_name);
 	      ecs_SetError(&(s->result),1,buffer);
 	      closedir(dirlist1);
-	      closedir(dirlist2);
+              if( dirlist2 != NULL )
+                  closedir(dirlist2);
 	      return 0;
 	    }
 	    if (!EcsRegExec(reglet,structure2->d_name,NULL)) {
 	      sprintf(buffer,"Badly formed dted file name: %s. No letters",structure2->d_name);
 	      ecs_SetError(&(s->result),1,buffer);
 	      closedir(dirlist1);
-	      closedir(dirlist2);
+              if( dirlist2 != NULL )
+                  closedir(dirlist2);
 	      return 0;
 	    }
 #if 0	  
@@ -1092,14 +829,16 @@ int _readValuesFromDirList(ecs_Server *s) {
 	    if (!ecs_GetRegex(regnum,0,&number)) {
 	      ecs_SetError(&(s->result),1,"Not enough memory to allocate server");  
 	      closedir(dirlist1);
-	      closedir(dirlist2);
+              if( dirlist2 != NULL )
+                  closedir(dirlist2);
 	      return 0;
 	    }
 	    if (!ecs_GetRegex(reglet,0,&letter)) {
 	      ecs_SetError(&(s->result),1,"Not enough memory to allocate server");  
 	      free(number);
 	      closedir(dirlist1);
-	      closedir(dirlist2);	    
+              if( dirlist2 != NULL )
+                  closedir(dirlist2);	    
 	      return 0;
 	    }
 	    y = atoi(number);

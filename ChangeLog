@@ -1,5 +1,22 @@
 2000-11-22  Frank Warmerdam  <warmerdam@pobox.com>
 
+	* Fixed devdir/ogdi/drivers/dted/utils.c so that:
+	  - closedir() is not called on dirlist2 if it was never opened.
+	  - Removed a big chunk of #ifdef'ed out code. 
+	  - Ignore CVS directories.
+
+      http://sourceforge.net/bugs/?func=detailbug&bug_id=123178&group_id=11181
+
+	* Modify the ECSRESULTTYPE, ECSRESULT, ECSGEOMTYPE, ECSGEOM, 
+	ECSAREARING, ECSERROR, ECSSUCCESS, ECSEOF, ECSPROJ, ECSMESSAGE,
+	ECSREGION, ECSTEXT, ECSRASTERINFO, ECSRASTERINFONB, ECSRASTERINFOCAT,
+	ECSOBJECT, ECSOBJECTID, ECSOBJECTATTR, ECSRASTER, 
+	ECS_SETGEOMBOUNDINGBOX, ECS_SETGEOMLINECOORD, ECS_SETGEOMMATRIXVALUE,
+	and ECS_SETGEOMIMAGEVALUE macros so they "protect" complex arguments.
+	The ECS_SET* macros were converted to subscoped statements. 
+	
+      http://sourceforge.net/bugs/?func=detailbug&bug_id=122425&group_id=11181
+	
 	* Added test_suite tree including some test data to CVS repository.
 	Note, this from the root, not under devdir.
 
