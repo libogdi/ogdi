@@ -1,5 +1,19 @@
 2001-04-12  Frank Warmerdam  <warmerdam@pobox.com>
 
+	* ogdi/c-api: ecs_capabilities.c client.c
+	ogdi/include/ecs_util.h
+
+	Completed initial capabilities implemention in client.
+
+	* contrib/ogdi_info/ogdi_info.c: added capabilities and extension
+	dumping support.
+
+	* test_suite/scripts/dted, test_suite/scripts/vpf: added capture 
+	of capabilities documents.
+
+	* configure, configure.in, config/generic.mak.in: added the ability
+	to substitute for zlib using configure options.
+
 	* ogdi/c-api/ecs_capabilities.c: initial implementation of
 	_ecs_ParseCapabilities(), still incomplete.
 
