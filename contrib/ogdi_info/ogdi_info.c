@@ -20,7 +20,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.11  2001-12-14 21:22:02  warmerda
+ * Revision 1.12  2004-02-18 21:27:13  warmerda
+ * Use ecs_CleanUp() to recover result memory
+ *
+ * Revision 1.11  2001/12/14 21:22:02  warmerda
  * dont reproject to latlong if already latlong
  *
  * Revision 1.10  2001/08/17 00:37:15  warmerda
@@ -843,6 +846,7 @@ int main( int argc, char ** argv )
         result = cln_DestroyClient(ClientID);
         if( CheckError( result ) )
             return( FALSE );
+        ecs_CleanUp( result );
         ClientID = -1;
     }
 
