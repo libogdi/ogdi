@@ -1,3 +1,14 @@
+2001-03-22  Frank Warmerdam  <warmerdam@pobox.com>
+
+	* mkbindist.sh: frist attempt at binary distribution script.
+
+2001-03-11  Frank Warmerdam  <warmerdam@pobox.com>
+
+	* include/win32: removed heapagnt.h, shmalloc.h, smrtheap.h,
+	AVDEFS.H, PAN.H, TARGET.H, avtypes.h, pafs.h, edat.h, portable.h,
+	product.h, proto.h, status_d.h.  They were not used, and contained 
+	problematic licenses.
+
 2001-02-20  Frank Warmerdam  <warmerdam@pobox.com>
 
 	* proj/biveval.c: upgraded to code from PROJ.4.4.2 to avoid 
