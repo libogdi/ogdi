@@ -13,8 +13,10 @@
 # It is provided "as is" without express or implied warranty.
 #
 
+TARGETDIR=ogdi.sourceforge.net:ftp-ogdi/.
+
 if [ $# -lt 1 ] ; then
-  echo "Usage: mkogdidist version"
+  echo "Usage: mkogdidist version [-install]"
   echo
   echo "Example: mkogdidist 3.1alpha"
   exit
@@ -22,6 +24,7 @@ fi
 
 OGDI_VERSION=$1
 DIST_NAME=ogdi-$OGDI_VERSION
+
 
 rm -rf dist_wrk  
 mkdir dist_wrk
@@ -54,3 +57,7 @@ zip -r ../${DIST_NAME}.zip ${DIST_NAME}
 cd ..
 rm -rf dist_wrk
 
+if test "$2" = "-install" ; then
+  scp ${DIST_NAME}.tar.gz $TARGETDIR
+  scp ${DIST_NAME}.zip $TARGETDIR
+fi
