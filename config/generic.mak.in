@@ -71,6 +71,17 @@ PROJ_STATICLIB := @PROJ_LIB@
 endif
 
 #
+# Handle internal/external ZLIB library usage.
+#
+
+ZLIB_SETTING=@ZLIB_SETTING@
+
+ifeq ($(ZLIB_SETTING),external)
+ZLIB_INCLUDE :=	@ZLIB_INCLUDE@
+ZLIB_LINKLIB := @ZLIB_LIB@
+endif
+
+#
 # Handle internal/external/disabled "Expat" library handling.
 #
 
