@@ -17,7 +17,7 @@ include $(TOPDIR)/config/common.mak
 #
 subdirs	= external vpflib ogdi contrib
 
-ifeq ($(PROJ_SETTING),internal)
+ifneq ($(PROJ_SETTING),external)
 subdirs := proj $(subdirs) 
 endif
 
