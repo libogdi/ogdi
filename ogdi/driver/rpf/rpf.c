@@ -17,7 +17,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.6  2001-04-12 19:22:46  warmerda
+ * Revision 1.7  2001-04-16 21:32:05  warmerda
+ * added capabilities support
+ *
+ * Revision 1.6  2001/04/12 19:22:46  warmerda
  * applied DND support Image type support
  *
  */
@@ -830,47 +833,136 @@ ecs_Result *dyn_UpdateDictionary(s,info)
      ecs_Server *s;
      char *info;
 {
-  char buffer[50],result[50];
-  register ServerPrivateData *spriv = s->priv;
-  int i,j,k;
-  Toc_file *toc;
+    char buffer[50],result[50];
+    register ServerPrivateData *spriv = s->priv;
+    int i,j,k;
+    Toc_file *toc;
 
-  (void) info;
+    toc = spriv->toc;
 
-  ecs_SetText(&(s->result)," "); 
+    if( strcmp(info,"ogdi_server_capabilities") == 0 )
+    {
+        ecs_AddText(&(s->result),
+                    "<?xml version=\"1.0\" ?>\n"
+                    "<OGDI_Capabilities version=\"3.1\">\n"
+                    "</OGDI_Capabilities>\n" );
+        ecs_SetSuccess(&(s->result));
+    }
 
-  toc = spriv->toc;
+    else if( strcmp(info,"ogdi_capabilities") == 0 )
+    {
+        char		line[256];
 
-  for (i=0; i<(int)toc->num_boundaries; i++)
-  {
-     if (toc->entries[i].invalid_geographics == 1L)
-       continue;
+        ecs_AddText(&(s->result),
+                    "<?xml version=\"1.0\" ?>\n"
+                    "<OGDI_Capabilities version=\"3.1\">\n" );
+        ecs_AddText(&(s->result),
+                    "   <FeatureTypeList>\n"
+                    "      <Operations>\n"
+                    "         <Query/>\n"
+                    "      </Operations>\n" );
 
-     sprintf(buffer,"%s@%s@%s@%s@%d",toc->entries[i].scale,
-	     toc->entries[i].zone,toc->entries[i].type,
-	     toc->entries[i].producer,toc->entries[i].boundary_id);
+        for (i=0; i<(int)toc->num_boundaries; i++)
+        {
+            if (toc->entries[i].invalid_geographics == 1L)
+                continue;
+            
+            sprintf(buffer,"%s@%s@%s@%s@%d",toc->entries[i].scale,
+                    toc->entries[i].zone,toc->entries[i].type,
+                    toc->entries[i].producer,toc->entries[i].boundary_id);
 
-     /* Remove the spaces */
-     k = 0;
-     for(j=0;j<(int) strlen(buffer);j++) {
-       if (buffer[j] != ' ') {
-	 result[k] = buffer[j];
-	 k++;
-       }
-     }
-     result[k] = '\0';
+            /* Remove the spaces */
+            k = 0;
+            for(j=0;j<(int) strlen(buffer);j++) {
+                if (buffer[j] != ' ') {
+                    result[k] = buffer[j];
+                    k++;
+                }
+            }
+            result[k] = '\0';
      
-     if (!(ecs_AddText(&(s->result),result))) {
-       return &(s->result);
-     }
+            ecs_AddText(&(s->result),
+                        "      <FeatureType>\n" );
+            sprintf( line, "         <Name>%s</Name>\n", result );
+            ecs_AddText(&(s->result), line );
+
+            
+            
+            sprintf( line, "         <SRS>PROJ4:%s</SRS>\n", PROJ_LONGLAT );
+            ecs_AddText(&(s->result),line);
+
+            sprintf(line, 
+                    "         <LongLatBoundingBox minx=\"%.9f\"  miny=\"%.9f\"\n"
+                    "                             maxx=\"%.9f\"  maxy=\"%.9f\" />\n",
+                    s->globalRegion.west, s->globalRegion.south, 
+                    s->globalRegion.east, s->globalRegion.north );
+            
+            ecs_AddText(&(s->result),line);
+            
+            sprintf(line, 
+                    "         <SRSBoundingBox minx=\"%.9f\"  miny=\"%.9f\"\n"
+                    "                         maxx=\"%.9f\"  maxy=\"%.9f\"\n"
+                    "                         x_res=\"%.9f\" y_res=\"%.9f\" />\n",
+                    s->globalRegion.west, s->globalRegion.south, 
+                    s->globalRegion.east, s->globalRegion.north,
+                    s->globalRegion.ew_res, s->globalRegion.ns_res );
+            ecs_AddText(&(s->result),line);
+            
+            ecs_AddText(&(s->result),
+                        "         <Family>Matrix</Family>\n"
+                        "         <Family>Image</Family>\n"
+                        "      </FeatureType>\n" );
+        }
+
+        ecs_AddText(&(s->result),
+                    "   </FeatureTypeList>\n" 
+                    "</OGDI_Capabilities>\n" );
+        ecs_SetSuccess(&(s->result));
+    }
+    else if( strcmp(info,"") == 0 )
+    {
+        ecs_SetText(&(s->result)," "); 
+
+        for (i=0; i<(int)toc->num_boundaries; i++)
+        {
+            if (toc->entries[i].invalid_geographics == 1L)
+                continue;
+
+            sprintf(buffer,"%s@%s@%s@%s@%d",toc->entries[i].scale,
+                    toc->entries[i].zone,toc->entries[i].type,
+                    toc->entries[i].producer,toc->entries[i].boundary_id);
+
+            /* Remove the spaces */
+            k = 0;
+            for(j=0;j<(int) strlen(buffer);j++) {
+                if (buffer[j] != ' ') {
+                    result[k] = buffer[j];
+                    k++;
+                }
+            }
+            result[k] = '\0';
      
-     if (!(ecs_AddText(&(s->result)," "))) {
-       return &(s->result);
-     }
-  }
+            if (!(ecs_AddText(&(s->result),result))) {
+                return &(s->result);
+            }
+     
+            if (!(ecs_AddText(&(s->result)," "))) {
+                return &(s->result);
+            }
+        }
   
-  ecs_SetSuccess(&(s->result));
-  return &(s->result);
+        ecs_SetSuccess(&(s->result));
+    }
+    else
+    {
+        char emsg[129];
+
+        sprintf( emsg, "RPF driver UpdateDictionary(%s) unsupported.", info );
+      
+        ecs_SetError(&(s->result), 1, emsg );
+    }
+
+    return &(s->result);
 
 }
 
