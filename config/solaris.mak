@@ -52,7 +52,7 @@ RPC_LINKLIB	= -lrpcsvc -lnsl -lsocket
 # Endian definition, could be little or big
 #
 
-ENDIAN          = big
+BIG_ENDIAN          = 1
 
 
 

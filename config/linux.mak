@@ -59,7 +59,7 @@ RPC_LINKLIB	=	-ldl
 # Endian definition, could be little or big
 #
 
-ENDIAN          = little
+BIG_ENDIAN          = 0
 
 
 
