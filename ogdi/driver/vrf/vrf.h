@@ -17,7 +17,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.7  2001-08-16 20:40:34  warmerda
+ * Revision 1.8  2001-08-16 21:02:37  warmerda
+ * Removed MAXSEGS and MAXRINGS fixed limits
+ *
+ * Revision 1.7  2001/08/16 20:40:34  warmerda
  * applied VITD fixes - merge primitive lines into a feature
  *
  * Revision 1.6  2001/06/20 21:49:31  warmerda
@@ -314,10 +317,6 @@ typedef struct {
 /* VPF feature types used */
 
 #define MAGIC_VEC2_DATA 120000002L
-#define MAXRINGS  5000
-#define MAXSEGS   5000
-#define MAXCOORDS 5000
-
 
 
 typedef struct

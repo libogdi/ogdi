@@ -17,7 +17,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.7  2001-08-16 20:40:34  warmerda
+ * Revision 1.8  2001-08-16 21:02:37  warmerda
+ * Removed MAXSEGS and MAXRINGS fixed limits
+ *
+ * Revision 1.7  2001/08/16 20:40:34  warmerda
  * applied VITD fixes - merge primitive lines into a feature
  *
  * Revision 1.6  2001/06/21 20:30:15  warmerda
@@ -31,6 +34,7 @@
 
 #include "ecs.h"
 #include "vrf.h"
+#include <assert.h>
 
 ECS_CVSID("$Id$");
 
@@ -644,7 +648,7 @@ int vrf_get_area_feature (s, layer, prim_id)
   vpf_table_type facetable, ringtable, edgetable;
   AREA_FEATURE area;
   double x,y;
-  int firstlength;
+  int firstlength, max_rings;
     
   /* 
      -----------------------------------------------------------
@@ -667,7 +671,8 @@ int vrf_get_area_feature (s, layer, prim_id)
   /* 
      Allocate space to store addresses of all the ring structures 
      */
-  area.rings = (RING**)xvt_zmalloc (MAXRINGS * sizeof (RING*));
+  max_rings = 5;
+  area.rings = (RING**)xvt_zmalloc (max_rings * sizeof (RING*));
   if (area.rings == NULL) {
     ecs_SetError(&(s->result), 2, "No enough memory");
     return FALSE;
@@ -712,6 +717,13 @@ int vrf_get_area_feature (s, layer, prim_id)
     }
 
     if (ring_rec.face == prim_id) {
+      if( n == max_rings )
+      {
+          max_rings *= 2;
+          area.rings = (RING **) xvt_realloc(area.rings, 
+                                             sizeof(RING *) * max_rings);
+      }
+
       area.rings[n] = (RING*)xvt_zmalloc (sizeof (RING));
       if (area.rings[n] == NULL) {
 	for(i=0;i<n-1;i++) {
@@ -747,6 +759,7 @@ int vrf_get_area_feature (s, layer, prim_id)
     }
   }
   area.nr_rings = n;
+  assert( n <= max_rings );
   
   /* 
      Extract all coordinates from area and put them in a ecs_Area 
@@ -821,7 +834,7 @@ int vrf_get_ring_coords (s,ring, face_id, start_edge, edgetable)
   long maxsegs;
   char buffer[120];
 
-  maxsegs = MAXSEGS;
+  maxsegs = 5;
   proj = NOPROJ;
   
   edge_rec = read_edge (start_edge, edgetable, proj.inverse_proj);
@@ -924,6 +937,14 @@ int vrf_get_ring_coords (s,ring, face_id, start_edge, edgetable)
             eqlleft_edge = 0L;
 	  if (eqlface1 && edge_rec.id == eqlright_edge)
             eqlright_edge = 0L;
+
+          if( n == maxsegs )
+          {
+              maxsegs *= 2;
+              ring->segs = (SEGMENT**)
+                  xvt_realloc(ring->segs, maxsegs * sizeof (SEGMENT*));
+          }
+
 	  ring->segs[n] = (SEGMENT*)xvt_zmalloc (sizeof (SEGMENT));
 	  ring->segs[n]->nr_coords = edge_rec.npts;
 	  ring->segs[n]->id = n+1;
@@ -957,6 +978,7 @@ int vrf_get_ring_coords (s,ring, face_id, start_edge, edgetable)
 	} /* if (!done) */
     } /* while */              
   ring->nr_segs = n;
+  assert( ring->nr_segs <= maxsegs );
 
   /* Realloc the segs array to free unused memory */
   temp = (SEGMENT**)xvt_zmalloc (ring->nr_segs * sizeof (SEGMENT*));
