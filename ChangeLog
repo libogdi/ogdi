@@ -1,3 +1,11 @@
+2001-07-05  Frank Warmerdam  <warmerdam@pobox.com>
+
+	* ogdi/driver/vrf/utils.c: Fixed bug in vrf_GetMetadata() that resulted
+	in first layer of a class appearing twice in metadata.  See SourceForge
+	bug 111181 originally reported by R.K.Beck@t-online.de to the 
+	ogdi-dev list. 
+
+
 2001-06-29  Frank Warmerdam  <warmerdam@pobox.com>
 
 	* ogdi/driver/vrf/utils.c: Fixed unterminated string.
