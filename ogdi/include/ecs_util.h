@@ -19,7 +19,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.15  2003-01-29 15:46:45  warmerda
+ * Revision 1.16  2003-12-15 18:11:21  warmerda
+ * Updated version to 3.1.2.
+ *
+ * Revision 1.15  2003/01/29 15:46:45  warmerda
  * fixed spelling of length
  *
  * Revision 1.14  2002/12/18 14:31:47  warmerda
@@ -54,8 +57,8 @@
 #ifndef ECS_UTIL
 #define ECS_UTIL 1
 
-#define OGDI_VERSION     311
-#define OGDI_RELEASEDATE 20020328
+#define OGDI_VERSION     312
+#define OGDI_RELEASEDATE 20031215
 
 #include <stdio.h>
 #include <stdlib.h>
