@@ -18,7 +18,12 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.3  2001-06-26 00:57:34  warmerda
+ * Revision 1.4  2004-10-25 19:09:06  warmerda
+ * Fixed so that string comparisons on fields long than 1 character
+ * work.  Also fixed so that trailing spaces are trimmed off string
+ * values before comparing.
+ *
+ * Revision 1.3  2001/06/26 00:57:34  warmerda
  * fixed strcasecmp on WIN32
  *
  * Revision 1.2  2001/06/21 20:30:15  warmerda
@@ -79,15 +84,18 @@ int vrf_swq_evaluator( swq_field_op *op, void *raw_info )
     row_type	row = info->row;
     vpf_table_type  table = info->table;
 
-    if (table.header[op->field_index].count != 1) 
-        return FALSE;
-
+/* -------------------------------------------------------------------- */
+/*      String field comparison.   We trim the spaces from the field    */
+/*      contents.                                                       */
+/* -------------------------------------------------------------------- */
     if( table.header[op->field_index].type == 'T' )
     {
-        int	ret_result;
+        int	ret_result, i;
 
         tptr = (char *)get_table_element( op->field_index, row, table,
                                           NULL, &count );
+        for( i = strlen(tptr)-1; i >= 0 && tptr[i] == ' '; i-- )
+            tptr[i] = '\0';
 
         if( op->operation == SWQ_EQ )
             ret_result = (strcasecmp(tptr,op->string_value) == 0);
@@ -98,8 +106,15 @@ int vrf_swq_evaluator( swq_field_op *op, void *raw_info )
 
         return ret_result;
     }
+
+/* -------------------------------------------------------------------- */
+/*      Numeric field comparison.                                       */
+/* -------------------------------------------------------------------- */
     else
     {
+        if (table.header[op->field_index].count != 1)
+            return FALSE;
+
         if( table.header[op->field_index].type == 'S' )
         {
             get_table_element( op->field_index, row, table, &sval, &count );
@@ -231,6 +246,8 @@ set_type query_table2( char *expression, vpf_table_type table )
 
       if( swq_expr_evaluate( expr, vrf_swq_evaluator, (void *) &ev_info ) )
           set_insert( i, select_set );
+
+      free_row(ev_info.row, table);
    }
 
 /* -------------------------------------------------------------------- */
