@@ -1,3 +1,10 @@
+2000-11-21  Frank Warmerdam  <warmerda@cs46980-c>
+
+	* Added Ecs_tcl_Init() entry point in ecs_tcl.c.  This
+	appears to be needed for Tcl8.x dynamic loading on Unix.
+
+      http://sourceforge.net/bugs/?func=detailbug&bug_id=123077&group_id=11181
+
 2000-11-10  Frank Warmerdam  <warmerda@cs46980-c>
 
 	* Change Crown copyrigh back to LAS copyright, but with the same 

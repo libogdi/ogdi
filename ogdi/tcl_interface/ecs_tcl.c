@@ -156,6 +156,11 @@ Tcl_Interp *interp;		/* Interpreter to add extra commands */
   return TCL_OK;
 }
 
+int Ecs_tcl_Init(Tcl_Interp *interp )
+{
+    return Ecs_Init( interp );
+}
+
 /*
  *----------------------------------------------------------------------
  *
