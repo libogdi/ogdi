@@ -17,7 +17,13 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.7  2001-06-25 19:46:10  warmerda
+ * Revision 1.8  2003-08-27 04:50:01  warmerda
+ * Fixed _releaseAllLayers() to release the layers starting with the
+ * last till the first since it appears that ecs_FreeLayer() is unexpectedly
+ * reducing the layer count, and shuffling layers down in the ecs_Server
+ * layer list.   Found while investigating leaking described in bug 795612.
+ *
+ * Revision 1.7  2001/06/25 19:46:10  warmerda
  * Made cleanup safer if verifyLocation() fails.
  *
  * Revision 1.6  2001/06/23 14:06:31  warmerda
@@ -471,7 +477,7 @@ _releaseAllLayers(s)
 {
   int i;
 
-  for (i = 0; i < s->nblayer; ++i)
+  for (i = s->nblayer-1; i >= 0; i-- )
     dyn_ReleaseLayer(s,&(s->layer[i].sel));
 }
 
