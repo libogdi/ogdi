@@ -17,7 +17,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.8  2001-05-30 19:02:51  warmerda
+ * Revision 1.9  2001-06-13 17:17:40  warmerda
+ * fixed capabilities to match 6.2 spec
+ *
+ * Revision 1.8  2001/05/30 19:02:51  warmerda
  * return real per-layer bounds in capabilities
  *
  * Revision 1.7  2001/04/16 21:32:05  warmerda
@@ -899,17 +902,17 @@ ecs_Result *dyn_UpdateDictionary(s,info)
             ecs_AddText(&(s->result),line);
 
             sprintf(line, 
-                    "         <LongLatBoundingBox minx=\"%.9f\"  miny=\"%.9f\"\n"
-                    "                             maxx=\"%.9f\"  maxy=\"%.9f\" />\n",
+                    "         <LatLonBoundingBox minx=\"%.9f\"  miny=\"%.9f\"\n"
+                    "                            maxx=\"%.9f\"  maxy=\"%.9f\" />\n",
                     entry->nw_long, entry->se_lat, 
                     entry->se_long, entry->nw_lat );
             
             ecs_AddText(&(s->result),line);
             
             sprintf(line, 
-                    "         <SRSBoundingBox minx=\"%.9f\"  miny=\"%.9f\"\n"
-                    "                         maxx=\"%.9f\"  maxy=\"%.9f\"\n"
-                    "                         x_res=\"%.9f\" y_res=\"%.9f\" />\n",
+                    "         <BoundingBox minx=\"%.9f\" miny=\"%.9f\"\n"
+                    "                      maxx=\"%.9f\" maxy=\"%.9f\"\n"
+                    "                      resx=\"%.9f\" resy=\"%.9f\" />\n",
                     entry->nw_long, entry->se_lat, 
                     entry->se_long, entry->nw_lat,
                     entry->horiz_interval, entry->vert_interval );

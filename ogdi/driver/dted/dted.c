@@ -17,7 +17,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.9  2001-04-19 05:04:12  warmerda
+ * Revision 1.10  2001-06-13 17:17:40  warmerda
+ * fixed capabilities to match 6.2 spec
+ *
+ * Revision 1.9  2001/04/19 05:04:12  warmerda
  * fixed roundoff issues with computing nbfeature
  *
  * Revision 1.8  2001/04/10 16:18:28  warmerda
@@ -592,17 +595,17 @@ ecs_Result *dyn_UpdateDictionary(s,info)
       ecs_AddText(&(s->result),line);
 
       sprintf(line, 
-              "         <LongLatBoundingBox minx=\"%.9f\"  miny=\"%.9f\"\n"
-              "                             maxx=\"%.9f\"  maxy=\"%.9f\" />\n",
+              "         <LatLonBoundingBox minx=\"%.9f\"  miny=\"%.9f\"\n"
+              "                            maxx=\"%.9f\"  maxy=\"%.9f\" />\n",
               s->globalRegion.west, s->globalRegion.south, 
               s->globalRegion.east, s->globalRegion.north );
 
       ecs_AddText(&(s->result),line);
       
       sprintf(line, 
-              "         <SRSBoundingBox minx=\"%.9f\"  miny=\"%.9f\"\n"
-              "                         maxx=\"%.9f\"  maxy=\"%.9f\"\n"
-              "                         x_res=\"%.9f\" y_res=\"%.9f\" />\n",
+              "         <BoundingBox minx=\"%.9f\"  miny=\"%.9f\"\n"
+              "                      maxx=\"%.9f\"  maxy=\"%.9f\"\n"
+              "                      resx=\"%.9f\"  resy=\"%.9f\" />\n",
               s->globalRegion.west, s->globalRegion.south, 
               s->globalRegion.east, s->globalRegion.north,
               s->globalRegion.ew_res, s->globalRegion.ns_res );

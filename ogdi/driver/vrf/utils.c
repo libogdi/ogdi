@@ -1877,17 +1877,17 @@ static void  vrf_build_layer_capabilities( ecs_Server *s, const char *coverage,
     ecs_AddText(&(s->result), line);
 
     sprintf(line, 
-            "        <LongLatBoundingBox minx=\"%.9f\"  miny=\"%.9f\"\n"
-            "                            maxx=\"%.9f\"  maxy=\"%.9f\" />\n",
+            "        <LatLonBoundingBox minx=\"%.9f\"  miny=\"%.9f\"\n"
+            "                           maxx=\"%.9f\"  maxy=\"%.9f\" />\n",
             s->globalRegion.west, s->globalRegion.south, 
             s->globalRegion.east, s->globalRegion.north );
     
     ecs_AddText(&(s->result),line);
     
     sprintf(line, 
-            "        <SRSBoundingBox minx=\"%.9f\"  miny=\"%.9f\"\n"
-            "                        maxx=\"%.9f\"  maxy=\"%.9f\"\n"
-            "                        x_res=\"%.9f\" y_res=\"%.9f\" />\n",
+            "        <BoundingBox minx=\"%.9f\"  miny=\"%.9f\"\n"
+            "                     maxx=\"%.9f\"  maxy=\"%.9f\"\n"
+            "                     resx=\"%.9f\"  resy=\"%.9f\" />\n",
             s->globalRegion.west, s->globalRegion.south, 
             s->globalRegion.east, s->globalRegion.north,
             s->globalRegion.ew_res, s->globalRegion.ns_res );

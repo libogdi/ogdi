@@ -17,7 +17,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.2  2001-04-12 18:14:16  warmerda
+ * Revision 1.3  2001-06-13 17:17:40  warmerda
+ * fixed capabilities to match 6.2 spec
+ *
+ * Revision 1.2  2001/04/12 18:14:16  warmerda
  * added/finished capabilities support
  *
  * Revision 1.1  2001/04/12 05:30:31  warmerda
@@ -180,10 +183,10 @@ static void startElementHandler( void *cbData, const char *element,
     }
 
 /* -------------------------------------------------------------------- */
-/*      We can handle LatLongBoundingBox immediately since all the      */
+/*      We can handle LatLonBoundingBox immediately since all the       */
 /*      information is passed as attributes.                            */
 /* -------------------------------------------------------------------- */
-    else if( strcmp(element,"LongLatBoundingBox") == 0 
+    else if( strcmp(element,"LatLonBoundingBox") == 0 
              && pi->cur_layer != NULL )
     {
         int	minx_set = 0, maxx_set = 0, miny_set = 0, maxy_set = 0;
@@ -218,7 +221,7 @@ static void startElementHandler( void *cbData, const char *element,
 
         if( !minx_set || !maxx_set || !miny_set || !maxy_set )
         {
-            recordError( pi, "One of minx, miny, maxx, or maxy not set for LatLongBoundingBox." );
+            recordError( pi, "One of minx, miny, maxx, or maxy not set for LatLonBoundingBox." );
             return;
         }
         
@@ -226,10 +229,10 @@ static void startElementHandler( void *cbData, const char *element,
     }
 
 /* -------------------------------------------------------------------- */
-/*      We can handle SRSBoundingBox immediately since all the          */
+/*      We can handle BoundingBox immediately since all the             */
 /*      information is passed as attributes.                            */
 /* -------------------------------------------------------------------- */
-    else if( strcmp(element,"SRSBoundingBox") == 0 
+    else if( strcmp(element,"BoundingBox") == 0 
              && pi->cur_layer != NULL )
     {
         int	minx_set = 0, maxx_set = 0, miny_set = 0, maxy_set = 0;
@@ -257,12 +260,12 @@ static void startElementHandler( void *cbData, const char *element,
                 pi->cur_layer->srs_north = atof(attr[i+1]);
                 maxy_set = 1;
             }
-            else if( strcmp(attr[i],"y_res") == 0 )
+            else if( strcmp(attr[i],"resy") == 0 )
             {
                 pi->cur_layer->srs_nsres = atof(attr[i+1]);
                 y_res_set = 1;
             }
-            else if( strcmp(attr[i],"x_res") == 0 )
+            else if( strcmp(attr[i],"resx") == 0 )
             {
                 pi->cur_layer->srs_ewres = atof(attr[i+1]);
                 x_res_set = 1;
@@ -276,7 +279,7 @@ static void startElementHandler( void *cbData, const char *element,
         if( !minx_set || !maxx_set || !miny_set || !maxy_set 
             || !x_res_set || !y_res_set )
         {
-            recordError( pi, "One of x_res, y_res, minx, miny, maxx, or maxy not set for SRSBoundingBox" );
+            recordError( pi, "One of resx, resy, minx, miny, maxx, or maxy not set for BoundingBox" );
             return;
         }
     }
@@ -307,7 +310,7 @@ static void endElementHandler( void *cbData, const char *element )
         }
         else if( pi->cur_layer->srs_ewres == 0.0 )
         {
-            recordError( pi, "Didn't get valid SRSBoundingBox for layer %s.", 
+            recordError( pi, "Didn't get valid BoundingBox for layer %s.", 
                          pi->cur_layer->name );
         }
 
