@@ -17,7 +17,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.5  2001-04-10 14:29:43  warmerda
+ * Revision 1.6  2001-04-19 05:04:59  warmerda
+ * move pos_y to middle of row, add errors for unsupported funcs
+ *
+ * Revision 1.5  2001/04/10 14:29:43  warmerda
  * Upgraded with changes from DND (hand applied to avoid losing bug fixes).
  * Patch also includes change to exclude zero elevations when computing
  * mincat/maxcat.
@@ -54,7 +57,8 @@ void _getNextObjectRaster(s,l)
   }
 
   /* get geographic position of current region's matrix point l->index */
-  pos_y = s->currentRegion.north - l->index * s->currentRegion.ns_res;  
+  pos_y = s->currentRegion.north - (l->index+0.5) * s->currentRegion.ns_res;  
+
   /* get the corresponding point from the global region's matrix */
   record_y = (int) ((s->globalRegion.north-pos_y) / s->globalRegion.ns_res);
   
@@ -84,7 +88,8 @@ _getObjectRaster(s,l,id)
 {
   (void) l;
   (void) id;
-  ecs_SetSuccess(&(s->result));
+  ecs_SetError(&(s->result),1,
+               "GetObject(id) not supported for DTED.");
 }
 
 void 
@@ -96,7 +101,8 @@ _getObjectIdRaster(s,l,coord)
   (void) l;
   (void) coord;
 
-  ecs_SetSuccess(&(s->result));
+  ecs_SetError(&(s->result),1,
+               "GetObjectIdFromCoord() not supported for DTED.");
 }	
 
 void _rewindRasterLayer(s,l)
