@@ -1,3 +1,14 @@
+2001-09-17  Frank Warmerdam  <warmerdam@pobox.com>
+
+	* configure.in: don't add /usr/local/lib to LIBS by default.  It
+	makes it hard to avoid using stuff from /usr/local.
+
+============================================================================
+
+2001-09-17  Frank Warmerdam  <warmerdam@pobox.com>
+
+	* OGDI 3.0 Final Released	
+	
 2001-08-27  Frank Warmerdam  <warmerdam@pobox.com>
 
 	* OGDI 3.1Beta2 Issued.
