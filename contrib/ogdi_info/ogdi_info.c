@@ -20,7 +20,11 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.12  2004-02-18 21:27:13  warmerda
+ * Revision 1.13  2004-10-26 19:37:52  warmerda
+ * Close old clientid if multiple -u's met.
+ * Report errors on illegal family specifications.
+ *
+ * Revision 1.12  2004/02/18 21:27:13  warmerda
  * Use ecs_CleanUp() to recover result memory
  *
  * Revision 1.11  2001/12/14 21:22:02  warmerda
@@ -772,6 +776,13 @@ int main( int argc, char ** argv )
             DumpDict( argv[++i] );
         }
         else if( strcmp(argv[i],"-u") == 0 ) {
+            if( ClientID != -1 ) {
+                result = cln_DestroyClient(ClientID);
+                if( CheckError( result ) )
+                    return( FALSE );
+                ClientID = -1;
+            }
+
             AccessURL( argv[++i], &reg );
             region = &reg;
         }
@@ -794,6 +805,10 @@ int main( int argc, char ** argv )
                 featureType = Matrix;
             else if( strcmp(argv[i+1],"Image") == 0 )
                 featureType = Image;
+            else
+                fprintf( stderr, 
+                         "-f argument (%s) not recognised (case matters!)\n",
+                         argv[i] );
             i++;
         }
         else if( strcmp(argv[i], "-r") == 0 && i < argc - 4 ) {
