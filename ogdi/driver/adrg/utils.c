@@ -17,7 +17,11 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.5  2001-06-22 16:37:50  warmerda
+ * Revision 1.6  2003-08-27 05:00:06  warmerda
+ * Fixed problems with _read_adrg(), _read_overview() and _initRegionWithDefault
+ * so that the files are actually closed after use.  As per bug 795612.
+ *
+ * Revision 1.5  2001/06/22 16:37:50  warmerda
  * added Image support, upgraded headers
  *
  */
@@ -200,6 +204,7 @@ int _read_adrg(s,l)
 	lpriv->tilelist = (int *) malloc(sizeof(int)*lpriv->rowtiles*lpriv->coltiles);
 	if (lpriv->tilelist == NULL) {
 	  ecs_SetError(&(s->result),1,"Not enough memory");
+          fclose( fichier );
 	  return FALSE;
 	}
 	
@@ -217,6 +222,7 @@ int _read_adrg(s,l)
 	  }
 	}
 
+        fclose( fichier );
 	return TRUE;      
       }
     }
@@ -225,6 +231,7 @@ int _read_adrg(s,l)
   }
 
   ecs_SetError(&(s->result),1,"ADRG image not found");
+  fclose( fichier );
   return FALSE;
 }
 
@@ -351,6 +358,7 @@ int _read_overview(s)
 	lpriv->tilelist = (int *) malloc(sizeof(int)*lpriv->rowtiles*lpriv->coltiles);
 	if (lpriv->tilelist == NULL) {
 	  ecs_SetError(&(s->result),1,"Not enough memory");
+          fclose( fichier );
 	  return FALSE;
 	}
 	
@@ -371,6 +379,7 @@ int _read_overview(s)
 	/* Set the bounding rectangle of the matrix with the global region
 	   (no region set for the overview, only data convertion). */
 
+        fclose( fichier );
 	return TRUE;      
       }
     }
@@ -379,6 +388,8 @@ int _read_overview(s)
   }
 
   ecs_SetError(&(s->result),1,"ADRG overview not found");
+  fclose( fichier );
+
   return FALSE;
 }
 
@@ -536,6 +547,7 @@ int _initRegionWithDefault(s)
   s->globalRegion.ns_res = (s->globalRegion.north - s->globalRegion.south)/1000.0;
   s->globalRegion.ew_res = (s->globalRegion.east - s->globalRegion.west)/1000.0;
   
+  fclose( fichier );
   return 1;
 }
 
