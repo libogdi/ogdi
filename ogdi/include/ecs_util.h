@@ -19,7 +19,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.8  2001-04-12 18:15:25  warmerda
+ * Revision 1.9  2001-04-12 19:25:39  warmerda
+ * added RGB<->Pixel functions
+ *
+ * Revision 1.8  2001/04/12 18:15:25  warmerda
  * added/finished capabilities support
  *
  * Revision 1.7  2001/04/12 05:29:47  warmerda
@@ -1169,9 +1172,6 @@ ecs_Result *cln_LoadCapabilities( int ClientID, const char *arg, int err );
 void ecs_ParseCapabilities( ecs_Client *cln, const char *cap_doc, 
                             ecs_Result *result );
 
-#endif /* ECS_UTIL */
-
-
 /***********************************************************************/
 
 
@@ -1463,4 +1463,17 @@ int ecs_GetTileId _ANSI_ARGS_((ecs_Server *s, ecs_TileStructure *t, ecs_Coordina
 int ecs_GetTileIdFromPos _ANSI_ARGS_((ecs_Server *s, ecs_TileStructure *t, int x, int y, ecs_TileID *tile_id)); 
 int ecs_TileCompare _ANSI_ARGS_((ecs_TileID *id1, ecs_TileID *id2));
 int ecs_SetTile _ANSI_ARGS_((ecs_TileID *destination, ecs_TileID *source));
+
+/* RGB Image functions */
+
+void ecs_GetRGBFromPixel( unsigned int pixel, 
+                          unsigned char *transparent, 
+                          unsigned char *r, 
+                          unsigned char *g, 
+                          unsigned char *b );
+
+unsigned int ecs_GetPixelFromRGB( int trans, int r, int g, int b );
+
+#endif /* ECS_UTIL */
+
 

@@ -17,7 +17,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.4  2001-04-09 15:04:34  warmerda
+ * Revision 1.5  2001-04-12 19:25:27  warmerda
+ * added RGB<->Pixel functions
+ *
+ * Revision 1.4  2001/04/09 15:04:34  warmerda
  * applied new source headers
  *
  */
@@ -530,4 +533,71 @@ int ecs_IsPointInPolygon(npoints,poly,x,y)
 
   return FALSE;
 }
+
+/*
+   @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+   ecs_GetRGBFromPixel: Fetch RGB/t components from 32bit pixel value.
+
+   IN
+     unsigned int pixel: the source 32bit value.
+     unsigned char *t:   location to set with transparency flag (1=opaque)
+     unsigned char *r:   location to set with red component.
+     unsigned char *g:   location to set with green component.
+     unsigned char *b:   location to set with blue component.
+
+   OUT
+     
+   @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+   */
+
+void ecs_GetRGBFromPixel( unsigned int pixel, 
+                          unsigned char *transparent, 
+                          unsigned char *r, 
+                          unsigned char *g, 
+                          unsigned char *b )
+
+{
+    unsigned char	*byte_pixel = (unsigned char *) &pixel;
+
+    if( transparent != NULL )
+        *transparent = byte_pixel[3];
+    *r = byte_pixel[0];
+    *g = byte_pixel[1];
+    *b = byte_pixel[2];
+}
+
+/*
+   @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+   ecs_GetPixelFromRGB: Fetch 32bit pixel value from RGB components.
+
+   IN
+     int t:   transparency flag (1=opaque,0=transparent)
+     int r:   red component (0-255).
+     int g:   green component (0-255).
+     int b:   blue component (0-255).
+
+   OUT
+     32bit pixel value.
+     
+   @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+   */
+
+unsigned int ecs_GetPixelFromRGB( int t, int r, int g, int b )
+
+{
+    unsigned int        pixel;
+    unsigned char	*byte_pixel = (unsigned char *) &pixel;
+
+    byte_pixel[0] = r;
+    byte_pixel[1] = g;
+    byte_pixel[2] = b;
+    byte_pixel[3] = t;
+
+    return pixel;
+}
+
+                          
+
 
