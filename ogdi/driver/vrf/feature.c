@@ -17,7 +17,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.6  2001-06-21 20:30:15  warmerda
+ * Revision 1.7  2001-08-16 20:40:34  warmerda
+ * applied VITD fixes - merge primitive lines into a feature
+ *
+ * Revision 1.6  2001/06/21 20:30:15  warmerda
  * added ECS_CVSID
  *
  * Revision 1.5  2001/06/13 17:33:59  warmerda
@@ -36,6 +39,230 @@ vpf_projection_type NOPROJ = {DDS, 0.0, 0.0, 0.0, 0.0, 0, 0.0, 0.0,
 
 
 /*********************************************************************
+  vrf_merge_line_prim()
+
+  Local service routine for vrf_get_merged_line_feature, which applies
+  the algorithm to merge a single new line segment into an existing
+  aggregated line.
+
+  IN
+     ecs_Server *s: ecs_Server structure
+     ecs_Layer *layer: Layer information structure
+     int primCount,primList: Primitive ID list
+
+  OUT
+     return int: Error code. True if the function execute correctly,
+     false else.
+  
+  ********************************************************************/
+
+static int vrf_merge_line_prim( int *vertCount, double * vertX, double *vertY,
+                                ecs_Line * line )
+
+{
+    int		insertFlag = FALSE, reverseFlag = FALSE, i, insertStart;
+    int		line_vert = line->c.c_len;
+
+    /*
+      Figure out the end points that match, if any, so we know how to
+      organize
+      */
+    
+    if( vertX[0] == line->c.c_val[0].x
+        && vertY[0] == line->c.c_val[0].y )
+    {
+        insertFlag = TRUE;
+        reverseFlag = TRUE;
+    }
+    else if( vertX[*vertCount - 1] == line->c.c_val[0].x
+             && vertY[*vertCount - 1] == line->c.c_val[0].y )
+    {
+        /* append to end, no reverse */
+    }
+    else if( vertX[*vertCount - 1] == line->c.c_val[line_vert-1].x
+             && vertY[*vertCount - 1] == line->c.c_val[line_vert-1].y )
+    {
+        reverseFlag = TRUE;
+    }
+    else if( vertX[0] == line->c.c_val[line_vert-1].x
+             && vertY[0] == line->c.c_val[line_vert-1].y )
+    {
+        insertFlag = TRUE;
+    }
+    else
+    {
+        /* there is no coincident end points ... give up */
+        return FALSE;
+    }
+    
+    /*
+      If we are inserting the new primitive in front of the existing
+      vertices, then we will have to push the existing ones down ...
+      */
+
+    if( insertFlag )
+    {
+        for( i = *vertCount - 1; i >= 0; i-- )
+        {
+            vertX[i + line_vert - 1] = vertX[i];
+            vertY[i + line_vert - 1] = vertY[i];
+        }
+    }
+
+    /*
+      Insert the new primitives vertices
+      */
+
+    if( insertFlag )
+        insertStart = 0;
+    else
+        insertStart = *vertCount - 1;
+
+    for( i = 0; i < line_vert; i++ )
+    {
+        if( reverseFlag )
+        {
+            vertX[insertStart + i] = line->c.c_val[line_vert - i - 1].x;
+            vertY[insertStart + i] = line->c.c_val[line_vert - i - 1].y;
+        }
+        else
+        {
+            vertX[insertStart + i] = line->c.c_val[i].x;
+            vertY[insertStart + i] = line->c.c_val[i].y;
+        }
+    }
+
+    *vertCount += (line_vert - 1);
+    
+    return TRUE;
+}
+
+/*********************************************************************
+  vrf_get_merged_line_feature
+
+  Fill the ecs_Result with the merged coordinates of the passed primitive list.
+
+  IN
+     ecs_Server *s: ecs_Server structure
+     ecs_Layer *layer: Layer information structure
+     int primCount,primList: Primitive ID list
+
+  OUT
+     return int: Error code. True if the function execute correctly,
+     false else.
+  
+  ********************************************************************/
+
+int vrf_get_merged_line_feature (s, layer, primCount, primList)
+     ecs_Server *s;
+     ecs_Layer *layer;
+     int primCount;
+     int32 *primList;
+{
+    int		iPrim;
+    ecs_Result	*primResults;
+    double      *vertX, *vertY;
+    int		vertCount, maxVertCount, i, *primConsumed, work_done;
+    int		primsRemaining;
+    ecs_Line	*line;
+
+    /*
+      simple case, no merging of primitives.
+      */
+    
+    if( primCount == 1 )
+    {
+        return vrf_get_line_feature( s, layer, primList[0],
+                                     &(s->result) );
+    }
+
+    /*
+      Collect geometry for each of the primitives.
+      */
+    primResults = (ecs_Result *) calloc(sizeof(ecs_Result),primCount);
+    maxVertCount = 0;
+    
+    for( iPrim = 0; iPrim < primCount; iPrim++ )
+    {
+        if( !vrf_get_line_feature( s, layer, primList[iPrim],
+                                   primResults+iPrim ) )
+            return FALSE; /* is it worth cleaning up? */
+
+        maxVertCount += ECSGEOM((primResults+iPrim)).line.c.c_len;
+    }
+
+    /*
+     * Initialize our aggregate feature with the first primitive.
+     */
+    
+    vertX = (double *) malloc(sizeof(double) * maxVertCount);
+    vertY = (double *) malloc(sizeof(double) * maxVertCount);
+    primConsumed = (int *) calloc(sizeof(int),primCount);
+
+    line = &(ECSGEOM((primResults+0)).line);
+    vertCount = line->c.c_len;
+    for( i = 0; i < (int) line->c.c_len; i++ )
+    {
+        vertX[i] = line->c.c_val[i].x;
+        vertY[i] = line->c.c_val[i].y;
+    }
+
+    /*
+     * Merge in new features one at a time.  If we make a pass through all
+     * the unmerged features without being able to merge another one
+     * at either end we give up, abandoning any remaining primitives.
+     */
+
+    primsRemaining = primCount - 1;
+    work_done = TRUE;
+    while( work_done && primsRemaining > 0 )
+    {
+        work_done = FALSE;
+        
+        for( iPrim = 1; iPrim < primCount; iPrim++ )
+        {
+            line = &(ECSGEOM((primResults+iPrim)).line);
+
+            if( primConsumed[iPrim] )
+                continue;
+
+            if( vrf_merge_line_prim( &vertCount, vertX, vertY, line ) )
+            {
+                work_done = TRUE;
+                primConsumed[iPrim] = TRUE;
+                primsRemaining--;
+            }
+        }
+    }
+
+    /*
+      Build returned line structure.
+      */
+    if (!ecs_SetGeomLine(&(s->result), vertCount))
+        return FALSE; 
+    
+    for( i = 0; i < vertCount; i++ )
+    {
+        ECS_SETGEOMLINECOORD((&(s->result)), i, vertX[i], vertY[i]);
+    }
+    
+    /*
+      Cleanup datastructures.
+      */
+
+    free( vertX );
+    free( vertY );
+    free( primConsumed );
+
+    for( iPrim = 0; iPrim < primCount; iPrim++ )
+        ecs_CleanUp( primResults + iPrim );
+
+    free( primResults );
+
+    return TRUE;
+}
+
+/*********************************************************************
   vrf_get_line_feature
 
   Fill the ecs_Result with the vrf information directly extract
@@ -52,10 +279,11 @@ vpf_projection_type NOPROJ = {DDS, 0.0, 0.0, 0.0, 0.0, 0, 0.0, 0.0,
   
   ********************************************************************/
 
-int vrf_get_line_feature (s, layer, prim_id)
+int vrf_get_line_feature (s, layer, prim_id, result)
      ecs_Server *s;
      ecs_Layer *layer;
      int prim_id;
+     ecs_Result *result;
 {
   int32 pos, count;
   row_type row;
@@ -88,7 +316,7 @@ int vrf_get_line_feature (s, layer, prim_id)
 
   row = read_row (prim_id, lpriv->l.line.edgeTable);
   if (row == NULL) {
-    ecs_SetError(&(s->result), 1,"Unable to extract the edge");
+    ecs_SetError(result, 1,"Unable to extract the edge");
     return FALSE;
   }
   pos = table_pos ("COORDINATES", lpriv->l.line.edgeTable);
@@ -116,7 +344,7 @@ int vrf_get_line_feature (s, layer, prim_id)
     ptr4 = get_table_element (pos, row, lpriv->l.line.edgeTable, NULL, &count);
     break;
   default:
-    ecs_SetError(&(s->result), 2, "Undefined VRF table type");
+    ecs_SetError(result, 2, "Undefined VRF table type");
   }
 
   free_row(row,lpriv->l.line.edgeTable);
@@ -129,7 +357,7 @@ int vrf_get_line_feature (s, layer, prim_id)
      -----------------------------------------------------------
      */
 
-  if (!ecs_SetGeomLine(&(s->result), count))
+  if (!ecs_SetGeomLine(result, count))
     return FALSE; 
 
   /* 
@@ -144,10 +372,10 @@ int vrf_get_line_feature (s, layer, prim_id)
   case 'C': 
     {
       if ((count == 1) && (ptr1 == (coordinate_type*)NULL)) {
-	ecs_SetError(&(s->result), 2, "Only one coordinate found for a line");
+	ecs_SetError(result, 2, "Only one coordinate found for a line");
       } else {
 	for (i=0; i<count; i++) {
-         ECS_SETGEOMLINECOORD((&(s->result)),i,
+         ECS_SETGEOMLINECOORD((result),i,
 			       ((double) ptr1[i].x),
 			       ((double) ptr1[i].y))
 	}
@@ -159,10 +387,10 @@ int vrf_get_line_feature (s, layer, prim_id)
   case 'Z':
     {
       if ((count == 1) && (ptr2 == (tri_coordinate_type*)NULL)) {
-	ecs_SetError(&(s->result), 2, "Only one coordinate found for a line");
+	ecs_SetError(result, 2, "Only one coordinate found for a line");
       } else {
 	for (i=0; i<count; i++) {
-	  ECS_SETGEOMLINECOORD((&(s->result)),i,((double) ptr2[i].x),((double) ptr2[i].y))
+	  ECS_SETGEOMLINECOORD((result),i,((double) ptr2[i].x),((double) ptr2[i].y))
 	}
 	if (ptr2)
 	  xvt_free ((char*)ptr2);
@@ -172,10 +400,10 @@ int vrf_get_line_feature (s, layer, prim_id)
   case 'B':
     {
       if ((count == 1) && (ptr3 == (double_coordinate_type*)NULL)) {
-	ecs_SetError(&(s->result), 2, "Only one coordinate found for a line");
+	ecs_SetError(result, 2, "Only one coordinate found for a line");
       } else {
 	for (i=0; i<count; i++) {
-	  ECS_SETGEOMLINECOORD((&(s->result)),i,((double) ptr3[i].x),((double) ptr3[i].y))
+	  ECS_SETGEOMLINECOORD((result),i,((double) ptr3[i].x),((double) ptr3[i].y))
 	}
       }
       if (ptr3)
@@ -185,10 +413,10 @@ int vrf_get_line_feature (s, layer, prim_id)
   case 'Y':
     {
       if ((count == 1) && (ptr4 == (double_tri_coordinate_type*)NULL)) {
-	ecs_SetError(&(s->result), 2, "Only one coordinate found for a line");
+	ecs_SetError(result, 2, "Only one coordinate found for a line");
       } else {
 	for (i=0; i<count; i++) {
-	  ECS_SETGEOMLINECOORD((&(s->result)),i,((double) ptr4[i].x),((double) ptr4[i].y))
+	  ECS_SETGEOMLINECOORD((result),i,((double) ptr4[i].x),((double) ptr4[i].y))
 	}
       }
       if (ptr4)
@@ -249,6 +477,58 @@ int vrf_get_line_mbr (layer, prim_id, xmin, ymin, xmax, ymax)
   free_row(row,lpriv->l.line.mbrTable);
 
   return TRUE;
+}
+
+/*********************************************************************
+  vrf_get_lines_mbr
+
+  Get the related mbr of a list of primitive lines
+
+  IN
+     ecs_Layer *layer: Layer information structure
+     int primCount: primitive count
+     int primList: list of Primitive IDs
+
+  OUT
+     return int: Error code. True if the function execute correctly,
+     false else.
+     double *xmin, *xmax, *ymin, *ymax: Returned bounding box
+  
+  ********************************************************************/
+
+int vrf_get_lines_mbr (layer, primCount, primList, xmin, ymin, xmax, ymax)
+     ecs_Layer *layer;
+     int32 primCount;
+     int32 *primList;
+     double *xmin;
+     double *ymin;
+     double *xmax;
+     double *ymax;
+{
+    int		i;
+
+    if( !vrf_get_line_mbr( layer, primList[0], xmin, ymin, xmax, ymax ) )
+        return FALSE;
+
+    for( i = 1; i < primCount; i++ )
+    {
+        double	x2min, x2max, y2min, y2max;
+
+        if( !vrf_get_line_mbr( layer, primList[i],
+                               &x2min, &y2min, &x2max, &y2max ) )
+            return FALSE;
+
+        if( x2min < *xmin )
+            *xmin = x2min;
+        if( y2min < *ymin )
+            *ymin = y2min;
+        if( x2max > *xmax )
+            *xmax = x2max;
+        if( y2max > *ymax )
+            *ymax = y2max;
+    }
+
+    return TRUE;
 }
 
 /*********************************************************************

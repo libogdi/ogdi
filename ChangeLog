@@ -1,6 +1,12 @@
 2001-08-16  Frank Warmerdam  <warmerdam@pobox.com>
 
-	* ogdi/ogdi/driver/vrf/utils.c: partially rewrite 
+	* ogdi/driver/vrf: vrf.c, vrf.h, object.c, feature.c:
+	added support for merging line features based on the relationship
+	implied by the join table (relating a set of primitive geometries
+	with one feature).  This patch was submitted by Frank Warmerdam in
+	1999.  See bug 222422.
+
+	* ogdi/driver/vrf/utils.c: partially rewrite 
 	vrf_build_coverage_capabilities() to avoid repeating entries and
 	to get rid of temp. 
 

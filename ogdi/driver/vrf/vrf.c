@@ -17,7 +17,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.10  2001-06-29 19:16:30  warmerda
+ * Revision 1.11  2001-08-16 20:40:34  warmerda
+ * applied VITD fixes - merge primitive lines into a feature
+ *
+ * Revision 1.10  2001/06/29 19:16:30  warmerda
  * fixed memory leak if FCS not found
  *
  * Revision 1.9  2001/06/21 20:30:15  warmerda
@@ -433,13 +436,20 @@ ecs_Result *dyn_SelectLayer(s,sel)
       }
 
       /*
-	Check if Tile_ID is defined in the join table, if not, it's an attribute join 
+	Check if Tile_ID is defined in the join table for tiled datasets, if
+        not, it's an attribute join.
+
+        There is no apparent way of identifying whether this is an
+        attribute join or not for non-tiled datasets such as VITD which don't
+        have TILE_ID, but do have feature joins so we assume in this case that
+        it is a feature join.
 	*/
 #ifdef TESTOPENTABLE
       printf("close lpriv->joinTable:%s\n");
 #endif
 
-      if (table_pos("TILE_ID",lpriv->joinTable) == -1) {
+      if (table_pos("TILE_ID",lpriv->joinTable) == -1
+          && lpriv->isTiled ) {
 	vpf_close_table(&(lpriv->joinTable));
 	free(lpriv->joinTableName);
 	lpriv->joinTableName = NULL;
@@ -460,14 +470,22 @@ ecs_Result *dyn_SelectLayer(s,sel)
 
   s->currentLayer = layer;
   s->layer[layer].index = 0;
-  if (lpriv->joinTableName != NULL)
+
+  lpriv->mergeFeatures = FALSE;
+#ifdef VRF_LINE_JOIN_HACK
+  if( s->layer[layer].sel.F == Line && lpriv->joinTableName != NULL )
+      lpriv->mergeFeatures = TRUE;
+#endif  
+
+  if (lpriv->joinTableName != NULL && !lpriv->mergeFeatures)
     s->layer[layer].nbfeature = lpriv->joinTable.nrows;
   else
     s->layer[layer].nbfeature = lpriv->featureTable.nrows;
   lpriv->current_tileid = -1;
 
   lpriv->index = (VRFIndex *) malloc(sizeof(VRFIndex) * (s->layer[layer].nbfeature+1));
-  for (i=0; i < (s->layer[layer].nbfeature+1); ++i) {
+
+  for (i=0; i < s->layer[layer].nbfeature+1; ++i) {
     lpriv->index[i].prim_id = -1;
   }
 

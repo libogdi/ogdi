@@ -17,7 +17,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.6  2001-06-20 21:49:31  warmerda
+ * Revision 1.7  2001-08-16 20:40:34  warmerda
+ * applied VITD fixes - merge primitive lines into a feature
+ *
+ * Revision 1.6  2001/06/20 21:49:31  warmerda
  * added improved query support (swq)
  *
  * Revision 1.5  2001/06/13 17:33:59  warmerda
@@ -88,6 +91,15 @@
 #include "strfunc.h"
 
 
+
+/* ----------------------------------------
+ * Define VRF_LINE_JOIN_HACK to enable
+ * merging of line features based on the
+ * join table. 
+ * ----------------------------------------
+ */
+
+#define VRF_LINE_JOIN_HACK
 
 /* ----------------------------------------
  * Definition of VRF specific structures
@@ -245,6 +257,7 @@ typedef struct {
   char *joinTableFeatureIdName;
   char *primitiveTableName;
   int isTiled;		/* is this a tiled layer ? */ 
+  int mergeFeatures;    /* merge primitives into features based on join table*/
 
   union {			/* specifics to each feature type */
 
@@ -362,10 +375,17 @@ int vrf_build_capabilities( ecs_Server *s, const char *request );
 
 int  vrf_get_xy _ANSI_ARGS_((vpf_table_type table, row_type row,int32 pos, double *x,double *y));
 int  vrf_get_point_feature _ANSI_ARGS_((ecs_Server *s,ecs_Layer *layer, int prim_id));
-int  vrf_get_line_feature _ANSI_ARGS_((ecs_Server *s,ecs_Layer *layer, int prim_id));
+int  vrf_get_line_feature _ANSI_ARGS_((ecs_Server *s,ecs_Layer *layer,
+                                       int prim_id, ecs_Result *result ));
+int  vrf_get_merged_line_feature _ANSI_ARGS_((ecs_Server *s,ecs_Layer *layer,
+                                              int primCount, int32 *primList));
 int  vrf_get_text_feature _ANSI_ARGS_((ecs_Server *s,ecs_Layer *layer, int prim_id));
 int  vrf_get_area_feature _ANSI_ARGS_((ecs_Server *s,ecs_Layer *layer, int prim_id));
 int  vrf_get_line_mbr _ANSI_ARGS_((ecs_Layer *layer,int32 prim_id,double *xmin,double *ymin,double *xmax,double *ymax));
+int  vrf_get_lines_mbr _ANSI_ARGS_((ecs_Layer *layer,
+                                    int32 primCount, int32 *primList,
+                                    double *xmin,double *ymin,
+                                    double *xmax,double *ymax));
 int  vrf_get_area_mbr _ANSI_ARGS_((ecs_Layer *layer,int32 prim_id,double *xmin,double *ymin,double *xmax,double *ymax));
 int  vrf_get_ring_coords _ANSI_ARGS_((ecs_Server *s, RING *ring, int32 face_id, 
 				 int32 start_edge,vpf_table_type edgetable));
@@ -402,6 +422,11 @@ void		_rewindTextLayer _ANSI_ARGS_((ecs_Server *s,ecs_Layer *layer));
 void            _getTileAndPrimId _ANSI_ARGS_((ecs_Server *s,ecs_Layer *l,
 					       int32 object_id,int32 *feature_id,
 					       short *tile_id,int32 *prim_id));
+void            _getPrimList _ANSI_ARGS_((ecs_Server *s,ecs_Layer *l,
+                                          int32 object_id,
+                                          int32 *feature_id, short *tile_id,
+                                          int32 *primCount, int32 **primList,
+                                          int32 *next_object_id));
 
 void		_getNextObjectLine _ANSI_ARGS_((ecs_Server *s,ecs_Layer *layer));
 void		_getNextObjectArea _ANSI_ARGS_((ecs_Server *s,ecs_Layer *layer));

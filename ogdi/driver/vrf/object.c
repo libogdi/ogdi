@@ -17,7 +17,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.6  2001-06-21 20:30:15  warmerda
+ * Revision 1.7  2001-08-16 20:40:34  warmerda
+ * applied VITD fixes - merge primitive lines into a feature
+ *
+ * Revision 1.6  2001/06/21 20:30:15  warmerda
  * added ECS_CVSID
  *
  * Revision 1.5  2001/06/13 17:33:59  warmerda
@@ -168,7 +171,7 @@ _getTileAndPrimId(s,l,object_id,feature_id,tile_id,prim_id)
 
   if (lpriv->index[object_id].prim_id == -1) {
     if ((lpriv->joinTableName != NULL) && 
-	(table_pos("TILE_ID",lpriv->joinTable) != -1) &&
+	(*tile_id != -1 || (table_pos("TILE_ID",lpriv->joinTable) != -1)) &&
 	(table_pos(lpriv->featureTablePrimIdName,lpriv->joinTable) != -1)) {
       join_row = get_row(object_id+1, lpriv->joinTable);
       
@@ -236,6 +239,140 @@ _getTileAndPrimId(s,l,object_id,feature_id,tile_id,prim_id)
     *tile_id = lpriv->index[object_id].tile_id;
     *prim_id = lpriv->index[object_id].prim_id;
   }
+}
+
+/*
+ *  --------------------------------------------------------------------------
+ *  _getPrimList()
+ *   
+ *      Build list of primitives joined to the same feature.
+ *	This function assumes that all the primitives for a given feature
+ *      will occur together in the join table.  While this appears to be
+ *      true of test datasets, it might not be true in general.  Eventually
+ *      an efficient for relating a feature id with it's list of primitives
+ *      should be build, and maintained over the access to this join table
+ *      if this is to be safe.
+ *
+ *      Note the object_id passed to this function is supposed to be the
+ *      row number of the first primitive in the join table when using
+ *      join tables and merging features.  
+ *  --------------------------------------------------------------------------
+ */
+
+void _getPrimList( ecs_Server *s, 
+                   ecs_Layer *l, 
+                   int32 object_id,
+                   int32 *feature_id,
+                   short *tile_id,
+                   int32 *primCount,
+                   int32 **primList,
+                   int32 *next_index )
+
+{
+    LayerPrivateData *lpriv = (LayerPrivateData *) l->priv;
+    int32	edg_id;
+    int		maxCount = 0;
+
+    /*
+      Get the first primitive for this feature.
+      */
+    
+    _getTileAndPrimId(s,l,object_id,feature_id,tile_id,&edg_id);
+    object_id++;
+
+    /*
+      If we aren't operating in merged format, just return this primiitive
+      */
+    maxCount = 1;
+    *primCount = 1;
+    *primList = (int32 *) malloc(sizeof(int32) * maxCount);
+    (*primList)[0] = edg_id;
+
+    if( !lpriv->mergeFeatures )
+    {
+        *next_index = object_id;
+        return;
+    }
+    
+    /*
+      Collect all other primitives with the same line id.  Note we are
+      incrementing the global index value.
+      */
+
+    while( object_id < lpriv->joinTable.nrows )
+    {
+        int32	this_feature_id;
+        short	this_tile_id;
+        
+        _getTileAndPrimId(s,l,object_id,
+                          &this_feature_id,&this_tile_id,&edg_id);
+
+        if( this_feature_id != *feature_id )
+            break;
+
+        /*
+          This primitive matches our feature_id, add to the list.
+          */
+
+        if( *primCount == maxCount )
+        {
+            maxCount += 100;
+            *primList = (int32*) realloc(*primList, sizeof(int32) * maxCount);
+        }
+
+        (*primList)[*primCount] = edg_id;
+        (*primCount)++;
+        
+        object_id++;
+    }
+
+    *next_index = object_id;
+}
+
+/*
+ *  --------------------------------------------------------------------------
+ *  _getPrimListByFeatureId()
+ *   
+ *      Build list of primitives joined to the same feature based on the
+ *      feature id as a key.  This can be kind of slow since the join
+ *      table is scanned linearly. 
+ *  --------------------------------------------------------------------------
+ */
+
+static void
+_getPrimListByFeatureId( ecs_Server *s, 
+                         ecs_Layer *l, 
+                         int32 object_id, /* this should be feature id */
+                         short *tile_id,
+                         int32 *primCount,
+                         int32 **primList,
+                         int32 *next_index )
+
+{
+    register LayerPrivateData *lpriv = (LayerPrivateData *) l->priv;
+    int		edgeCount, edgeId;
+    
+    if( lpriv->mergeFeatures )
+        edgeCount = lpriv->joinTable.nrows;
+    else
+        edgeCount = l->nbfeature;
+
+    for( edgeId = 0; edgeId < edgeCount; edgeId++ )
+    {
+        int32	prim_id, this_feature_id;
+        
+        _getTileAndPrimId( s, l, edgeId, &this_feature_id, tile_id, &prim_id );
+
+        if( object_id == this_feature_id )
+        {
+            _getPrimList( s, l, edgeId, &this_feature_id, tile_id,
+                          primCount, primList, next_index );
+            return;
+        }
+    }
+
+    *primCount = 0;
+    *primList = NULL;
 }
 
 /*
@@ -607,13 +744,22 @@ _getNextObjectLine(s,l)
   register LayerPrivateData *lpriv = (LayerPrivateData *) l->priv;
   short tile_id;
   int32 line_id;
-  int32 edg_id;
   int found = 0;
   char *temp;
   double xmin, xmax, ymin, ymax;
+  int	edgeCount;
+  int32	*primList = NULL, primCount = 0;
 
-  while(!found && l->index < l->nbfeature) {
-    _getTileAndPrimId(s,l,l->index,&line_id,&tile_id, &edg_id);
+  if( lpriv->mergeFeatures )
+      edgeCount = lpriv->joinTable.nrows;
+  else
+      edgeCount = l->nbfeature;
+
+  while(!found && l->index < edgeCount) {
+
+    _getPrimList( s, l, l->index, &line_id, &tile_id, &primCount, &primList,
+                  (int32 *) &(l->index));
+    
     if (set_member(line_id,lpriv->feature_rows)) {      
       if (tile_id == -1) {
 	ecs_SetError(&(s->result), 1, "The VRF tiles are badly defined");
@@ -627,7 +773,7 @@ _getNextObjectLine(s,l)
       if (lpriv->isTiled == 0 || spriv->tile[tile_id-1].isSelected) {
 
 	_selectTileLine(s,l,tile_id);
-	if (!vrf_get_line_mbr(l,edg_id,&xmin,&ymin,&xmax,&ymax)) {
+	if (!vrf_get_lines_mbr(l,primCount,primList,&xmin,&ymin,&xmax,&ymax)) {
 	  ecs_SetError(&(s->result),1,"Unable to open mbr");
 	  return;
 	}
@@ -638,19 +784,24 @@ _getNextObjectLine(s,l)
 	} 
       }
     }
-    l->index++;
   }
 
   /* if a feature is found, get the feature info */
 
   if (found) {
-    if (!vrf_get_line_feature(s,l,edg_id)) 
-      return;
-    l->index++;
+    if( !vrf_get_merged_line_feature(s,l,primCount,primList) )
+    {
+        free( primList );
+        return;
+    }
+
   } else {
+    free( primList );
     ecs_SetError(&(s->result),2,"End of selection");
     return;
   }
+
+  free( primList );
 
   /* Add the identifier to the object */
 
@@ -683,20 +834,20 @@ _getObjectLine(s,l,id)
 
   register LayerPrivateData *lpriv = (LayerPrivateData *) l->priv;
   int object_id;
-  int32 line_id;
   short tile_id;
-  int32 edg_id;
   double xmin, xmax, ymin, ymax;
   char *temp;
+  int32 primCount, *primList, next_object;
 
   object_id = atoi(id);
 
-  if (object_id > l->nbfeature || object_id < 0) {
-    ecs_SetError(&(s->result),1,"Invalid line id");
+  _getPrimListByFeatureId( s, l, object_id, &tile_id,
+                           &primCount, &primList, &next_object );
+  if (primCount == 0) {
+    ecs_SetError(&(s->result), 1,
+                 "No primitives identified for this feature.");
     return;
   }
-
-  _getTileAndPrimId(s,l,object_id,&line_id,&tile_id, &edg_id);
   if (tile_id == -1) {
     ecs_SetError(&(s->result), 1, "The VRF tiles are badly defined");
     return;
@@ -708,23 +859,26 @@ _getObjectLine(s,l,id)
 	
   _selectTileLine(s,l,tile_id);
 
-  if (!vrf_get_line_feature(s,l,edg_id)) 
+  if (!vrf_get_merged_line_feature(s,l,primCount,primList))
     return;
 
   /* Add the identifier to the object */
 
   ecs_SetObjectId(&(s->result),id);
 
-  if (vrf_get_line_mbr(l,edg_id,&xmin,&ymin,&xmax,&ymax)) {
+  if (vrf_get_lines_mbr(l,primCount,primList,&xmin,&ymin,&xmax,&ymax)) {
     ECS_SETGEOMBOUNDINGBOX((&(s->result)),xmin,ymin,xmax,ymax);
   } else {
+    free( primList );
     ecs_SetError(&(s->result), 1, "VRF table mbr not open");
     return;
   }
 
+  free( primList );
+
   /* Add the attributes to the object */
 
-  temp =vrf_get_ObjAttributes(lpriv->featureTable, line_id);
+  temp =vrf_get_ObjAttributes(lpriv->featureTable, object_id);
   if (temp != NULL)
     ecs_SetObjectAttr(&(s->result),temp);
   else 
@@ -745,18 +899,24 @@ _getObjectIdLine(s,l,coord)
   register ServerPrivateData *spriv = (ServerPrivateData *) s->priv;
   register LayerPrivateData *lpriv = (LayerPrivateData *) l->priv;
   short tile_id;
-  int32 edg_id;
   int feature_id;
-  int32 line_id;
+  int32 line_id, primCount, *primList;
   double xmin, xmax, ymin, ymax;
-  int32 index;
+  int32 index, edgeCount;
   double distance,result;
 
   distance = HUGE_VAL;
   feature_id = -1;
 
-  for(index = 0; index < l->nbfeature; index++) {
-    _getTileAndPrimId(s,l,index,&line_id,&tile_id, &edg_id);
+  if( lpriv->mergeFeatures )
+      edgeCount = lpriv->joinTable.nrows;
+  else
+      edgeCount = l->nbfeature;
+
+  index = 0;
+  while( index < edgeCount ) {
+    _getPrimList( s, l, index, &line_id, &tile_id, &primCount, &primList,
+                  &index);
     if (set_member(line_id,lpriv->feature_rows)) {
       if (tile_id == -1) {
 	ecs_SetError(&(s->result), 1, "The VRF tiles are badly defined");
@@ -774,20 +934,20 @@ _getObjectIdLine(s,l,coord)
 	   (coord->y < spriv->tile[tile_id-1].ymax))) {
 	
 	_selectTileLine(s,l,tile_id);
-	if (!vrf_get_line_mbr(l,edg_id,&xmin,&ymin,&xmax,&ymax)) {
+	if (!vrf_get_lines_mbr(l,primCount,primList,&xmin,&ymin,&xmax,&ymax)) {
 	  ecs_SetError(&(s->result), 1, "VRF table mbr not open");
 	  return;
 	}
 	if ((coord->x>xmin) && (coord->x<xmax) && 
 	    (coord->y>ymin) && (coord->y<ymax)) {
-	  if (!vrf_get_line_feature(s,l,edg_id)) 
+	  if (!vrf_get_merged_line_feature(s,l,primCount,primList))
 	    return;
 	  
 	  result = ecs_DistanceObjectWithTolerance((&(ECSOBJECT((&(s->result))))),
 				      coord->x, coord->y);
 	  if (result < distance) {
 	    distance = result;
-	    feature_id = index;
+	    feature_id = line_id;
 	  }
 	}
       }
