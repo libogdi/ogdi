@@ -1,5 +1,10 @@
 2001-04-12  Frank Warmerdam  <warmerdam@pobox.com>
 
+	* ogdi/c-api/ogdi.def: added various capabilities related entry points.
+
+	* ogdi/c-api/ecsdist.c, ogdi/include/ecs_util.h:
+	Added ecs_GetPixelFromRGB() and ecs_GetRGBFromPixel().
+
 	* test_suite/scripts/rpf: added test for Image support.
 
 	* ogdi/drivers/rpf: rpf.c, rpf.h, object.c, utils.c
