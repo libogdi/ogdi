@@ -1,3 +1,11 @@
+2001-04-16  Frank Warmerdam  <warmerdam@pobox.com>
+
+	* makefile, ogdi/include/makefile: added special non-local install
+	rules for include files and creating target directories. 
+
+	* config/common.mak, config/generic.mak.in: added non-local install
+	support (normally into /usr/local). 
+
 2001-04-12  Frank Warmerdam  <warmerdam@pobox.com>
 
 	* ogdi/c-api/ogdi.def: added various capabilities related entry points.

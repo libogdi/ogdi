@@ -53,6 +53,15 @@ BINDIR		= $(TOPDIR)/bin/$(TARGET)
 LIBDIR		= $(TOPDIR)/lib/$(TARGET)
 
 #
+#	Final OS installation location.
+#
+prefix		= /usr/local
+exec_prefix 	= ${prefix}
+INST_INCLUDE	= ${prefix}/include
+INST_LIB	= ${exec_prefix}/lib
+INST_BIN	= ${exec_prefix}/bin
+
+#
 # A location named $(LINKDIR) will be defined in the system
 # specific configuration files.  Under win32 this will point 
 # to the location of the export libs $(LIBDIR), but under
@@ -138,7 +147,7 @@ ifndef PROGGEN
 PROGGEN = $(TOPDIR)/bin/$(TARGET)/$(TOBEGEN)$(APP_EXT)
 endif
 
-STANDARD_TARGETS	= clean
+STANDARD_TARGETS	= clean install
 
 #
 # Default target to be used if no others are specified.
@@ -180,6 +189,30 @@ $(DEPENDFILE): $(SOURCES)
 
 default-clean:
 	-$(RMALL) $(OBJDIR) $(TOPDIR)/lib/$(TARGET)/static/$(LIB_PREFIX)$(TOBEGEN).* $(OBJDIR) $(TOPDIR)/lib/$(TARGET)/$(LIB_PREFIX)$(TOBEGEN).* $(TOPDIR)/bin/$(TARGET)/$(LIB_PREFIX)$(TOBEGEN).* $(PROGGEN)
+
+#
+#	Default rule(s) to install stuff if appropriate.
+#
+ifeq ($(TARGETGEN),$(DYNAGEN))
+default-install:
+	cp $(TARGETGEN) $(INST_LIB)
+endif
+
+ifeq ($(TARGETGEN),$(ARCHGEN))
+default-install:
+	cp $(TARGETGEN) $(INST_LIB)
+endif
+
+ifeq ($(TARGETGEN),$(PROGGEN))
+default-install:
+	cp $(TARGETGEN) $(INST_BIN)
+endif
+
+ifeq ($(TARGETGEN),)
+default-install:
+endif
+
+install:	default-install $(EXTRA_INSTALL_TARGETS)
 
 #
 # Include the auto-generated dependency rules.  Only include

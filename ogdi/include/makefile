@@ -13,6 +13,8 @@
 # It is provided "as is" without express or implied warranty.
 #
 
+EXTRA_INSTALL_TARGETS	=	install-includes
+
 include $(TOPDIR)/config/common.mak
 
 all:
@@ -24,3 +26,6 @@ rpcgen:
 
 clean:
 	@echo Nothing to clean in ogdi/include
+
+install-includes:
+	cp *.h $(INST_INCLUDE)

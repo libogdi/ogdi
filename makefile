@@ -10,6 +10,8 @@
 # representations about the suitability of this software for any purpose.
 # It is provided "as is" without express or implied warranty.
 
+EXTRA_INSTALL_TARGETS	=	mk_nonlocal_install_dirs
+
 include $(TOPDIR)/config/common.mak
  
 #
@@ -36,7 +38,7 @@ $(subdirs): mkinstalldirs
 	cd $@; $(MAKE)
 
 #
-# Make the installation directories
+# Make the (local) installation directories
 #
 .PHONY: mkinstalldirs
 mkinstalldirs:
@@ -49,27 +51,11 @@ mkinstalldirs:
 #
 .PHONY: $(STANDARD_TARGETS)
 $(STANDARD_TARGETS):
-	for i in $(subdirs); do \
+	@for i in $(subdirs); do \
 	  $(MAKE) --directory $$i $@; \
 	done
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+mk_nonlocal_install_dirs:
+	$(MKINSTALLDIR) $(prefix) $(exec_prefix) $(INST_LIB) $(INST_BIN) $(INST_INCLUDE)
 

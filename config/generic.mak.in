@@ -48,6 +48,15 @@ TCL_INCLUDE = -I/usr/include/tcl8.3
 TCL_LINKLIB =
 
 #
+#	Install Locations
+#
+prefix		= @prefix@
+exec_prefix 	= @exec_prefix@
+INST_INCLUDE	= ${prefix}/include
+INST_LIB	= @libdir@
+INST_BIN	= @bindir@
+
+#
 # platform specific file locations
 #
 #RPC_LINKLIB	= -lrpcsvc -lnsl -lsocket
