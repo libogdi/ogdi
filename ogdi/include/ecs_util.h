@@ -19,7 +19,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.9  2001-04-12 19:25:39  warmerda
+ * Revision 1.10  2001-06-22 16:28:24  warmerda
+ * fixed typo in ECS_SETGEOMIMAGEVALUE
+ *
+ * Revision 1.9  2001/04/12 19:25:39  warmerda
  * added RGB<->Pixel functions
  *
  * Revision 1.8  2001/04/12 18:15:25  warmerda
@@ -740,7 +743,7 @@ int ecs_GetDefaultInfo _ANSI_ARGS_((char* url, char* key, char** result));
   */
 
 #define ECS_SETGEOMIMAGEVALUE(result,lpos,lval) \
-{((result)->res.ecs_ResultUnion_u.dob.geom.ecs_Geometry_u.image.x.x_val[lpos] = (lval);}
+{(result)->res.ecs_ResultUnion_u.dob.geom.ecs_Geometry_u.image.x.x_val[lpos] = (lval);}
 
 /********************************/
 
