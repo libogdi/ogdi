@@ -17,7 +17,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.6  2001-04-12 19:22:46  warmerda
+ * Revision 1.7  2001-06-26 18:14:55  warmerda
+ * implement rpf_fopen_ci() to case insenstive file access
+ *
+ * Revision 1.6  2001/04/12 19:22:46  warmerda
  * applied DND support Image type support
  *
  */
@@ -27,6 +30,67 @@
 ECS_CVSID("$Id$");
 
 void dyn_string_tolower(char *);
+
+#ifdef _WINDOWS
+#define DIR_CHAR '\\'
+#else
+#define DIR_CHAR '/'
+#endif
+
+/*
+** rpf_fopen_ci()
+**
+** Cover for fopen() that can open a file with either upper
+** case or lower case.  Allows grabbing of a.toc or A.TOC on
+** Unix regardless of how the data came off CD. 
+*/
+
+static FILE *rpf_fopen_ci( const char *dir, const char *file, 
+                           const char *access )
+{
+    char	*filename = malloc(strlen(dir)+strlen(file)+3);
+    FILE 	*fp;
+    int		i;
+
+    if( filename == NULL )
+        return NULL;
+
+    if( dir[strlen(dir)-1] == '/' || dir[strlen(dir)-1] == '\\' )
+        sprintf( filename, "%s%s", dir, file );
+    else
+        sprintf( filename, "%s%c%s", dir, DIR_CHAR, file );
+
+    /* try natural */
+    fp = fopen( filename, access );
+
+    /* try upper case */
+    if( fp == NULL )
+    {
+        for( i = strlen(dir); filename[i] != '\0'; i++ )
+        {
+            if( filename[i] >= 'a' && filename[i] <= 'z' )
+                filename[i] = filename[i] - 'a' + 'A';
+        }
+        fp = fopen( filename, access );
+    }
+        
+    /* try lower case */
+    if( fp == NULL )
+    {
+        for( i = strlen(dir); filename[i] != '\0'; i++ )
+        {
+            if( filename[i] >= 'A' && filename[i] <= 'Z' )
+                filename[i] = filename[i] - 'A' + 'a';
+        }
+        fp = fopen( filename, access );
+    }
+     
+/*    printf( "fp=%p, filename=%s\n", fp, filename ); */
+   
+    free( filename );
+
+    return fp;
+}
 
 /*
 *******************************************************************
@@ -355,6 +419,7 @@ int dyn_read_rpftile(s, l, tile_row, tile_col)
   register LayerPrivateData *lpriv = (LayerPrivateData *) l->priv;
   int i,j,k;
   char *framefile;
+  const char *dir;
   
   /*
     Check if tile_row and tile_col is the same than the one in lpriv.
@@ -415,9 +480,15 @@ int dyn_read_rpftile(s, l, tile_row, tile_col)
     lpriv->ff = NULL;
     return FALSE; 
   }
-  strcpy(framefile,lpriv->entry->frames[tile_col][tile_row].directory);
-  strcat(framefile,"/");
-  strcat(framefile,lpriv->entry->frames[tile_col][tile_row].filename);
+
+  dir = lpriv->entry->frames[tile_col][tile_row].directory;
+
+  if( dir[strlen(dir)-1] == '\\' || dir[strlen(dir)-1] == '/' )
+      sprintf( framefile, "%s%s", dir, 
+               lpriv->entry->frames[tile_col][tile_row].filename);
+  else
+      sprintf( framefile, "%s%c%s", dir, DIR_CHAR,
+               lpriv->entry->frames[tile_col][tile_row].filename);
 
   /* Parse the frame */
   
@@ -512,7 +583,7 @@ dyn_verifyLocation(s)
   DIR *dirlist;
   FILE *test;
   register ServerPrivateData *spriv = s->priv;
-  char *ptr,*ptr1,*ptr2;
+  char *ptr,*ptr1;
 
   returnvalue = FALSE;
 
@@ -530,20 +601,10 @@ dyn_verifyLocation(s)
       ptr++;
     }
     ptr1++;
-    ptr2 = malloc(lenght+10);
-    if (ptr2 != NULL) {
-      strncpy(ptr2,spriv->pathname,lenght+1);
-#ifdef _WINDOWS
-	  strcat(ptr2,"\\");
-#else
-	  strcat(ptr2,"/");
-#endif
-      strcat(ptr2,"a.toc");
-      test = fopen(ptr2,"r");
-      if (test != NULL) {
-	fclose(test);
-	returnvalue = TRUE;
-      }
+    test = rpf_fopen_ci( spriv->pathname, RGPF_TOC, "r" );
+    if (test != NULL) {
+        fclose(test);
+        returnvalue = TRUE;
     }
   }
 
@@ -700,7 +761,6 @@ Toc_entry *parse_toc(ecs_Server *s, char *dir, Header *head, uint *num_boundarie
   FILE     *toc;
   ushort   n, path_length;
   int     i, j, k;
-  char     filename[80];
   char     *directory;
   ushort   boundary_id, frame_row, frame_col;
   int     new_boundary_ids=0L;
@@ -717,21 +777,15 @@ Toc_entry *parse_toc(ecs_Server *s, char *dir, Header *head, uint *num_boundarie
   
  /* Open input "A.TOC" */
 
-  strcpy(filename, dir);
-  strcat(filename,"/");
-  strcat(filename, RGPF_TOC);
+  toc = rpf_fopen_ci( dir, RGPF_TOC, "rb" );
 
-  sprintf(string, "parsetoc: dir %s\n",dir);
-  tprintf(string);
-  sprintf(string, "parsetoc: filename %s\n",filename);
-  tprintf(string);
-
-  if ((toc = (FILE *)fopen((char *)filename, "rb")) == NULL)
+  if( toc  == NULL )
   {
     sprintf(string, "parsetoc: Can't open %s",RGPF_TOC);
     ecs_SetError(&(s->result),1,string);
     return((Toc_entry *)NULL);
   }
+
   tprintf ("parsetoc: here 1\n");
 
  /* Check for NITF header */
@@ -1049,16 +1103,14 @@ Toc_entry *parse_toc(ecs_Server *s, char *dir, Header *head, uint *num_boundarie
         ecs_SetError(&(s->result),1,"Error on malloc of frame->directory");
         return((Toc_entry *)NULL);
       }
+    frame->directory[0] = '\0';
+
     directory = (char *) malloc((size_t)(path_length + 1));
     if (directory == (char *)NULL)
       {
         ecs_SetError(&(s->result),1,"Error on malloc of directory");
         return((Toc_entry *)NULL);
       }
-
-   /* 1st part of directory name is passed as arg: e.g. "../RPF2/" */
-    sprintf(frame->directory, "%s/",dir);
-    k = strlen(frame->directory);
 
    /* Read directory name from toc. */
 
@@ -1213,10 +1265,12 @@ uchar *blackpixel;
   double   dist;                   /* distance for black pixel */
   double   r,g,b;
   char     string[256];
+  register ServerPrivateData *spriv = (ServerPrivateData *) s->priv;
 
   (void) frame;
 
-  if ((fin = (FILE *)fopen((char *)filename, "rb")) == NULL)
+  fin = rpf_fopen_ci( spriv->pathname, filename, "rb" );
+  if (fin == NULL )
   {
     sprintf(string,"Can't open %s",filename);
     ecs_SetError(&(s->result),1,string);
@@ -1514,8 +1568,10 @@ char *filename;
   uint     subfr_mask_tbl_off;   /* subframe mask table offset */
   int     nsubfr;               /* the number of subframes */
   char     string[256];
-    
-  if ((fin = (FILE *)fopen((char *)filename, "rb")) == NULL) 
+  register ServerPrivateData *spriv = (ServerPrivateData *) s->priv;
+
+  fin = rpf_fopen_ci( spriv->pathname, filename, "rb" );
+  if (fin == NULL)
     {
       sprintf(string,"Can't open frame file %s",filename);
       ecs_SetError(&(s->result),1,string);
@@ -1913,10 +1969,12 @@ int         ReducedColorTable;
   int tindex;
   int i,j,k;
   char string[256];
+  register ServerPrivateData *spriv = (ServerPrivateData *) s->priv;
 
  /* Open the file */
 
-  if ((fin = (FILE *)fopen((char *)filename, "rb")) == NULL)
+  fin = rpf_fopen_ci( spriv->pathname, filename, "rb" );
+  if (fin == NULL)
   {
     sprintf(string,"Can't open frame file %s",filename);
     ecs_SetError(&(s->result),1,string);
@@ -1987,6 +2045,7 @@ uchar      blackpixel;
   int  offset;
   int  cc;
   char  string[256];
+  register ServerPrivateData *spriv = (ServerPrivateData *) s->priv;
 
  /* If blank subframe zero out tile */
 
@@ -1998,7 +2057,8 @@ uchar      blackpixel;
 
  /* Open the file */
 
-  if ((fin = (FILE *)fopen((char *)filename, "rb")) == NULL)
+  fin = rpf_fopen_ci( spriv->pathname, filename, "rb" );
+  if (fin == NULL)
   {
     sprintf(string,"Can't open frame file %s",filename);
     ecs_SetError(&(s->result),1,string);
