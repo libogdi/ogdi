@@ -16,7 +16,7 @@ include $(TOPDIR)/config/common.mak
 #
 # Sub-directories that need to be built
 #
-subdirs	= external proj vpflib ogdi
+subdirs	= external proj vpflib ogdi contrib
 
 #
 # Default target to build everything in all sub-directories
