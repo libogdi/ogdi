@@ -77,12 +77,14 @@ muse_file_open(path, mode)
     strcpy(upbuf, pathext);
     strcpy(lobuf, pathext);
 
-    for (i = 0; i < len; i++)
+    for (i = len-1; i >= 0; i--)
     {
 	if (pathext[i] == '.')
 	{
 	    DOT_FOUND = TRUE;
 	}
+        if (pathext[i] == (int) FILE_SEP) 
+            break;
     }
 #if 0
     for (i = len - 1; (i >= 0 && pathext[i] != (int) FILE_SEP); i--)
@@ -202,12 +204,14 @@ fil_open(path, mode)
     strcpy(upbuf, pathext);
     strcpy(lobuf, pathext);
 
-    for (i = 0; i < len; i++)
+    for (i = len-1; i >= 0; i--)
     {
 	if (pathext[i] == '.')
 	{
 	    DOT_FOUND = TRUE;
 	}
+        if (pathext[i] == (int) FILE_SEP) 
+            break;
     }
 #if 0
     for (i = len - 1; (i >= 0 && pathext[i] != (int) FILE_SEP); i--)
@@ -314,12 +318,14 @@ muse_access(path, amode)
     strcpy(upbuf, pathext);
     strcpy(lobuf, pathext);
 
-    for (i = 0; i < len; i++)
+    for (i = len-1; i >= 0; i--)
     {
 	if (pathext[i] == '.')
 	{
 	    DOT_FOUND = TRUE;
 	}
+        if (pathext[i] == (int) FILE_SEP) 
+            break;
     }
 #if 0
     for (i = len - 1; (i >= 0 && pathext[i] != (int) FILE_SEP); i--)
