@@ -2,7 +2,7 @@
 	==================
 
 
-This directory contains the ZLIB 1.1.3 source release code.  Only the
+This directory contains the ZLIB 1.1.4 source release code.  Only the
 core ZLIB code has been preserved, various contributed utilities and
 so forth have been omitted.  
 
@@ -14,5 +14,6 @@ a generic 1.1.3 zlib build.
 
 More information about zlib can be found at:
 
-  http://www.cdrom.com/pub/infozip/zlib/
+  http://www.gzip.org/zlib
+
 
