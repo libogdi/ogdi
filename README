@@ -15,10 +15,10 @@ Detailed building instructions are available at:
 
   http://ogdi.sourceforge.net/build.html
 
-Briefly, set the environment variables TOPDIR (to point to devdir directory)
-and TARGET (to one of win32, linux or solaris - case matters).  
-$TOPDIR/bin/$TARGET must be in the LD_LIBRARY_PATH.  Then type make in the 
-root directory of the distribution (this directory).  
+Briefly, set the environment variables TOPDIR (to point to home directory
+of the OGDI source tree) and TARGET (to one of win32, linux or solaris - case 
+matters).  $TOPDIR/bin/$TARGET must be in the LD_LIBRARY_PATH.  Then type make
+in the root directory of the distribution (this directory).  
 
 On windows the Cygwin environment (http://www.cygwin.com) is required. 
 
