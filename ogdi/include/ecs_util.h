@@ -19,7 +19,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.6  2001-04-09 15:04:35  warmerda
+ * Revision 1.7  2001-04-12 05:29:47  warmerda
+ * added ecs_LayerCapabilities structure, and additions to ecs_Client
+ *
+ * Revision 1.6  2001/04/09 15:04:35  warmerda
  * applied new source headers
  *
  */
@@ -925,6 +928,55 @@ typedef int dtfunc();
   STRUCTURE_INFORMATION
   
   NAME
+     ecs_LayerCapabilities
+
+  DESCRIPTION
+     Information about a layer gleaned from OGDI_Capabilities document.
+  END_DESCRIPTION
+
+  ATTRIBUTES
+     char *name: The default layer name, as per the <Name> element.
+  END_ATTRIBUTES
+
+  END_STRUCTURE_INFORMATION
+
+  ********************************************************************/
+
+#define MAX_FAMILIES 20
+
+typedef struct {
+  char  *name;
+  char  *title;
+  char  *srs;
+  int   families[MAX_FAMILIES];
+  char  **parents;
+  char  **extensions;
+
+  int    ll_bounds_set;
+  double ll_north;
+  double ll_south;
+  double ll_east;
+  double ll_west;
+
+  double srs_north;
+  double srs_south;
+  double srs_east;
+  double srs_west;
+  double srs_nsres;
+  double srs_ewres;
+
+  int    query_expression_set;
+  char   *qe_prefix;
+  char   *qe_suffix;
+  char   *qe_format;
+  char   *qe_description;
+} ecs_LayerCapabilities;
+
+/*********************************************************************
+
+  STRUCTURE_INFORMATION
+  
+  NAME
      ecs_Client
 
   DESCRIPTION
@@ -1002,6 +1054,17 @@ typedef struct {
   ecs_FeatureRing *mask;
   ecs_Region maskregion;
   int isMaskInclusive;
+
+  int           have_server_capabilties;				       
+  char		server_version_str[32];
+  int           server_version; /* version times 1000, ie. 3100 for 3.1 */
+
+  char          **global_extensions;
+
+  int           have_capabilities;
+  int           layer_cap_count;
+  ecs_LayerCapabilities **layer_cap;
+    
 } ecs_Client;
 
 #define MAXCLIENT 32
@@ -1384,8 +1447,4 @@ int ecs_GetTileId _ANSI_ARGS_((ecs_Server *s, ecs_TileStructure *t, ecs_Coordina
 int ecs_GetTileIdFromPos _ANSI_ARGS_((ecs_Server *s, ecs_TileStructure *t, int x, int y, ecs_TileID *tile_id)); 
 int ecs_TileCompare _ANSI_ARGS_((ecs_TileID *id1, ecs_TileID *id2));
 int ecs_SetTile _ANSI_ARGS_((ecs_TileID *destination, ecs_TileID *source));
-
-
-
-
 
