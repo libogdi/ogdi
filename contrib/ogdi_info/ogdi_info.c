@@ -20,7 +20,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.7  2001-04-12 19:26:08  warmerda
+ * Revision 1.8  2001-04-19 05:28:50  warmerda
+ * improve region bounds reporting
+ *
+ * Revision 1.7  2001/04/12 19:26:08  warmerda
  * added RGB image support
  *
  * Revision 1.6  2001/04/12 18:12:42  warmerda
@@ -185,6 +188,81 @@ const char * DecToDMS( double dfAngle )
 }
 
 /************************************************************************/
+/*                          DumpGlobalRegion()                          */
+/************************************************************************/
+
+static int DumpGlobalRegion( ecs_Region * region, PJ * proj_defn )
+
+{
+    ecs_Result	*result;
+    ecs_Region  tmpRegion;
+    projUV     proj_pnt;
+
+    if( region == NULL )
+        region = &tmpRegion;
+
+/* -------------------------------------------------------------------- */
+/*      print the global bounds.                                        */
+/* -------------------------------------------------------------------- */
+    result = cln_GetGlobalBound(ClientID);
+    if( CheckError( result ) )
+        return( FALSE );
+
+    printf( "Bounds\n" );
+    printf( "north = %f\n", ECSREGION(result).north );
+    printf( "south = %f\n", ECSREGION(result).south );
+    printf( "east = %f\n", ECSREGION(result).east );
+    printf( "west = %f\n", ECSREGION(result).west );
+    printf( "ns_res = %.9f\n", ECSREGION(result).ns_res );
+    printf( "ew_res = %.9f\n", ECSREGION(result).ew_res );
+
+    *region = ECSREGION(result);
+
+/* -------------------------------------------------------------------- */
+/*	Print the corner coordinates in lat/long.			*/
+/* -------------------------------------------------------------------- */
+#ifndef _WINDOWS    
+    if( proj_defn != NULL ) {
+        printf( "Lat/Long Corners\n" );
+        
+        proj_pnt.v = region->north;
+        proj_pnt.u = region->west;
+        proj_pnt = pj_inv(proj_pnt, proj_defn);
+        printf( "Upper Left:  (%s,%s) (%g,%g)\n",
+                DecToDMS(proj_pnt.u/DEG_TO_RAD),
+                DecToDMS(proj_pnt.v/DEG_TO_RAD),
+                proj_pnt.u/DEG_TO_RAD, proj_pnt.v/DEG_TO_RAD );
+        
+        proj_pnt.v = region->north;
+        proj_pnt.u = region->east;
+        proj_pnt = pj_inv(proj_pnt, proj_defn);
+        printf( "Upper Right: (%s,%s) (%g,%g)\n",
+                DecToDMS(proj_pnt.u/DEG_TO_RAD),
+                DecToDMS(proj_pnt.v/DEG_TO_RAD),
+                proj_pnt.u/DEG_TO_RAD, proj_pnt.v/DEG_TO_RAD );
+        
+        proj_pnt.v = region->south;
+        proj_pnt.u = region->west;
+        proj_pnt = pj_inv(proj_pnt, proj_defn);
+        printf( "Lower Left:  (%s,%s) (%g,%g)\n",
+                DecToDMS(proj_pnt.u/DEG_TO_RAD),
+                DecToDMS(proj_pnt.v/DEG_TO_RAD),
+                proj_pnt.u/DEG_TO_RAD, proj_pnt.v/DEG_TO_RAD );
+        
+        proj_pnt.v = region->south;
+        proj_pnt.u = region->east;
+        proj_pnt = pj_inv(proj_pnt, proj_defn);
+        printf( "Lower Right: (%s,%s) (%g,%g)\n",
+                DecToDMS(proj_pnt.u/DEG_TO_RAD),
+                DecToDMS(proj_pnt.v/DEG_TO_RAD),
+                proj_pnt.u/DEG_TO_RAD, proj_pnt.v/DEG_TO_RAD );
+    }
+#endif
+    
+    return TRUE;
+}
+
+/************************************************************************/
 /*                          DumpRasterObject()                          */
 /************************************************************************/
 
@@ -297,7 +375,6 @@ static int AccessURL( char * url, ecs_Region * region )
 {
     ecs_Result *result;
     PJ	       *proj_defn = NULL;
-    projUV     proj_pnt;
 
 /* -------------------------------------------------------------------- */
 /*      Close old client if there is one active.                        */
@@ -329,65 +406,12 @@ static int AccessURL( char * url, ecs_Region * region )
     if( !bNoProj )
         proj_defn = cln_ProjInit( ECSTEXT(result) );
 #endif
-    
-/* -------------------------------------------------------------------- */
-/*      print the global bounds.                                        */
-/* -------------------------------------------------------------------- */
-    result = cln_GetGlobalBound(ClientID);
-    if( CheckError( result ) )
-        return( FALSE );
-
-    printf( "Global Bounds\n" );
-    printf( "north = %f\n", ECSREGION(result).north );
-    printf( "south = %f\n", ECSREGION(result).south );
-    printf( "east = %f\n", ECSREGION(result).east );
-    printf( "west = %f\n", ECSREGION(result).west );
-    printf( "ns_res = %f\n", ECSREGION(result).ns_res );
-    printf( "ew_res = %f\n", ECSREGION(result).ew_res );
-
-    *region = ECSREGION(result);
 
 /* -------------------------------------------------------------------- */
-/*	Print the corner coordinates in lat/long.			*/
+/*      Dump the global region.                                         */
 /* -------------------------------------------------------------------- */
-#ifndef _WINDOWS    
-    if( proj_defn != NULL ) {
-        printf( "Lat/Long Corners\n" );
-        
-        proj_pnt.v = region->north;
-        proj_pnt.u = region->west;
-        proj_pnt = pj_inv(proj_pnt, proj_defn);
-        printf( "Upper Left:  (%s,%s) (%g,%g)\n",
-                DecToDMS(proj_pnt.u/DEG_TO_RAD),
-                DecToDMS(proj_pnt.v/DEG_TO_RAD),
-                proj_pnt.u/DEG_TO_RAD, proj_pnt.v/DEG_TO_RAD );
-        
-        proj_pnt.v = region->north;
-        proj_pnt.u = region->east;
-        proj_pnt = pj_inv(proj_pnt, proj_defn);
-        printf( "Upper Right: (%s,%s) (%g,%g)\n",
-                DecToDMS(proj_pnt.u/DEG_TO_RAD),
-                DecToDMS(proj_pnt.v/DEG_TO_RAD),
-                proj_pnt.u/DEG_TO_RAD, proj_pnt.v/DEG_TO_RAD );
-        
-        proj_pnt.v = region->south;
-        proj_pnt.u = region->west;
-        proj_pnt = pj_inv(proj_pnt, proj_defn);
-        printf( "Lower Left:  (%s,%s) (%g,%g)\n",
-                DecToDMS(proj_pnt.u/DEG_TO_RAD),
-                DecToDMS(proj_pnt.v/DEG_TO_RAD),
-                proj_pnt.u/DEG_TO_RAD, proj_pnt.v/DEG_TO_RAD );
-        
-        proj_pnt.v = region->south;
-        proj_pnt.u = region->east;
-        proj_pnt = pj_inv(proj_pnt, proj_defn);
-        printf( "Lower Right: (%s,%s) (%g,%g)\n",
-                DecToDMS(proj_pnt.u/DEG_TO_RAD),
-                DecToDMS(proj_pnt.v/DEG_TO_RAD),
-                proj_pnt.u/DEG_TO_RAD, proj_pnt.v/DEG_TO_RAD );
-    }
-#endif
-    
+    DumpGlobalRegion( region, proj_defn );
+
 /* -------------------------------------------------------------------- */
 /*      Print the Dictionary (update).                                  */
 /* -------------------------------------------------------------------- */
@@ -529,6 +553,8 @@ static void DumpLayer( const char * options, ecs_Region * region,
     
     if( CheckError( result ) )
         return;
+
+    DumpGlobalRegion( NULL, NULL );
 
 /* -------------------------------------------------------------------- */
 /*      Dump the attribute definitions.                                 */
@@ -706,6 +732,9 @@ int main( int argc, char ** argv )
 
         if( strcmp(argv[i],"-dl") == 0 ) {
             DumpLayer( "", region, layer, featureType );
+        }
+        else if( strcmp(argv[i],"-dr") == 0 ) {
+            DumpGlobalRegion( NULL, NULL );
         }
         else if( strcmp(argv[i], "-no-proj") == 0 ) {
             bNoProj = TRUE;
