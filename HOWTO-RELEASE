@@ -20,7 +20,7 @@
    ie. 
 
    cd devdir
-   cvs tag 3_1_0
+   cvs tag ogdi_3_1_0
 
 7) Create the source distributions using the mkogdidist.sh script.  The
    version name should include subrelease name components as appropriate.
