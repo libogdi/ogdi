@@ -1,5 +1,6 @@
 #include "ecs.h"
-#ifdef _LINUX
+
+#if !defined(MISSING_DLFCN_H)
 #include <dlfcn.h>
 #endif
 
