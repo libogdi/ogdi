@@ -1,7 +1,22 @@
 2001-02-18  Frank Warmerdam  <warmerdam@pobox.com>
 
+	* ogdi/drivers/adrg: adrg.c adrg.h object.c utils.c
+	  ogdi/drivers/dted: dted.c, object.c
+	  ogdi/drivers/skeleton: skeleton.c, skeleton.h, open.c, object.c
+	  ogdi/drivers/network/remote.c
+	  ogdi/drivers/vrf: feature.c, object.c, open.c, vrf.c
+	  ogdi/drivers/rpf: object.c, rpf.c, rpf.h, utils.c
+	
+	  Avoid unused argument and other warnings.
+
+	* ogdi/datum_driver/canada/dtcanada.c, ogdi/datum_driver/usa/dtusa.c
+	  ogdi/c-api: client.c ecsgeo.c, ogdi/include/ecs_util.h
+	  contrib/ogdi_info/ogdi_info.c
+
+	  Fixed so that PROJ.4.4.x with projUV instead of UV will also work.
+
 	* */makefile: include explicit clean targets, and get rid of test
-	targets alltogether to avoid override messages from GNUmake.
+	  targets alltogether to avoid override messages from GNUmake.
 
 	* readme.sun: removed, adequately addressed in build.html.
 
