@@ -27,6 +27,10 @@ NEWS file is just used to sumarize major changes, and new features.
 
  o Added contributed GDAL raster driver as contrib/gdal.
 
+ o Updated zlib in external/zlib to 1.1.3.
+
+ o Embed version number in OGDI shared libraries (eg. libogdi31.so).
+
 
 3.1Alpha
 ========
