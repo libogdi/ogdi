@@ -20,7 +20,7 @@ include $(TOPDIR)/config/common.mak
 # Sub-directories that need to be built
 #
 # MOD START
-subdirs	= include c-api attr_driver datum_driver glutil driver gltpd examples
+subdirs	= include c-api attr_driver datum_driver driver gltpd examples
 # MOD END
 
 #
