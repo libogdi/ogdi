@@ -81,7 +81,6 @@ void dyn_getNextObjectRaster(s,l)
      ecs_Server *s;
      ecs_Layer *l;
 {
-  ServerPrivateData *spriv = s->priv;
   LayerPrivateData *lpriv = l->priv;
   ecs_Coordinate start, end;
   double pos_y;
@@ -114,6 +113,8 @@ dyn_getObjectRaster(s,l,id)
      ecs_Layer *l;
      char *id;
 {
+  (void) l;
+  (void) id;
   ecs_SetSuccess(&(s->result));
 }
 
@@ -123,6 +124,8 @@ dyn_getObjectIdRaster(s,l,coord)
      ecs_Layer *l;
      ecs_Coordinate *coord;
 {
+  (void) l;
+  (void) coord;
   ecs_SetSuccess(&(s->result));
 }	
 
@@ -180,6 +183,9 @@ void dyn_rewindRasterLayer(s,l)
      ecs_Layer *l;
 {
   LayerPrivateData *lpriv = l->priv;
+
+  (void) s;
+
   ecs_TileClearBuffer(&(lpriv->tilestruct));
   l->index=0;
 }
@@ -290,6 +296,8 @@ int dyn_PointCallBack(s,t,xtile,ytile,xpixel,ypixel,cat)
   register int tile_r,tile_c;
   register unsigned int Val,PosVal;
   register double rapport;
+
+  (void) t;
 
   rapport = s->currentRegion.ns_res/lpriv->entry->vert_interval;
   if (rapport > 10.0) {
@@ -406,6 +414,11 @@ int dyn_DimCallBack(s,t,x,y,width,height)
     int *width;
     int *height;
 {
+  (void) s;
+  (void) t;
+  (void) x;
+  (void) y;
+
   *width = 1536;
   *height = 1536;
   return TRUE;

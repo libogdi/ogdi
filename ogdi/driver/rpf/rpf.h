@@ -495,8 +495,8 @@ typedef struct {
 
 int dyn_prepare_rpflayer       _ANSI_ARGS_((ecs_Server *s,ecs_Layer *l));
 int dyn_read_rpftile           _ANSI_ARGS_((ecs_Server *s,ecs_Layer *l,int tile_row,int tile_col));
-/*int dyn_verifyLocation         _ANSI_ARGS_((ecs_Server *s));
-int dyn_initRegionWithDefault  _ANSI_ARGS_((ecs_Server *s));*/
+int dyn_verifyLocation         _ANSI_ARGS_((ecs_Server *s));
+int dyn_initRegionWithDefault  _ANSI_ARGS_((ecs_Server *s));
 void check_swap             _ANSI_ARGS_((unsigned char little_endian));
 void swap                   _ANSI_ARGS_((unsigned char *ptr, size_t count));
 Toc_entry *parse_toc        _ANSI_ARGS_((ecs_Server *s, char *dir, Header *head, uint *num_boundaries));

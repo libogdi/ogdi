@@ -59,6 +59,9 @@ ecs_Result *dyn_CreateServer(s,Request)
      char *Request;
 {
   register ServerPrivateData *spriv = s->priv = (void *) malloc(sizeof(ServerPrivateData));
+
+  (void) Request;
+
   if (spriv == NULL) {
     ecs_SetError(&(s->result),1,"Not enough memory to allocate server private data");
     return &(s->result);
@@ -240,7 +243,6 @@ ecs_Result *dyn_SelectLayer(s,sel)
 {
   int layer;
   register LayerPrivateData *lpriv;
-  register ServerPrivateData *spriv = s->priv;
   ecs_Region region;
 
   /* first, try to find an existing layer with same request and family */
@@ -470,8 +472,6 @@ ecs_Result *
 dyn_GetAttributesFormat(s)
      ecs_Server *s;
 {
-  register ServerPrivateData *spriv = s->priv;
-  
   ecs_SetObjAttributeFormat(&(s->result));
 
   ecs_AddAttributeFormat(&(s->result),"category",Integer,5,0,0);
@@ -694,9 +694,8 @@ int dyn_initCatTable(s,layer)
      ecs_Layer *layer;
 {
   register LayerPrivateData *lpriv;
-  register ServerPrivateData *spriv = s->priv;
-  int first = TRUE;
-  int found = FALSE;
+
+  (void) s;
   
   lpriv = (LayerPrivateData *) layer->priv;
 
@@ -814,6 +813,8 @@ ecs_Result *dyn_UpdateDictionary(s,info)
   int i,j,k;
   Toc_file *toc;
 
+  (void) info;
+
   ecs_SetText(&(s->result)," "); 
 
   toc = spriv->toc;
@@ -898,6 +899,8 @@ ecs_Result *dyn_SetServerLanguage(s,language)
      ecs_Server *s;
      u_int language;
 {
+  (void) language;
+
   ecs_SetSuccess(&(s->result));
   return &(s->result);
 }

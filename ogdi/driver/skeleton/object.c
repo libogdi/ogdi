@@ -1291,11 +1291,9 @@ _getNextObjectMatrix(s,l)
      ecs_Server *s;
      ecs_Layer *l;
 {
-  register ServerPrivateData *spriv = s->priv;
   int i,i2,j2;
   char buffer[128];
   register LayerPrivateData *lpriv = (LayerPrivateData *) l->priv;
-  static int UseOverview;
   int totalcol,totalrow;
   int value;
   double pos;
@@ -1376,11 +1374,9 @@ _getObjectMatrix(s,l,id)
      char *id;
 {
   int index;
-  register ServerPrivateData *spriv = s->priv;
   int i,i2,j2;
   char buffer[128];
   register LayerPrivateData *lpriv = (LayerPrivateData *) l->priv;
-  static int UseOverview;
   int totalcol,totalrow;
   int value;
   double pos;
@@ -1461,7 +1457,6 @@ _getObjectIdMatrix(s,l,coord)
      ecs_Coordinate *coord;
 {
   register LayerPrivateData *lpriv = (LayerPrivateData *) l->priv;
-  register ServerPrivateData *spriv = s->priv;
   char buffer[128];
   int pix_c,pix_r;
   int value;
@@ -1516,8 +1511,6 @@ int _calcPosValue(s,l,i,j)
      int j;
 {
   register LayerPrivateData *lpriv = (LayerPrivateData *) l->priv;
-  register ServerPrivateData *spriv = s->priv;
-  double pos_x, pos_y;
   int pix_c,pix_r;
   register int value;
 
@@ -1593,8 +1586,9 @@ int _getValueFromCoord(s,l,pix_c,pix_r)
      int pix_r;
 {
   register LayerPrivateData *lpriv = (LayerPrivateData *) l->priv;
-  register ServerPrivateData *spriv = s->priv;
   int value;
+
+  (void) pix_c;
 
   if (pix_r < ((double) (lpriv->matrixheight/4.0)))
     value = 1;

@@ -28,6 +28,8 @@
 
 #include "rpf.h"
 
+void dyn_string_tolower(char *);
+
 /*
 *******************************************************************
 
@@ -701,8 +703,6 @@ Toc_entry *parse_toc(ecs_Server *s, char *dir, Header *head, uint *num_boundarie
   ushort   Bound_rec_len;           /* Boundary record length */
   ushort   N_pathname_recs;         /* # frame file pathname records */
   ushort   Index_rec_len;           /* frame file index record length */
-  ushort   Index_subhdr_len = 9 ;   /* frame file index subheader length */
-  uint     TOC_nitf_hdr_len = 410;  /* ???? 0 or 410. TOC NITF header length */
   uint     bnd_rec_tbl_off;         /* Bound. rect. table offset */
   uint     frm_index_tbl_off;       /* Frame file index table offset */
   char     NITF[5];
@@ -721,7 +721,7 @@ Toc_entry *parse_toc(ecs_Server *s, char *dir, Header *head, uint *num_boundarie
 
   if ((toc = (FILE *)fopen((char *)filename, "rb")) == NULL)
   {
-    sprintf(string, "parsetoc: Can't open %s\0",RGPF_TOC);
+    sprintf(string, "parsetoc: Can't open %s",RGPF_TOC);
     ecs_SetError(&(s->result),1,string);
     return((Toc_entry *)NULL);
   }
@@ -778,9 +778,9 @@ Toc_entry *parse_toc(ecs_Server *s, char *dir, Header *head, uint *num_boundarie
   parse_locations(s, toc, locations, 4L);
 
   for (i = 0; i < 4; i++)
-    if (locations[i].phys_index == ~0)
+    if ((int) locations[i].phys_index == ~0)
     {
-      sprintf(string, "Can't locate section %ld in table of contents\0",locations[i].id);
+      sprintf(string, "Can't locate section %d in table of contents",locations[i].id);
       ecs_SetError(&(s->result),1,string);
       return((Toc_entry *)NULL);
     }
@@ -796,7 +796,7 @@ Toc_entry *parse_toc(ecs_Server *s, char *dir, Header *head, uint *num_boundarie
   swap((ucharp)&n, sizeof(n));
 
   *num_boundaries = (int)n;
-  sprintf(string,"parse_toc: n = %ld\n",n);
+  sprintf(string,"parse_toc: n = %d\n",n);
   tprintf(string);
 
  /* Boundary record length */
@@ -892,7 +892,7 @@ Toc_entry *parse_toc(ecs_Server *s, char *dir, Header *head, uint *num_boundarie
       malloc((size_t)entries[i].vert_frames * sizeof(Frame_entry *));
     if (entries[i].frames == (Frame_entry **)NULL)
     {
-      sprintf(string,"Error on malloc of entries[%ld].frames\0",i);
+      sprintf(string,"Error on malloc of entries[%d].frames",i);
       ecs_SetError(&(s->result),1,string);
       return((Toc_entry *)NULL);
     }
@@ -903,7 +903,7 @@ Toc_entry *parse_toc(ecs_Server *s, char *dir, Header *head, uint *num_boundarie
         malloc((size_t)entries[i].horiz_frames * sizeof(Frame_entry));
       if (entries[i].frames[j] == (Frame_entry *)NULL)
       {
-        sprintf(string, "Error on malloc of entries[%ld].frames[%ld]\0",i,j);
+        sprintf(string, "Error on malloc of entries[%d].frames[%d]",i,j);
         ecs_SetError(&(s->result),1,string);
         return((Toc_entry *)NULL);
       }
@@ -947,9 +947,9 @@ Toc_entry *parse_toc(ecs_Server *s, char *dir, Header *head, uint *num_boundarie
     if (new_boundary_ids == 0L)
        boundary_id--;
     
-    if (boundary_id < 0L || boundary_id > (ushort)(*num_boundaries-1L))
+    if (boundary_id > (ushort)(*num_boundaries-1L))
     {
-      sprintf(string,"Bad boundary id in FF index record %d\0", i);
+      sprintf(string,"Bad boundary id in FF index record %d", i);
       ecs_SetError(&(s->result),1,string);
       return((Toc_entry *)NULL);
     }
@@ -972,16 +972,16 @@ Toc_entry *parse_toc(ecs_Server *s, char *dir, Header *head, uint *num_boundarie
       frame_row = (entry->vert_frames-1L) - frame_row;
     }
    
-    if ((int)frame_row < 0L || (int)frame_row > entry->vert_frames-1L)
+    if ((int)frame_row > entry->vert_frames-1L)
     {
-      sprintf(string,"Bad row num:%ld, in FF index record %ld\0",frame_row,i);
+      sprintf(string,"Bad row num:%d, in FF index record %d",frame_row,i);
       ecs_SetError(&(s->result),1,string);
       return((Toc_entry *)NULL);
     }
 
-    if ((int)frame_col < 0L || (int)frame_col > entry->horiz_frames-1L)
+    if ((int)frame_col > entry->horiz_frames-1L)
     {
-      sprintf(string,"Bad col number in FF index record %ld\0", i);
+      sprintf(string,"Bad col number in FF index record %d", i);
       ecs_SetError(&(s->result),1,string);
       return((Toc_entry *)NULL);
     }
@@ -993,7 +993,7 @@ Toc_entry *parse_toc(ecs_Server *s, char *dir, Header *head, uint *num_boundarie
 
     if (frame->exists)
     {
-      sprintf(string,"FF %ld is a duplicate\0", i);
+      sprintf(string,"FF %d is a duplicate", i);
       ecs_SetError(&(s->result),1,string);
       return((Toc_entry *)NULL);
     }
@@ -1040,7 +1040,7 @@ Toc_entry *parse_toc(ecs_Server *s, char *dir, Header *head, uint *num_boundarie
       }
 
    /* 1st part of directory name is passed as arg: e.g. "../RPF2/" */
-    sprintf(frame->directory, "%s/\0",dir);
+    sprintf(frame->directory, "%s/",dir);
     k = strlen(frame->directory);
 
    /* Read directory name from toc. */
@@ -1064,7 +1064,7 @@ Toc_entry *parse_toc(ecs_Server *s, char *dir, Header *head, uint *num_boundarie
 
   fclose(toc);
   tprintf ("parsetoc: here end\n");
-  sprintf(string,"parse_toc: *num_boundaries = %ld\n",*num_boundaries);
+  sprintf(string,"parse_toc: *num_boundaries = %d\n",*num_boundaries);
   tprintf(string);
 
   return(entries);
@@ -1088,6 +1088,8 @@ int parse_locations(ecs_Server *s, FILE *fin, Location *locs, int count)
   uint     phys_index;
   ushort   us;
   uint     ui;
+
+  (void) s;
 
  /* Initialize indices so we can later tell if they weren't found */
 
@@ -1168,7 +1170,6 @@ uchar *blackpixel;
   FILE     *fin;
   Location loc[3];
   int     i,j;
-  uint     Hdr_sec_len = 48L;    /* Header section length */
   uint     loc_sec_phys_loc;     /* location section physical location */
   uchar    N_offset_recs;        /* # of offset records */
   uchar    N_cc_offset_recs;     /* # of color converter offset records */
@@ -1196,9 +1197,11 @@ uchar *blackpixel;
   double   r,g,b;
   char     string[256];
 
+  (void) frame;
+
   if ((fin = (FILE *)fopen((char *)filename, "rb")) == NULL)
   {
-    sprintf(string,"Can't open %s\0",filename);
+    sprintf(string,"Can't open %s",filename);
     ecs_SetError(&(s->result),1,string);
     return(0L);
   }
@@ -1225,7 +1228,7 @@ uchar *blackpixel;
   loc[2].id = LOC_COLOR_CONVERTOR_SUBSECTION;   /* 139 */
   parse_locations(s, fin, loc, 3L);
 
-  if (loc[0].phys_index == ~0)
+  if ((int) loc[0].phys_index == ~0)
   {
     ecs_SetError(&(s->result),1,"Can't find color/gray section subheader (ID=134) location");
     return(0L);
@@ -1257,7 +1260,7 @@ uchar *blackpixel;
  /* Check for colormap subsection: id = 135 */
  /* ?? can't find this section */
 
-  if (loc[1].phys_index == ~0)
+  if ((int) loc[1].phys_index == ~0)
   {
     ecs_SetError(&(s->result),1,"Can't find colormap subsection location ID=135");
     free((char *)col_off);
@@ -1464,6 +1467,7 @@ uchar *blackpixel;
   fclose(fin);
   free((char *)col_off);
 
+  return 0;
 }  /* parse_clut */
 
 /***********************************************************************\
@@ -1486,7 +1490,6 @@ char *filename;
   Location loc[11];
   FILE    *fin;
   int     i, j;
-  uint     Hdr_sec_len = 52L;  /* Header section length */
   char     NITF[5];
   ascii    date[8];
   uint     lkup_off_tbl_off;     /* 2lookup offset table offset */
@@ -1497,7 +1500,7 @@ char *filename;
     
   if ((fin = (FILE *)fopen((char *)filename, "rb")) == NULL) 
     {
-      sprintf(string,"Can't open frame file %s\0",filename);
+      sprintf(string,"Can't open frame file %s",filename);
       ecs_SetError(&(s->result),1,string);
       return(0L);
     }
@@ -1572,11 +1575,11 @@ char *filename;
 
   parse_locations(s, fin, loc, 11L);
 
-  if (loc[0].phys_index == ~0)
+  if ((int) loc[0].phys_index == ~0)
   {
     ecs_SetError(&(s->result),1,"Can't find LOC_COMPRESSION section in FF");
   }
-  if (loc[1].phys_index == ~0)
+  if ((int) loc[1].phys_index == ~0)
   {
     ecs_SetError(&(s->result),1,"Can't find LOC_IMAGE section in FF");
     return(0L);
@@ -1584,7 +1587,7 @@ char *filename;
 
  /* Read the coverage section */
 
-  if (loc[6].phys_index == ~0)
+  if ((int) loc[6].phys_index == ~0)
   {
     ecs_SetError(&(s->result),1,"Can't find LOC_COVERAGE_SECTION in FF");
     return(0L);
@@ -1618,7 +1621,7 @@ char *filename;
 
  /* Read the compression tables */
 
-  if (loc[0].phys_index != ~0)
+  if ((int) loc[0].phys_index != ~0)
   {
      fseek(fin, loc[0].phys_index, SEEK_SET);
      fread(&file->compr.algorithm   , sizeof(file->compr.algorithm   ), 1, fin);
@@ -1635,7 +1638,7 @@ char *filename;
   if (file->head.rpf_type != RPF_CDTED)
   {
     file->loc_lut_shdr = loc[2].phys_index;
-    if (loc[2].phys_index == ~0)
+    if ((int) loc[2].phys_index == ~0)
     {
       ecs_SetError(&(s->result),1,"Warning: Can't find compr. lookup subsection in FrameFile: Using alternate computation");
 
@@ -1705,7 +1708,7 @@ char *filename;
     int hufflen;
 
     file->comp_parm_shdr = loc[2].phys_index;
-    if (loc[2].phys_index == ~0)
+    if ((int) loc[2].phys_index == ~0)
     {
       ecs_SetError(&(s->result),1,"Warning: Can't find compr. parameter subsection in FrameFile");
       return(0L);
@@ -1786,7 +1789,7 @@ char *filename;
 
  /* Fseek to LOC_IMAGE_DISPLAY_PARAM_SUBHEADER, ID=137 */
 
-  if (loc[4].phys_index == ~0)
+  if ((int) loc[4].phys_index == ~0)
   {
     ecs_SetError(&(s->result),1,"Can't find IMAGE_DISPLAY_PARAM_SUBHEADER section in Frame file");
     return(0L);
@@ -1810,7 +1813,7 @@ char *filename;
  /* Fseek to LOC_SPATIAL_DATA_SUBSECTION, ID=140 */
 
   file->loc_data = loc[3].phys_index;
-  if (loc[3].phys_index == ~0)
+  if ((int) loc[3].phys_index == ~0)
   {
     ecs_SetError(&(s->result),1,"Can't find SPATIAL_DATA_SUBSECTION section in Frame file");
     return(0L);
@@ -1823,7 +1826,7 @@ char *filename;
 
    /* Fseek to LOC_MASK_SUBSECTION, ID=138 */
 
-    if (loc[5].phys_index == ~0)
+    if ((int) loc[5].phys_index == ~0)
     {
       ecs_SetError(&(s->result),1,"Can't find MASK_SUBSECTION section in Frame file");
       return(0L);
@@ -1898,7 +1901,7 @@ int         ReducedColorTable;
 
   if ((fin = (FILE *)fopen((char *)filename, "rb")) == NULL)
   {
-    sprintf(string,"Can't open frame file %s\0",filename);
+    sprintf(string,"Can't open frame file %s",filename);
     ecs_SetError(&(s->result),1,string);
     return FALSE;
   }
@@ -1980,7 +1983,7 @@ uchar      blackpixel;
 
   if ((fin = (FILE *)fopen((char *)filename, "rb")) == NULL)
   {
-    sprintf(string,"Can't open frame file %s\0",filename);
+    sprintf(string,"Can't open frame file %s",filename);
     ecs_SetError(&(s->result),1,string);
     return(0L);
   }
@@ -2067,7 +2070,7 @@ void dyn_string_tolower(chaine)
 {
   int i;
   
-  for(i=0;i<strlen(chaine);i++) {
+  for( i=0; i< (int) strlen(chaine); i++) {
     if (chaine[i] >= 'A' && chaine[i] <= 'Z')
       chaine[i] += 32;
   }
