@@ -20,7 +20,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.7  2001-10-02 02:06:25  warmerda
+ * Revision 1.8  2001-10-09 22:48:27  warmerda
+ * preliminary support for setting output projection
+ *
+ * Revision 1.7  2001/10/02 02:06:25  warmerda
  * various bug fixes related to region setting
  *
  * Revision 1.6  2001/08/16 13:44:52  warmerda
@@ -43,9 +46,19 @@
 #include "ecs.h"
 #include "shapefil.h"
 #include <assert.h>
+#include "projects.h"
 
+#ifndef PJ_VERSION
+#define projPJ PJ
+#define projUV UV
+#endif
 
 static int	ClientID = -1;
+
+#ifndef MAX
+#  define MIN(a,b)      ((a<b) ? a : b)
+#  define MAX(a,b)      ((a>b) ? a : b)
+#endif
 
 /************************************************************************/
 /*                             CheckError()                             */
@@ -94,14 +107,6 @@ static int AccessURL( char * url, ecs_Region * region )
     result = cln_GetGlobalBound(ClientID);
     if( CheckError( result ) )
         return( FALSE );
-
-    printf( "Global Bounds\n" );
-    printf( "north = %f\n", ECSREGION(result).north );
-    printf( "south = %f\n", ECSREGION(result).south );
-    printf( "east = %f\n", ECSREGION(result).east );
-    printf( "west = %f\n", ECSREGION(result).west );
-    printf( "ns_res = %f\n", ECSREGION(result).ns_res );
-    printf( "ew_res = %f\n", ECSREGION(result).ew_res );
 
     *region = ECSREGION(result);
 
@@ -553,6 +558,8 @@ static void ImportMatrix( ecs_Region *region, const char * layer,
         result = cln_GetNextObject(ClientID);
     }
 
+    CheckError( result );
+
     fclose( fp_raw );
 }
 
@@ -682,6 +689,164 @@ static void ImportImage( ecs_Region *region, const char * layer,
 }
 
 /************************************************************************/
+/*                          ParseProjection()                           */
+/************************************************************************/
+
+projPJ *ParseProjection( const char *projection )
+
+{
+    char      wproj[1024];
+    char      *proj_parms[30];
+    int       parm_count = 0;
+    projPJ    *pj;
+
+/* -------------------------------------------------------------------- */
+/*      Parse into tokens.                                              */
+/* -------------------------------------------------------------------- */
+    strcpy( wproj, projection );
+    proj_parms[parm_count] = strtok( wproj, " " );
+    while( proj_parms[parm_count] != NULL )
+        proj_parms[++parm_count] = strtok( NULL, " " );
+
+/* -------------------------------------------------------------------- */
+/*      Call pj_init()                                                  */
+/* -------------------------------------------------------------------- */
+    pj = pj_init( parm_count, proj_parms );
+
+    if( pj == NULL )
+    {
+        printf( "Failed to initialize projection from: %s\n", projection );
+    }
+}
+
+/************************************************************************/
+/*                          RecomputeRegion()                           */
+/*                                                                      */
+/*      Translate the source region into the indicate output            */
+/*      coordinate system.                                              */
+/************************************************************************/
+
+static int RecomputeRegion( const char * output_projection,
+                            ecs_Region *region )
+
+{
+    ecs_Result *result;
+    projPJ      *src, *dst;
+    projUV      corners[4];
+    ecs_Region  out_region;
+    int         iCorner, src_xsize, src_ysize, max_dim;
+    
+/* -------------------------------------------------------------------- */
+/*      Fetch source projection.                                        */
+/* -------------------------------------------------------------------- */
+    result = cln_GetServerProjection( ClientID );
+    if( CheckError( result ) )
+        return( FALSE );
+
+    src = ParseProjection( ECSTEXT(result) );
+
+/* -------------------------------------------------------------------- */
+/*      Parse destination projection.                                   */
+/* -------------------------------------------------------------------- */
+    dst = ParseProjection( output_projection );
+
+/* -------------------------------------------------------------------- */
+/*      Setup input coordinates of corners.                             */
+/* -------------------------------------------------------------------- */
+    corners[0].u = region->west;
+    corners[0].v = region->north;
+    corners[1].u = region->east;
+    corners[1].v = region->north;
+    corners[2].u = region->east;
+    corners[2].v = region->south;
+    corners[3].u = region->west;
+    corners[3].v = region->south;
+
+/* -------------------------------------------------------------------- */
+/*      Reproject, and establish new bounding region.                   */
+/* -------------------------------------------------------------------- */
+    for( iCorner = 0; iCorner < 4; iCorner++ )
+    {
+        /* Translate source to radians */
+        
+        if( src != NULL )
+        {
+            corners[iCorner] = pj_inv( corners[iCorner], src );
+        }
+        else
+        {
+            corners[iCorner].u *= DEG_TO_RAD;
+            corners[iCorner].v *= DEG_TO_RAD;
+        }
+
+        /* Translate into destination projection or back to degrees */
+
+        if( dst != NULL )
+        {
+            corners[iCorner] = pj_fwd( corners[iCorner], dst );
+        }
+        else
+        {
+            corners[iCorner].u *= DEG_TO_RAD;
+            corners[iCorner].v *= DEG_TO_RAD;
+        }
+
+        /* Grow region to hold result */
+
+        if( iCorner == 0 )
+        {
+            out_region.north = out_region.south = corners[iCorner].v;
+            out_region.east = out_region.west = corners[iCorner].u;
+        }
+        else
+        {
+            out_region.north = MAX(out_region.north,corners[iCorner].v);
+            out_region.south = MIN(out_region.south,corners[iCorner].v);
+            out_region.east = MAX(out_region.east,corners[iCorner].u);
+            out_region.west = MIN(out_region.west,corners[iCorner].u);
+        }
+    }
+
+/* -------------------------------------------------------------------- */
+/*      Establish output resolution.                                    */
+/* -------------------------------------------------------------------- */
+    src_xsize = (int) ceil((region->east - region->west) / region->ew_res);
+    src_ysize = (int) ceil((region->north - region->south) / region->ns_res);
+
+    max_dim = MAX(src_xsize,src_ysize);
+    if( out_region.north - out_region.south >
+        out_region.east - out_region.west )
+    {
+        out_region.ns_res = (out_region.north - out_region.south) / max_dim;
+        out_region.ew_res = out_region.ns_res;
+    }
+    else
+    {
+        out_region.ew_res = (out_region.east - out_region.west) / max_dim;
+        out_region.ns_res = out_region.ew_res;
+    }
+
+/* -------------------------------------------------------------------- */
+/*      Grow region by one pixel to help with weird round off issues.   */
+/* -------------------------------------------------------------------- */
+    out_region.north += out_region.ns_res;
+    out_region.south -= out_region.ns_res;
+    out_region.east += out_region.ew_res;
+    out_region.west -= out_region.ew_res;
+
+    *region = out_region;
+
+    printf( "out_region.north = %f\n", out_region.north );
+    printf( "out_region.south = %f\n", out_region.south );
+    printf( "out_region.east = %f\n", out_region.east );
+    printf( "out_region.west = %f\n", out_region.west );
+    printf( "out_region.ns_res = %f\n", out_region.ns_res );
+    printf( "out_region.ew_res = %f\n", out_region.ew_res );
+
+    return TRUE;
+}
+
+/************************************************************************/
 /*                                main()                                */
 /************************************************************************/
 
@@ -693,10 +858,12 @@ int main( int argc, char ** argv )
     ecs_Result *result;
     int		i, set_region = FALSE, set_res = FALSE;
     char	*out_file = "ogdi_out";
+    const char *output_projection = NULL;
 
     if( argc == 1 )
     {
         printf("Usage: ogdi_import -u url -f family\n");
+        printf("          [-op output_projection]\n" );
         printf("          [-r north south east west] [-res ns_res ew_res]\n" );
         printf("          [-o filename]\n" );
         printf("          -l layername [more_opts -l layername]\n" );
@@ -718,6 +885,15 @@ int main( int argc, char ** argv )
         }
         else if( strcmp(argv[i],"-o") == 0 ) {
             out_file = argv[++i];
+        }
+        else if( strcmp(argv[i],"-op") == 0 ) {
+            output_projection = argv[++i];
+            RecomputeRegion( output_projection, region );
+            set_res = TRUE;
+            set_region = TRUE;
+            result = cln_SetClientProjection( ClientID, output_projection );
+            if( CheckError( result ) )
+                break;
         }
         else if( strcmp(argv[i], "-l") == 0 ) {
             layer = argv[++i];
