@@ -15,51 +15,18 @@ typedef struct
     long            output;
 } xBYTE_ORDER;
 
+#if BIG_ENDIAN == 1
+#define MACHINE_BYTE_ORDER MOST_SIGNIFICANT
+#else
+#define MACHINE_BYTE_ORDER LEAST_SIGNIFICANT
+#endif
+
 #ifdef _WINDOWS
-#define DOS 1
-#define MACHINE_BYTE_ORDER LEAST_SIGNIFICANT
+#  define DOS 1
 #else  /* Not _WINDOWS */
-#ifdef _LINUX
-#define UNIX 1
-#define MACHINE_BYTE_ORDER LEAST_SIGNIFICANT
-#define strcmpi(s1,s2) strcasecmp(s1,s2)
-#define stricmp(s1,s2) strcasecmp(s1,s2)
-#define strnicmp(s1,s2, len) strncasecmp(s1,s2, len)
-#else /* Not _LINUX */
-#ifdef _ALPHA
-#define UNIX 1
-#define MACHINE_BYTE_ORDER LEAST_SIGNIFICANT
-#define strcmpi(s1,s2) strcasecmp(s1,s2)
-#define stricmp(s1,s2) strcasecmp(s1,s2)
-#define strnicmp(s1,s2, len) strncasecmp(s1,s2, len)
-#else /* Not _ALPHA */
-#ifdef _SOLARIS
-#define UNIX 1
-#define MACHINE_BYTE_ORDER MOST_SIGNIFICANT
-#define strcmpi(s1,s2) strcasecmp(s1,s2)
-#define stricmp(s1,s2) strcasecmp(s1,s2)
-#define strnicmp(s1,s2, len) strncasecmp(s1,s2, len)
-#else /* Not _SOLARIS */
-#if 0
-#if XVT_OS == XVT_OS_WIN
-#define DOS 1
-#define MACHINE_BYTE_ORDER LEAST_SIGNIFICANT
-#endif /* not 0 */
-#endif /* XVT_OS == XVT_OS_WIN */
-#if XVT_OS_ISUNIX == TRUE
-#define UNIX 1
-#define MACHINE_BYTE_ORDER MOST_SIGNIFICANT
-#define strcmpi(s1,s2) strcasecmp(s1,s2)
-#define stricmp(s1,s2) strcasecmp(s1,s2)
-#define strnicmp(s1,s2, len) strncasecmp(s1,s2, len)
-#endif /* endif XVT_OS_ISUNIX == TRUE */
-#if XVT_OS == XVT_OS_MAC
-#define MAC 1
-#define MACHINE_BYTE_ORDER MOST_SIGNIFICANT
-#endif /* endif XVT_OS == XVT_OS_MAC */
-#endif /* endif _SOLARIS */
-#endif /* endif _ALPHA */
-#endif /* endif _LINUX */
+#  define strcmpi(s1,s2) strcasecmp(s1,s2)
+#  define stricmp(s1,s2) strcasecmp(s1,s2)
+#  define strnicmp(s1,s2, len) strncasecmp(s1,s2, len)
 #endif /* endif _WINDOWS */
 
 #ifndef __INT32DEF__
