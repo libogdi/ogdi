@@ -1,3 +1,7 @@
+2004-10-04  Frank Warmerdam  <warmerdam@pobox.com>
+
+	* Release OGDI 3.1.3.
+
 2004-03-29  Frank Warmerdam  <warmerdam@pobox.com>
 
 	* ogdi/drivers/rpf/utils.c: Check for FSDEVG field is present in 
@@ -724,5 +728,3 @@ Remarks:  -The function svr_BroadCloseLayers() in server.c seems to be useless a
            them in the example2 directory of the present core.
 
 	    -The file datadict.h was missing to build the skeleton driver.  I took the one from the previous core.
-            
-	
