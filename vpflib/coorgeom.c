@@ -37,7 +37,7 @@
 #define MAXFLOAT    3.37E+38
 #endif
 
-#ifdef _WINDOWS
+#ifndef MISSING_FLOAT_H
 #include <float.h>
 #define MAXFLOAT FLT_MAX
 #endif
@@ -46,10 +46,6 @@
 #include "coorgeom.h"
 #endif
 
-#ifdef _LINUX
-#include <float.h>
-#define MAXFLOAT FLT_MAX
-#endif
 
 
 /*************************************************************************
