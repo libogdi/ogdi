@@ -55,6 +55,8 @@ ecs_Result *dyn_CreateServer(s,Request)
   char buffer[125];
   char cc,sc[3];
 
+  (void) Request;
+
   if (spriv == NULL) {
     ecs_SetError(&(s->result),1,"Not enough memory to allocate server private data");
     return &(s->result);
@@ -205,6 +207,18 @@ ecs_Result *dyn_CreateServer(s,Request)
 
   ecs_SetSuccess(&(s->result));
   return &(s->result);
+}
+
+/* deselect all layer */
+
+static void
+_releaseAllLayers(s)
+     ecs_Server *s;
+{
+  int i;
+
+  for (i = 0; i < s->nblayer; ++i)
+    dyn_ReleaseLayer(s,&(s->layer[i].sel));
 }
 
 
@@ -422,18 +436,6 @@ ecs_Result *dyn_ReleaseLayer(s,sel)
   return &(s->result);
 }
 
-/* deselect all layer */
-
-static void
-_releaseAllLayers(s)
-     ecs_Server *s;
-{
-  int i;
-
-  for (i = 0; i < s->nblayer; ++i)
-    dyn_ReleaseLayer(s,&(s->layer[i].sel));
-}
-
 /* ----------------------------------------------------------------------
  *  dyn_SelectRegion: 
  *     
@@ -494,8 +496,6 @@ ecs_Result *
 dyn_GetAttributesFormat(s)
      ecs_Server *s;
 {
-  register ServerPrivateData *spriv = s->priv;
-  
   ecs_SetObjAttributeFormat(&(s->result));
 
   ecs_AddAttributeFormat(&(s->result),"category",Integer,5,0,0);
@@ -622,6 +622,8 @@ ecs_Result *dyn_UpdateDictionary(s,info)
   register ServerPrivateData *spriv = s->priv;
   char *c;
 
+  (void) info;
+
   dirlist = opendir(spriv->imgdir);
   if (dirlist==NULL) {
     ecs_SetError(&(s->result),1,"Unable to see the ADRG directory");
@@ -702,6 +704,7 @@ ecs_Result *dyn_SetServerLanguage(s,language)
      ecs_Server *s;
      u_int language;
 {
+  (void) language;
   ecs_SetSuccess(&(s->result));
   return &(s->result);
 }

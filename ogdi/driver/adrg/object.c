@@ -169,10 +169,8 @@ void _getNextObjectRaster(s,l)
      ecs_Server *s;
      ecs_Layer *l;
 {
-  register ServerPrivateData *spriv = s->priv;
   int i,i2,j2;
   char buffer[128];
-  register LayerPrivateData *lpriv = (LayerPrivateData *) l->priv;
   static int UseOverview;
 
   int totalcol,totalrow;
@@ -229,8 +227,6 @@ _getObjectRaster(s,l,id)
 {
   int i,i2,j2;
   char buffer[128];
-  register ServerPrivateData *spriv = s->priv;
-  register LayerPrivateData *lpriv = (LayerPrivateData *) l->priv;
   int totalcol,totalrow;
   int value;
   int index;
@@ -281,6 +277,9 @@ _getObjectIdRaster(s,l,coord)
      ecs_Coordinate *coord;
 {
 
+  (void) l;
+  (void) coord;
+
   ecs_SetSuccess(&(s->result));
 }	
 
@@ -288,6 +287,8 @@ void _rewindRasterLayer(s,l)
      ecs_Server *s;
      ecs_Layer *l;
 {
+    (void) s;
+    (void) l;
 }
 
 

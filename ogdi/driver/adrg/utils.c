@@ -242,7 +242,6 @@ int _read_overview(s)
   int first;
   char c,sc[4];
   char buffer[20];
-  double x,y;
   int i,j,count;
   int isTiled;
 

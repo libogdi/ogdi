@@ -97,7 +97,6 @@ typedef struct {
 void _calPosWithCoord _ANSI_ARGS_((ecs_Server *s,ecs_Layer *l,double pos_x,double pos_y,int *i,int *j,int UseOverview));
 
 int	_IsOutsideRegion _ANSI_ARGS_((double n, double s, double e,double w, ecs_Region *x));
-void	_releaseAllLayers _ANSI_ARGS_((ecs_Server *s));
 
 int _read_adrg _ANSI_ARGS_((ecs_Server *s,ecs_Layer *l));
 int _read_overview _ANSI_ARGS_((ecs_Server *s));
