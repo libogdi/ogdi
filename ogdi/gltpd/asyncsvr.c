@@ -1,17 +1,23 @@
 #include "ecs.h"
+
 #ifdef _WINDOWS
-#include "rpc/pmap_cln.h"
-#include "time.h"
+#  include "rpc/pmap_cln.h"
+#  include "time.h"
 #else
-#include <sys/wait.h>
-#endif
-#include <unistd.h>
-#ifdef _WINDOWS
-#include <errno.h>
-#else
-#include <sys/errno.h>
+#  include <sys/wait.h>
 #endif
 
+#include <unistd.h>
+
+#ifdef _WINDOWS
+#  include <errno.h>
+#else
+#  include <sys/errno.h>
+#endif
+
+#ifdef HAVE_STD_RPC_INCLUDES
+#  include <rpc/pmap_clnt.h>
+#endif
 
 #define COMTIMEOUT 900
 
@@ -24,6 +30,8 @@ static char str1[255];
 static char *argv0;
 static void gltpd_svc_run();
 
+
+
 FILE *gltpdstate = NULL;
 
 int main(argc,argv)
@@ -31,7 +39,7 @@ int main(argc,argv)
      char **argv;
 {
   SVCXPRT *transp;
-  unsigned int num;
+  int num;
   int isDispatch = TRUE;
   char *debug;
 
@@ -42,7 +50,7 @@ int main(argc,argv)
   debug = getenv("GLTPDLOGFILE");
 
   if (debug) {
-    gltpdstate = ".";
+    gltpdstate = (FILE *) ".";
     if (gltpdstate) {
       printf("%d: Start in the main\n",getpid());
       for(num=0;num<argc;num++) {
@@ -112,7 +120,8 @@ int main(argc,argv)
 		      dispatchno_1, IPPROTO_TCP)) {
       (void)fprintf(stderr, "unable to register (DISPATCHNO, DISPATCHVERS, tcp).\n");
       if (debug && gltpdstate) {
-	printf("%d: Start dispatcher: unable to register the dispatcher no %d.\n",getpid(),dispatchno_1);
+	printf("%d: Start dispatcher: unable to register the dispatcher.\n",
+               getpid());
       }    
       return 0;
     }
@@ -123,7 +132,7 @@ int main(argc,argv)
     (void)fprintf(stderr, "svc_run returned\n");
   } else {
     if (debug && gltpdstate) {
-      printf("%d: Start server: Call pmap_unset at rpcaddress %d version %d\n",getpid(),num,ECSVERS);
+      printf("%d: Start server: Call pmap_unset at rpcaddress %d version %d\n",getpid(),num,(int) ECSVERS);
     }
 
     (void)pmap_unset(num, ECSVERS);
@@ -175,10 +184,10 @@ dispatchno_1(rqstp, transp)
   STARTUPINFO  si;
   SECURITY_ATTRIBUTES saProcess, saThread;
   PROCESS_INFORMATION piProcessB;
+  bool_t result;
 #endif
   char temp[256];
   char *debug;
-  bool_t result;
   union {
     int fill;
   } argument;
@@ -187,7 +196,7 @@ dispatchno_1(rqstp, transp)
   debug = getenv("GLTPDLOGFILE");
 
   if (debug) {
-    gltpdstate = 1;
+    gltpdstate = (FILE *) (void *) 1;
     if (gltpdstate) {
       printf("%d: Start in the dispatcher function\n",getpid());
     }
@@ -209,7 +218,7 @@ dispatchno_1(rqstp, transp)
     }
  
     memset((char *)&argument,0, sizeof(argument));
-    if (!svc_getargs(transp, xdr_void, &argument)) {
+    if (!svc_getargs(transp, (xdrproc_t) xdr_void, (char *) &argument)) {
       svcerr_decode(transp);
       return;
     }
@@ -246,7 +255,8 @@ dispatchno_1(rqstp, transp)
     svc_destroy(newtransp);
     
     if (debug && gltpdstate) {
-      printf("%d: Dispatcher function: RPC number: %d\n",getpid(),newprogramno);
+      printf("%d: Dispatcher function: RPC number: %ld\n",
+             getpid(), newprogramno);
     }
 
 #ifdef _WINDOWS
@@ -262,10 +272,6 @@ dispatchno_1(rqstp, transp)
     saThread.nLength = sizeof(saThread);
     saThread.lpSecurityDescriptor =NULL;
      saThread.bInheritHandle=FALSE;
-
-#ifndef _WINDOWS
-    time(&timecount);
-#endif
 
     /* spawn process */
 
@@ -383,7 +389,7 @@ dispatchno_1(rqstp, transp)
     exit(1);
     */
 
-    sprintf(temp,"%s %d &",argv0, newprogramno); 
+    sprintf(temp,"%s %ld &",argv0, newprogramno); 
     if (debug && gltpdstate) {
       printf("%d: Dispatcher function: Call CreateProcess\n",getpid());
     }
@@ -404,7 +410,7 @@ dispatchno_1(rqstp, transp)
       svcerr_systemerr(transp);
       printf("erreur reply\n");
     }
-    if (!svc_freeargs(transp, xdr_void, &argument)) {
+    if (!svc_freeargs(transp, (xdrproc_t) xdr_void, (char *) &argument)) {
       (void)fprintf(stderr, "unable to free arguments\n");
       exit(1);
     }
@@ -485,7 +491,7 @@ void gltpd_svc_run()
 	if (currenttime - timecount > COMTIMEOUT) {
 	  xdr_argument = (xdrproc_t) xdr_void;
 	  xdr_result = (xdrproc_t) xdr_ecs_Result;
-	  destroyserver_1_svc(xdr_argument,xdr_result);
+	  destroyserver_1_svc(xdr_argument,NULL);
 	  perror("gltpd_svc_run: - timeout");
 	  return;
 	}
@@ -497,7 +503,7 @@ void gltpd_svc_run()
     case 0:
       xdr_argument = (xdrproc_t) xdr_void;
       xdr_result = (xdrproc_t) xdr_ecs_Result;
-      destroyserver_1_svc(xdr_argument,xdr_result);
+      destroyserver_1_svc(xdr_argument,NULL);
       perror("gltpd_svc_run: - timeout");
       return;
     default:
