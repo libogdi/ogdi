@@ -1,4 +1,3 @@
-/* config.h.  Generated automatically by configure.  */
 /*================================================================
 ** Copyright 2000, Clark Cooper
 ** All rights reserved.
@@ -10,39 +9,24 @@
 **
 */
 
-/* Define to empty if the keyword does not work.  */
-/* #undef const */
+/*
+** This file was hand crafted for OGDI.  Currently we assume we have
+** standard C headers, and memmove().   We depend on the makefile defining
+** WORDS_BIGENDIAN on big endian platforms.
+**
+** Frank Warmerdam, April, 2001
+*/
 
-/* Define if you have a working `mmap' system call.  */
-#define HAVE_MMAP 1
-
-/* Define to `long' if <sys/types.h> doesn't define.  */
-/* #undef off_t */
-
-/* Define to `unsigned' if <sys/types.h> doesn't define.  */
-/* #undef size_t */
+#include <string.h>
 
 /* Define if you have the ANSI C header files.  */
 #define STDC_HEADERS 1
 
-/* Define if your processor stores words with the most significant
-   byte first (like Motorola and SPARC, unlike Intel and VAX).  */
-/* #undef WORDS_BIGENDIAN */
-
 /* Define if you have the bcopy function.  */
 #define HAVE_BCOPY 1
 
-/* Define if you have the getpagesize function.  */
-#define HAVE_GETPAGESIZE 1
-
 /* Define if you have the memmove function.  */
 #define HAVE_MEMMOVE 1
-
-/* Define if you have the <fcntl.h> header file.  */
-#define HAVE_FCNTL_H 1
-
-/* Define if you have the <unistd.h> header file.  */
-#define HAVE_UNISTD_H 1
 
 #define XML_NS
 #define XML_DTD
