@@ -200,7 +200,6 @@ endif
 
 ifeq ($(TARGETGEN),$(ARCHGEN))
 default-install:
-	cp $(TARGETGEN) $(INST_LIB)
 endif
 
 ifeq ($(TARGETGEN),$(PROGGEN))
@@ -211,6 +210,11 @@ endif
 ifeq ($(TARGETGEN),)
 default-install:
 endif
+
+install-so-link:
+	rm -f $(INST_LIB)/$(LIB_PREFIX)$(TOBEGEN_STRIPPED).$(SHLIB_EXT)
+	ln -s $(LIB_PREFIX)$(TOBEGEN).$(SHLIB_EXT) \
+	      $(INST_LIB)/$(LIB_PREFIX)$(TOBEGEN_STRIPPED).$(SHLIB_EXT)
 
 install:	default-install $(EXTRA_INSTALL_TARGETS)
 
