@@ -4,6 +4,23 @@
 View the ChangeLog file for detailed, file by file notes on changes.  The
 NEWS file is just used to sumarize major changes, and new features. 
 
+3.1.4
+=====
+
+ o Fixed bug in VRF driver when one client connection is closed and another
+   opened. 
+ 
+ o Fixed severe problems with VRF driver and selection expressions for string
+   fields. 
+
+ o Fixed severe problem composing area polygons from non-tiled VRF datastores
+   (such as VMAP0 rference layer). 
+
+ o Fixed additional memory leaks. 
+
+ o Improvements in README for how to build on Unix and windows.
+
+
 3.1.3
 =====
 
