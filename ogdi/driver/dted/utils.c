@@ -449,6 +449,7 @@ _verifyLocation(s)
 	  returnvalue = TRUE;
 	}
       }
+      free( ptr2 );
     }
   }
   if (!returnvalue)
@@ -933,12 +934,12 @@ int _readValuesFromDirList(ecs_Server *s) {
   /* free the memory */
 
   for (y=0; y < nb_ewdir; y++) {
-    if (! dirlist[y]->nsfile)
+    if ( dirlist[y]->nsfile)
       free(dirlist[y]->nsfile);
     free(dirlist[y]);
   }
 
-  if (!dirlist) 
+  if (dirlist) 
     free(dirlist);
   
   /* set the layer name based on the region */

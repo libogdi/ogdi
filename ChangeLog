@@ -1,5 +1,7 @@
 2001-02-07  Frank Warmerdam  <warmerdam@pobox.com>
 
+	* ogdi/driver/dted/utils.c, dted.c: Fixed various memory leaks.
+
 	* ogdi/c-api/server.c: Modified svr_DestroyServer() to free 
 	rasterconversion.coef.coef_val if non-null to fix memory leak.
 

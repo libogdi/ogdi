@@ -46,9 +46,12 @@ ecs_Result *dyn_CreateServer(s,Request)
      ecs_Server *s;
      char *Request;
 {
-  ServerPrivateData *spriv = s->priv = (void *) malloc(sizeof(ServerPrivateData));
+  ServerPrivateData *spriv = s->priv =
+      (void *) calloc(1,sizeof(ServerPrivateData));
+  
   if (spriv == NULL) {
-    ecs_SetError(&(s->result),1,"Not enough memory to allocate server private data");
+    ecs_SetError(&(s->result),1,
+                 "Not enough memory to allocate server private data");
     return &(s->result);
   }
 
@@ -101,7 +104,8 @@ ecs_Result *dyn_CreateServer(s,Request)
   }
 
   /* 1,1 are placeholders; the width is calculated from _getResolution */
-  if (!ecs_TileInitialize( s, &(spriv->t), &(s->globalRegion), spriv->xtiles, spriv->ytiles, 1, 1, _calcPosValue, _getTileDim)) { 
+  if (!ecs_TileInitialize( s, &(spriv->t), &(s->globalRegion), spriv->xtiles,
+                           spriv->ytiles, 1, 1, _calcPosValue, _getTileDim)) { 
     ecs_SetError(&(s->result), 1, "Unable to retrieve tile structure.");
     free(spriv->pathname);
     free(s->priv);
@@ -132,6 +136,7 @@ ecs_Result *dyn_DestroyServer(s)
      ecs_Server *s;
 {
   ServerPrivateData *spriv = s->priv;
+  int               i;
 
   /* Release all layer */
   
@@ -141,6 +146,14 @@ ecs_Result *dyn_DestroyServer(s)
     if (spriv->pathname != NULL) {
       free(spriv->pathname);
     }
+    for( i=0; i < spriv->xtiles; i++ )
+    {
+        if( spriv->ewdir != NULL && spriv->ewdir[i].nsfile != NULL )
+            free( spriv->ewdir[i].nsfile );
+    }
+    if( spriv->ewdir != NULL )
+        free( spriv->ewdir );
+        
     free(spriv);
   }
   
