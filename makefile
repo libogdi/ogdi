@@ -10,13 +10,16 @@
 # representations about the suitability of this software for any purpose.
 # It is provided "as is" without express or implied warranty.
 
-
 include $(TOPDIR)/config/common.mak
  
 #
 # Sub-directories that need to be built
 #
-subdirs	= external proj vpflib ogdi contrib
+subdirs	= external vpflib ogdi contrib
+
+ifeq ($(PROJ_SETTING),internal)
+subdirs := proj $(subdirs) 
+endif
 
 #
 # Default target to build everything in all sub-directories
