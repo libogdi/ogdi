@@ -17,7 +17,12 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.9  2003-05-21 18:50:19  warmerda
+ * Revision 1.10  2003-05-22 16:58:01  warmerda
+ * Several fixes related to reading VITD area geometries properly even if
+ * the datasets face information seems to be corrupt.  See bug:
+ * http://sf.net/tracker/index.php?func=detail&aid=741854&group_id=11181&atid=111181
+ *
+ * Revision 1.9  2003/05/21 18:50:19  warmerda
  * verify that table_pos(COORDINATE) succeeds in point/line feature read
  *
  * Revision 1.8  2001/08/16 21:02:37  warmerda
@@ -700,6 +705,9 @@ int vrf_get_area_feature (s, layer, prim_id)
   
   area.rings[n]->id = n+1;
 
+  if( prim_id == 231 )
+      printf( "reading ring(s) for prim_id %d\n", prim_id );
+
   if (!vrf_get_ring_coords (s,area.rings[n], prim_id, ring_rec.edge, edgetable)) {
     xvt_free((char*)area.rings[0]);
     xvt_free ((char*)area.rings);
@@ -843,10 +851,11 @@ int vrf_get_ring_coords (s,ring, face_id, start_edge, edgetable)
   long eqlleft_edge=0L, eqlright_edge=0L;
   long maxsegs;
   char buffer[120];
+  char start_dir = '+';
 
   maxsegs = 5;
   proj = NOPROJ;
-  
+
   edge_rec = read_edge (start_edge, edgetable, proj.inverse_proj);
   if (edge_rec.npts == 0) {
     sprintf(buffer,"Unable to read the edge %d in the face %d",
@@ -866,6 +875,7 @@ int vrf_get_ring_coords (s,ring, face_id, start_edge, edgetable)
       eqlnpts = edge_rec.npts;
       eqlleft_edge = edge_rec.left_edge;
       eqlright_edge = edge_rec.right_edge;
+      start_dir = edge_rec.dir;
     }
   else
     eqlface1 = 0L;
@@ -941,7 +951,21 @@ int vrf_get_ring_coords (s,ring, face_id, start_edge, edgetable)
             eqlface2 = 1L;
 	  else
             eqlface2 = 0L;
- 
+
+          /* 
+           * This is to catch cases where there would appear to be a dangle
+           * (so we set eqlface1), but when we go to repeat the start edge
+           * we find we are going the same direction as the first time.  
+           * This occurs with some VITD dataset as per bug 741854 on
+           * http://ogdi.sf.net/
+           */
+#ifndef SKIP_BUG_741854_FIX
+          if( edge_rec.id == start_edge && edge_rec.dir == start_dir )
+          {
+              done = TRUE;
+              continue;
+          }
+#endif
 	  /* Allocate space for the next segment */
 	  if (eqlface1 && edge_rec.id == eqlleft_edge)
             eqlleft_edge = 0L;
@@ -1040,9 +1064,28 @@ int32 vrf_next_face_edge (edge_rec, prevnode, face_id)
     edge_rec->dir = '-';
     *prevnode = edge_rec->start_node;
   }
-  else
-    next = -1;
-  
+  /*
+   * I think we only end up here if the face information is wrong for some
+   * reason.  I have this problem with most layers in some VITD datasets
+   * 04KOREA (Edition 1) VITD data.  In this case we fall back to establishing
+   * the correction edge direction based on the start and end node.
+   * 
+   * See bug 741854 on http://ogdi.sf.net/
+   */
+  else {
+    if (*prevnode == edge_rec->start_node) {
+      edge_rec->dir = '+';
+      next = edge_rec->right_edge;
+      *prevnode = edge_rec->end_node;
+    } else if (*prevnode == edge_rec->end_node) {
+      edge_rec->dir = '-';
+      next = edge_rec->left_edge;
+      *prevnode = edge_rec->start_node;
+    } else {
+      next = -1;
+    }
+  }
+
   return next;
 }  
 
