@@ -1,6 +1,8 @@
 	Notes on Preparing an OGDI Source Release
 	=========================================
 
+0) Ensure the OGDI_VERSION and OGDI_RELEASEDATE values are up to date in
+   ogdi/include/ecs_utils.h.
 
 1) Do complete test builds on several platforms - at least Linux, 
    Solaris, and Windows NT.  
