@@ -8,7 +8,7 @@
 #  these programs without the prior permission of L.A.S. Inc.
 #
 
-TOBEGEN = proj_ogdi$(OGDI_VERSION)
+TOBEGEN = proj
 TARGETGEN = $(ARCHGEN)
 
 SOURCES	= pj_aea.c pj_aeqd.c pj_airy.c pj_aitoff.c \
