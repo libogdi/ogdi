@@ -377,6 +377,9 @@ ecs_Result *svr_DestroyServer(s)
   s->AttributeListQty = 0;
   s->AttributeList = NULL;
 
+  if (s->rasterconversion.coef.coef_val != NULL)
+    free(s->rasterconversion.coef.coef_val);
+  
   if (s->layer != NULL) {
     free(s->layer);
     s->layer = NULL;
