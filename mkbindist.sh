@@ -24,17 +24,30 @@ mkdir $DIST_DIR/include
 
 cp bin/$TARGET/* $DIST_DIR/bin
 cp bin/$TARGET/*.* $DIST_DIR/bin
+rm -f $DIST_DIR/bin/*.pdb
+rm -f $DIST_DIR/bin/core
+rm -f $DIST_DIR/bin/*_pure*
+
 cp ogdi/include/*.h $DIST_DIR/include
+
+sed -e "s/@PLATFORM@/${TARGET}/g" < README-BIN.TXT \
+    | sed -e "s/@VERSION@/${VERSION}/g" > $DIST_DIR/README-BIN.TXT
 
 if test "$TARGET" = "win32" ; then
   mkdir $DIST_DIR/lib
   cp lib/$TARGET/ogdi* $DIST_DIR/lib
 fi
 
-rm -f ${DIST_DIR}.tar.gz
-tar cf ${DIST_DIR}.tar ${DIST_DIR}
-gzip -9 ${DIST_DIR}.tar
-echo "Created: ${DIST_DIR}.tar.gz"
-
-zip -r ${DIST_DIR}.zip $DIST_DIR
-echo "Created: ${DIST_DIR}.zip"
+#
+# Make compressed distribution file. 
+#
+if test "$TARGET" = "win32" ; then
+  rm -f ${DIST_DIR}.zip
+  zip -r ${DIST_DIR}.zip $DIST_DIR
+  echo "Created: ${DIST_DIR}.zip"
+else
+  rm -f ${DIST_DIR}.tar.gz
+  tar cf ${DIST_DIR}.tar ${DIST_DIR}
+  gzip -9 ${DIST_DIR}.tar
+  echo "Created: ${DIST_DIR}.tar.gz"
+fi
