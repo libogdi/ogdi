@@ -4,6 +4,26 @@
 View the ChangeLog file for detailed, file by file notes on changes.  The
 NEWS file is just used to sumarize major changes, and new features. 
 
+3.1.1
+=====
+
+ o Upgraded to ZLIB 1.1.4 to avoid buffer overflow security risk in zlib 1.1.3.
+
+ o Various bugs fixed, and improvements to ogdi_info, and ogdi_import 
+   utilities.
+
+ o Fixed problems in cln_CalcCtlPoints() with very small regions, equivelent 
+   to one pixel of data.  Sometimes produced a degenerate transformation.
+
+ o Added OGDI_VERSION and OGDI_RELEASEDATE macros in ecs_util.h.
+
+
+3.1.0
+=====
+
+Essentially the same as 3.1Beta1.
+
+
 3.1Beta1
 ========
 
