@@ -17,7 +17,11 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.3  2001-04-09 15:04:34  warmerda
+ * Revision 1.4  2001-04-19 05:09:17  warmerda
+ * fixed round off errors in calculation of t->linelength, and placed
+ * coord.x/y at center of pixel instead of the corner.
+ *
+ * Revision 1.3  2001/04/09 15:04:34  warmerda
  * applied new source headers
  *
  */
@@ -247,6 +251,7 @@ int ecs_TileGetLine(s,t,start,end)
   
   offsetx = (int) ((s->currentRegion.west - t->region.west)/t->region.ew_res);
   offsety = (int) ((t->region.north - s->currentRegion.north)/t->region.ns_res);
+
   ratio_x = s->currentRegion.ew_res/t->region.ew_res;
   ratio_y = s->currentRegion.ns_res/t->region.ns_res;
   
@@ -261,11 +266,11 @@ int ecs_TileGetLine(s,t,start,end)
   /* calculate linelength */  
   if (t->linelength<0) {
     
-    t->linelength=((int) ((end->x - start->x) / s->currentRegion.ew_res))+2;
+    t->linelength = (int) (((end->x-start->x) / s->currentRegion.ew_res)+0.5);
     
   } else {
-    tmp=((int) ((end->x - start->x) / s->currentRegion.ew_res)) + 2;
-    /*     tmp=(s->currentRegion.east - s->currentRegion.west) / s->currentRegion.ew_res; */
+    tmp=(int) (((end->x - start->x) / s->currentRegion.ew_res)+0.5);
+
     /* check if resolution has changed */
     if (tmp!=t->linelength) {
       ecs_TileDeleteAllLines(t);
@@ -283,7 +288,7 @@ int ecs_TileGetLine(s,t,start,end)
   /* y=(int) ((s->currentRegion.north- start->y) / s->currentRegion.ns_res); */
   
   y=l->index;
-  
+
   /* if the first line of the buffer isn't the current line, add it to the buffer */
   if (t->index != y) {
     ecs_TileAddLine(t,t->linelength, y, &tbuf);
@@ -303,8 +308,8 @@ int ecs_TileGetLine(s,t,start,end)
       }
       
       if (t->tileDimCallback!=NULL) {
-	coord.x=s->currentRegion.west+j*s->currentRegion.ew_res;    
-	coord.y=s->currentRegion.north-i*s->currentRegion.ns_res;
+	coord.x=s->currentRegion.west+(j+0.5)*s->currentRegion.ew_res;    
+	coord.y=s->currentRegion.north-(i+0.5)*s->currentRegion.ns_res;
 	t->tileDimCallback(s, t, coord.x, coord.y, &(t->width), &(t->height));
 	ew_res=1.0 / (double) t->width;
 	ns_res=1.0 / (double) t->height;
