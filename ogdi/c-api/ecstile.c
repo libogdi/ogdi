@@ -120,6 +120,8 @@ int ecs_TileInitialize (s, t, region, xtiles, ytiles, tilewidth, tileheight, cal
   dirty=1;
   */
 
+  (void) s;
+
   t->width=tilewidth;
   t->height=tileheight;
 
@@ -563,6 +565,8 @@ int ecs_TileFill(ecs_Server *s, ecs_TileStructure *t, int index, ecs_TileID *cur
 
 int ecs_GetTileId(ecs_Server *s, ecs_TileStructure *t, ecs_Coordinate *coord, ecs_TileID *tile_id) {
 
+  (void) s;
+
   if (coord->x < t->region.west || coord->x > t->region.east ||
       coord->y < t->region.south || coord->y > t->region.north) {
     tile_id->none=1;
@@ -618,6 +622,8 @@ int ecs_GetTileId(ecs_Server *s, ecs_TileStructure *t, ecs_Coordinate *coord, ec
 */
 
 int ecs_GetTileIdFromPos(ecs_Server *s, ecs_TileStructure *t, int x, int y, ecs_TileID *tile_id) {
+
+  (void) s;
 
   if (x < 0 || x > t->regionwidth ||
       y < 0 || y > t->regionheight) {

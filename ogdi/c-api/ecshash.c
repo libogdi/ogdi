@@ -797,6 +797,9 @@ BogusFind(tablePtr, key)
     ecs_HashTable *tablePtr;	/* Table in which to lookup entry. */
     char *key;			/* Key to use to find matching entry. */
 {
+    (void) tablePtr;
+    (void) key;
+
     return NULL;
 }
 
@@ -827,6 +830,10 @@ BogusCreate(tablePtr, key, newPtr)
     int *newPtr;		/* Store info here telling whether a new
 				 * entry was created. */
 {
+    (void) tablePtr;
+    (void) key;
+    (void) newPtr;
+
     return NULL;
 }
 

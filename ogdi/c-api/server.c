@@ -2149,7 +2149,7 @@ int ecs_GetLateralDBConnectionCtrlFile(s)
       strcpy(layer,chaine);
       break;
     case 3:
-      family = -1;
+      family = 0;
       if (strcmp(chaine,"Area") == 0 || strcmp(chaine,"AREA") == 0)
 	family = Area;
       else
@@ -2171,7 +2171,7 @@ int ecs_GetLateralDBConnectionCtrlFile(s)
 		  code = 32;
 		  goto GetLateralDBConnectionCtrlFileError;
 		}
-      if (family == -1) {
+      if (family == 0) {
 	goto GetLateralDBConnectionCtrlFileError;
       }
       break;
@@ -3079,6 +3079,8 @@ int ecs_UnstackRequest(s,request)
   int count,i;
   int candlist[13];
 
+  (void) s;
+
   /* Count the quantity of & in request and keep the position of each of it */
   count = 0;
   for(i=0;i<(int) strlen(*request);i++) {
@@ -3186,6 +3188,8 @@ int ecs_SetBindListForVector(s,l,msg,BindList,error)
   char **attribute_list;
   int argc;
   char **argv;
+
+  (void) s;
 
   attribute_qty = l->SelectionAttributeListQty;
 
@@ -3321,6 +3325,8 @@ int ecs_SetBindListForMatrix(s,l,ptr,BindList,error)
   int code;
   char temp[100];
   char **attribute_list;
+
+  (void) s;
 
   attribute_qty = l->SelectionAttributeListQty;
 

@@ -93,7 +93,7 @@ xdr_ecs_Result_Decode(XDR *xdrs, ecs_Result *objp)
 		if (status != Z_OK) {
 			break;
 		}
-	} while (size == objp->compression.cblksize);
+	} while (size == (int) objp->compression.cblksize);
 
 	do {
 		status = inflate(&z, Z_FINISH);
@@ -206,7 +206,8 @@ xdr_ecs_Result_Encode(XDR *xdrs, ecs_Result *objp)
 		z.avail_out = objp->compression.cblksize;
 		status = deflate(&z, Z_NO_FLUSH);
 		count = objp->compression.cblksize - z.avail_out;
-		if ((status != Z_OK) || (count < objp->compression.cblksize)) {
+		if ((status != Z_OK) 
+                    || (count < (int)objp->compression.cblksize)) {
 			break;
 		}
 		xdr_bytes(xdrs, (char **) &zbuf, &count,
@@ -215,10 +216,11 @@ xdr_ecs_Result_Encode(XDR *xdrs, ecs_Result *objp)
 	while (1) {
 		status = deflate(&z, Z_FINISH);
 		count = objp->compression.cblksize - z.avail_out;
-		if ((status != Z_OK) || (count < objp->compression.cblksize)) {
+		if ((status != Z_OK) 
+                    || (count < (int) objp->compression.cblksize)) {
 			xdr_bytes(xdrs, (char **) &zbuf, &count,
 				  objp->compression.cblksize);
-			if (count == objp->compression.cblksize) {
+			if (count == (int) objp->compression.cblksize) {
 				count = 0;
 				xdr_bytes(xdrs, (char **) &zbuf, &count,
 					  objp->compression.cblksize);
