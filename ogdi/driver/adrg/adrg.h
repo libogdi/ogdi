@@ -17,7 +17,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.5  2001-06-22 16:37:50  warmerda
+ * Revision 1.6  2001-06-23 14:06:31  warmerda
+ * added capabilities support, cache layer list when opening datastore
+ *
+ * Revision 1.5  2001/06/22 16:37:50  warmerda
  * added Image support, upgraded headers
  *
  */
@@ -72,6 +75,10 @@ typedef struct {
   char *genfilename;
   char *imgdir;
   LayerPrivateData overview;
+
+  int  layer_count;
+  char **layer_list;
+
 } ServerPrivateData;
 
 /* layer oriented method definition */

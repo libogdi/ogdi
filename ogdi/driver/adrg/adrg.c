@@ -17,7 +17,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.5  2001-06-22 16:37:50  warmerda
+ * Revision 1.6  2001-06-23 14:06:31  warmerda
+ * added capabilities support, cache layer list when opening datastore
+ *
+ * Revision 1.5  2001/06/22 16:37:50  warmerda
  * added Image support, upgraded headers
  *
  */
@@ -77,6 +80,9 @@ ecs_Result *dyn_CreateServer(s,Request)
     return &(s->result);
   }  
 
+  spriv->layer_count = 0;
+  spriv->layer_list = (char **) malloc(sizeof(char *) * 1);
+
   if (s->pathname[2] == ':') {
     strcpy(spriv->imgdir,s->pathname+1);
   } else {
@@ -102,6 +108,7 @@ ecs_Result *dyn_CreateServer(s,Request)
       c = structure->d_name;
       while((c[0]!='.') && (c[0]!='\0'))
 	c++;
+
       if ((strcmp(".GEN",c) == 0) || (strcmp(".gen",c) == 0)) {
 	spriv->genfilename = (char *) malloc(strlen(spriv->imgdir)+
 					     strlen(structure->d_name)+2);
@@ -115,7 +122,19 @@ ecs_Result *dyn_CreateServer(s,Request)
 	strcpy(spriv->genfilename,spriv->imgdir);
 	strcat(spriv->genfilename,"/");
 	strcat(spriv->genfilename,structure->d_name);
-	break;
+
+      } else if( (strcmp(".IMG",c) == 0) || (strcmp(".img",c) == 0)) {
+          spriv->layer_list = (char **) 
+              realloc(spriv->layer_list,
+                      sizeof(char *)*(spriv->layer_count+1));
+          if( spriv->layer_list == NULL )
+          {
+              ecs_SetError(&(s->result),1,"Not enough memory");
+              return &(s->result);
+          }
+          
+          spriv->layer_list[spriv->layer_count++] = 
+              strdup( structure->d_name );
       }
     }
 
@@ -207,8 +226,6 @@ ecs_Result *dyn_CreateServer(s,Request)
     cc = getc(spriv->overview.imgfile);
   }
 
-
-
   /* initialize layer private data */
 
   s->nblayer = 0; 
@@ -235,6 +252,7 @@ ecs_Result *dyn_DestroyServer(s)
   _releaseAllLayers(s);
 
   if(spriv != NULL) {
+    int  i;
     if (spriv->imgdir != NULL) {
       free(spriv->imgdir);
     }
@@ -247,6 +265,12 @@ ecs_Result *dyn_DestroyServer(s)
     if (spriv->overview.imgfile != NULL) {
       fclose(spriv->overview.imgfile);
     }
+
+    for( i = 0; i < spriv->layer_count; i++ )
+        free( spriv->layer_list[i] );
+    if( spriv->layer_list != NULL )
+        free( spriv->layer_list );
+    
     free(spriv);
   }
   
@@ -629,44 +653,118 @@ ecs_Result *dyn_UpdateDictionary(s,info)
      ecs_Server *s;
      char *info;
 {
-  char buffer[256];
-  struct dirent *structure;
-  DIR *dirlist;
-  register ServerPrivateData *spriv = s->priv;
-  char *c;
+    register ServerPrivateData *spriv = s->priv;
+    int	   i;
 
-  dirlist = opendir(spriv->imgdir);
-  if (dirlist==NULL) {
-    ecs_SetError(&(s->result),1,"Unable to see the ADRG directory");
-  }
-
-  structure = (struct dirent *) readdir(dirlist);
-
-  /* make sure an empty list is returned in all case */
-  ecs_SetText(&(s->result)," "); 
-
-  while (structure != NULL) {
-    if (!((strcmp(structure->d_name,".") == 0) || 
-	  (strcmp(structure->d_name,"..") == 0))) {
-      c = structure->d_name;
-      while((c[0]!='.') && (c[0]!='\0'))
-	c++;
-      if ((strcmp(".IMG",c) == 0) || (strcmp(".img",c) == 0)) {
-	sprintf(buffer,"%s ",structure->d_name);
-	if (!ecs_AddText(&(s->result),buffer)) {
-	  closedir(dirlist);
-	  return &(s->result);
-	}
-      }
+/* -------------------------------------------------------------------- */
+/*      Reduced capabilities without layers.                            */
+/* -------------------------------------------------------------------- */
+    if( strcmp(info,"ogdi_server_capabilities") == 0 )
+    {
+        ecs_AddText(&(s->result),
+                    "<?xml version=\"1.0\" ?>\n"
+                    "<OGDI_Capabilities version=\"3.1\">\n"
+                    "</OGDI_Capabilities>\n" );
+        ecs_SetSuccess(&(s->result));
     }
 
-    structure = (struct dirent *) readdir(dirlist);       
-  }
+/* -------------------------------------------------------------------- */
+/*      Full capabilities.                                              */
+/* -------------------------------------------------------------------- */
+    else if( strcmp(info,"ogdi_capabilities") == 0 )
+    {
+        char		line[256];
 
-  closedir(dirlist);
+        ecs_AddText(&(s->result),
+                    "<?xml version=\"1.0\" ?>\n"
+                    "<OGDI_Capabilities version=\"3.1\">\n" );
+        ecs_AddText(&(s->result),
+                    "   <FeatureTypeList>\n"
+                    "      <Operations>\n"
+                    "         <Query/>\n"
+                    "      </Operations>\n" );
 
-  ecs_SetSuccess(&(s->result));
-  return &(s->result);
+        for (i=0; i < spriv->layer_count; i++ )
+        {
+            ecs_Layer	dummy_layer;
+            LayerPrivateData *lpriv;
+            
+            dummy_layer.priv = (void *) calloc(sizeof(LayerPrivateData),1);
+
+            lpriv = (LayerPrivateData *) dummy_layer.priv;
+            lpriv->tilelist = NULL;
+            lpriv->buffertile = NULL;
+
+            strcpy(lpriv->imgfilename,spriv->layer_list[i]);
+  
+            /* Extract the layer information from the GEN file */
+            
+            if (!_read_adrg(s,&dummy_layer)) 
+            {
+                _freelayerpriv(lpriv);
+                continue;
+            }
+
+            /* Format the XML info */
+
+            ecs_AddText(&(s->result),
+                        "      <FeatureType>\n" );
+            sprintf( line, "         <Name>%s</Name>\n", 
+                     spriv->layer_list[i] );
+            ecs_AddText(&(s->result), line );
+            
+            sprintf( line, "         <SRS>PROJ4:%s</SRS>\n", PROJ_LONGLAT );
+            ecs_AddText(&(s->result),line);
+            sprintf(line, 
+                    "         <LatLonBoundingBox minx=\"%.9f\"  miny=\"%.9f\"\n"
+                    "                            maxx=\"%.9f\"  maxy=\"%.9f\" />\n",
+                    lpriv->region.west, 
+                    lpriv->region.south,
+                    lpriv->region.east,
+                    lpriv->region.north );
+            ecs_AddText(&(s->result),line);
+
+            sprintf(line, 
+                    "         <BoundingBox minx=\"%.9f\" miny=\"%.9f\"\n"
+                    "                      maxx=\"%.9f\" maxy=\"%.9f\"\n"
+                    "                      resx=\"%.9f\" resy=\"%.9f\" />\n",
+                    lpriv->region.west, 
+                    lpriv->region.south,
+                    lpriv->region.east,
+                    lpriv->region.north,
+                    lpriv->region.ew_res, 
+                    lpriv->region.ns_res );
+            ecs_AddText(&(s->result),line);
+
+            ecs_AddText(&(s->result),
+                        "         <Family>Matrix</Family>\n"
+                        "         <Family>Image</Family>\n"
+                        "      </FeatureType>\n" );
+
+            _freelayerpriv(lpriv);
+        }
+
+        ecs_AddText(&(s->result),
+                    "   </FeatureTypeList>\n" 
+                    "</OGDI_Capabilities>\n" );
+        ecs_SetSuccess(&(s->result));
+    }
+
+/* -------------------------------------------------------------------- */
+/*      Old style return result.                                        */
+/* -------------------------------------------------------------------- */
+    else 
+    {
+        ecs_SetText(&(s->result)," "); 
+        for( i = 0; i < spriv->layer_count; i++ )
+        {
+            ecs_AddText( &(s->result), spriv->layer_list[i] );
+            ecs_AddText( &(s->result), " " );
+        }
+    }
+
+    ecs_SetSuccess(&(s->result));
+    return &(s->result);
 
 }
 
