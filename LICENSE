@@ -63,26 +63,6 @@ ogdi/c-api/opendir.c/h is:
 
 ===============================================================================
 
-include/win32/PAN.H (and others):
-** Copyright (c) 1993 Cimmetry Systems Inc., All Rights Reserved.
-**
-** This file should be included in all C.S.I. source files.
-
-===============================================================================
-
-include/win32/heapagnt.h (and others):
-/* heapagnt.h -- HeapAgent (tm) public C/C++ header file
- *
- * Copyright (C) 1991-1996 by Arthur D. Applegate.  All Rights Reserved.
- * All Rights Reserved.
- *
- * No part of this source code may be copied, modified or reproduced
- * in any form without retaining the above copyright notice.
- * This source code, or source code derived from it, may not be redistributed
- * without express written permission of the author.
-
-===============================================================================
-
 include/win32/unistd.h:
  * Copyright (c) 1994 Software Research Associates, Inc.
  *
