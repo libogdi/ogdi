@@ -1,3 +1,8 @@
+2001-08-27  Frank Warmerdam  <warmerdam@pobox.com>
+
+	* external/expat/makefile: fixed declaration for WORDS_BIGENDIAN
+	macro.
+
 2001-08-16  Frank Warmerdam  <warmerdam@pobox.com>
 
 	* ogdi/driver/vrf: feature.c, vrf.h
