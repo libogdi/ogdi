@@ -29,7 +29,7 @@
 #include <io.h>
 #include <dos.h>
 #else
-#include <values.h>
+#include <float.h>
 #endif
 
 #ifndef _VPFTABLE_H_

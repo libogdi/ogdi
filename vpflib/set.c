@@ -49,8 +49,9 @@
 #include <memory.h>
 #endif
 
-#include <values.h>
+#include <float.h>
 #include <stdlib.h>
+
 #ifndef __SET_H__
 #include "set.h"
 #endif

@@ -7,7 +7,7 @@
 
 #include <stdio.h>
 #include <math.h>
-#include <values.h>
+#include <float.h>
 
 
 #ifdef _MSC

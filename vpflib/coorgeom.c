@@ -23,13 +23,11 @@
 
 #include <math.h>
 #include <stdlib.h>
+#include <float.h>
 
 #ifdef _MSDOS   
 #include <limits.h>
-#include <float.h>
 #define MAXFLOAT FLT_MAX
-#else
-#include <values.h>
 #endif
 
 #ifdef _MAC
