@@ -17,7 +17,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.10  2001-06-29 19:17:00  warmerda
+ * Revision 1.11  2001-07-05 14:16:06  warmerda
+ * fixed vrf_GetMetadata error duplicating first layer in a class, bug 111181
+ *
+ * Revision 1.10  2001/06/29 19:17:00  warmerda
  * fixed unterminated 'temp' string
  *
  * Revision 1.9  2001/06/21 20:30:15  warmerda
@@ -1137,7 +1140,7 @@ vrf_GetMetadata(s)
 	    return 0;
 	  }
   
-	for (i = 0; i <= spriv->fcsTable.nrows; ++i) 
+	for (i = 1; i <= spriv->fcsTable.nrows; ++i) 
 	  {
 	    flag=0;
 	    row = get_row(i, spriv->fcsTable);
