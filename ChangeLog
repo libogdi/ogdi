@@ -1,5 +1,9 @@
 2004-10-25  Frank Warmerdam  <warmerdam@pobox.com>
 
+	* vpflib/vpfprim.c: Fixed bug in create_edge_rec() with getting
+	the left face id if it is in 'I' format, instead of 'K' format such
+	as occurs in the rference layer of VMAP0 products.
+
 	* ogdi/driver/vrf/utils.c: Use short for "buffint" variable.  This is
 	the level number used in forming metadata.  This corrects a complaint
 	noticed in valgrind.  Likely to cause problems on big endian systems
