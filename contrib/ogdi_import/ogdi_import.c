@@ -20,7 +20,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.8  2001-10-09 22:48:27  warmerda
+ * Revision 1.9  2001-11-14 04:55:47  warmerda
+ * added -no-dict option
+ *
+ * Revision 1.8  2001/10/09 22:48:27  warmerda
  * preliminary support for setting output projection
  *
  * Revision 1.7  2001/10/02 02:06:25  warmerda
@@ -54,6 +57,7 @@
 #endif
 
 static int	ClientID = -1;
+static int      bNoDict = FALSE;
 
 #ifndef MAX
 #  define MIN(a,b)      ((a<b) ? a : b)
@@ -117,7 +121,8 @@ static int AccessURL( char * url, ecs_Region * region )
     if( CheckError( result ) )
         return( FALSE );
 
-    printf( "UpdateDictionary = \n%s\n", ECSTEXT(result) );
+    if( !bNoDict )
+        printf( "UpdateDictionary = \n%s\n", ECSTEXT(result) );
   
 /* -------------------------------------------------------------------- */
 /*      Print the projection.                                           */
@@ -717,6 +722,8 @@ projPJ *ParseProjection( const char *projection )
     {
         printf( "Failed to initialize projection from: %s\n", projection );
     }
+
+    return pj;
 }
 
 /************************************************************************/
@@ -862,7 +869,7 @@ int main( int argc, char ** argv )
 
     if( argc == 1 )
     {
-        printf("Usage: ogdi_import -u url -f family\n");
+        printf("Usage: ogdi_import [-no-dict] -u url -f family\n");
         printf("          [-op output_projection]\n" );
         printf("          [-r north south east west] [-res ns_res ew_res]\n" );
         printf("          [-o filename]\n" );
@@ -883,6 +890,9 @@ int main( int argc, char ** argv )
             if( region == NULL )
                 region = &reg;
         }
+        else if( strcmp(argv[i], "-no-dict") == 0 ) {
+            bNoDict = TRUE;
+        }
         else if( strcmp(argv[i],"-o") == 0 ) {
             out_file = argv[++i];
         }
@@ -891,7 +901,8 @@ int main( int argc, char ** argv )
             RecomputeRegion( output_projection, region );
             set_res = TRUE;
             set_region = TRUE;
-            result = cln_SetClientProjection( ClientID, output_projection );
+            result = cln_SetClientProjection( ClientID, 
+                                              (char *) output_projection );
             if( CheckError( result ) )
                 break;
         }
