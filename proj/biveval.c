@@ -2,7 +2,7 @@
 #ifndef lint
 static const char SCCSID[]="@(#)biveval.c	4.4	93/06/12	GIE	REL";
 #endif
-#include <projects.h>
+# include <projects.h>
 # define NEAR_ONE	1.00001
 	static UV
 w2, w;
@@ -77,7 +77,14 @@ bpseval(UV in, Tseries *T) {
 	}
 	return out;
 }
-	UV /* general entry point selecting evaluation mode */
+
+UV /* general entry point selecting evaluation mode */
 biveval(UV in, Tseries *T) {
-	return (T->power ? bpseval(in, T) : bcheval(in, T));
+
+    if (T->power) {
+        return bpseval(in, T);
+    } else {
+        return bcheval(in, T);
+    }
 }
+
