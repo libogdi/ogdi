@@ -31,9 +31,6 @@
 #ifndef INCL_XVTH
 #include <xvt.h>
 #endif
-#ifndef _MAC
-#define MAXINT SHRT_MAX
-#endif
 
 #ifndef __VPF_H__
 #include "vpf.h"
@@ -54,7 +51,9 @@
 #include "vpfprop.h"
 #endif
 
-
+#ifndef MAXINT
+#define MAXINT SHRT_MAX
+#endif
 
 /* Global Variables */
 char *projection_names[] = {"Decimal Degrees",

@@ -49,11 +49,6 @@
 #include "vpftable.h"
 #endif
 
-#ifdef MSC
-#define MAXSHORT SHRT_MAX
-#define MAXINT SHRT_MAX
-#endif
-
 /*
  * per heap block byte overhead
  */
