@@ -48,3 +48,6 @@ rpcgen:
 	perl ../scripts/svc_clean.pl \
 		-o ecs_svc.c $(OBJDIR)/ecs_svc.c.raw
 	$(RM) -f ecs.x
+
+clean: default-clean
+

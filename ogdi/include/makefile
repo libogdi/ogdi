@@ -15,14 +15,12 @@
 
 include $(TOPDIR)/config/common.mak
 
-all: ecs.h
+all:
 
-ecs.h: ecs.x
-ifneq ($(TARGET),win32)
+rpcgen:
 	-$(RM) -f $@ $@.raw
 	rpcgen -h -C -o $@.raw ecs.x
 	perl ../scripts/h_clean.pl -o $@ $@.raw
-endif
 
 clean:
 	@echo Nothing to clean in ogdi/include

@@ -51,3 +51,5 @@ all: MKOBJECTDIR
 
 uninstall:
 	-$(RM) $(PROJ_LIB)
+
+clean: default-clean

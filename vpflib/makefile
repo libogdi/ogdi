@@ -37,3 +37,4 @@ include $(TOPDIR)/config/common.mak
 all: MKOBJECTDIR 
 	$(MAKE) --directory $(OBJDIR) -f ../makefile PASS='depend' $(TARGETGEN)
 
+clean: default-clean

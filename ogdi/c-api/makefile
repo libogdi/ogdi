@@ -49,3 +49,4 @@ rpcgen:
 	perl ../scripts/xdr_clean.pl -o $@ $@.raw
 	$(RM) -f ecs.x
 
+clean: default-clean

@@ -17,5 +17,4 @@ all: MKOBJECTDIR
 	$(MAKE) --directory $(OBJDIR) -f ../makefile PASS='depend' $(TARGETGEN)
 	$(COPY_LOCAL)
 
-
-
+clean: default-clean

@@ -84,3 +84,6 @@ all: MKOBJECTDIR
 	$(MAKE) --directory $(OBJDIR) -f ../makefile PASS='depend' $(TARGETGEN)
 	$(MAKE) -f makeportmap.mak
 	$(MAKE) -f makerpcinfo.mak
+
+clean: default-clean
+

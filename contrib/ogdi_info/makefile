@@ -31,5 +31,4 @@ include $(TOPDIR)/config/common.mak
 all: MKOBJECTDIR ogdi_info.c
 	$(MAKE) --directory $(OBJDIR) -f ../makefile PASS='depend' $(TARGETGEN)
 
-
-
+clean: default-clean

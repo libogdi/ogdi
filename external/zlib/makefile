@@ -56,3 +56,4 @@ all: MKOBJECTDIR
 	$(MAKE) --directory $(OBJDIR) -f ../makefile PASS='depend' $(TARGETGEN)
 	$(MAKE) --directory $(OBJDIR) -f ../makefile PASS='depend' $(DYNAGEN)
 
+clean: default-clean
