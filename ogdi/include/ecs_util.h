@@ -481,7 +481,7 @@ int ecs_GetDefaultInfo _ANSI_ARGS_((char* url, char* key, char** result));
   ----------------------------------------------------------------
   */
 
-#define ECSRESULTTYPE(result) result->res.type
+#define ECSRESULTTYPE(result) ((result)->res.type)
 
 /*
   ----------------------------------------------------------------
@@ -490,7 +490,7 @@ int ecs_GetDefaultInfo _ANSI_ARGS_((char* url, char* key, char** result));
   ----------------------------------------------------------------
   */
 
-#define ECSRESULT(result) result->res.ecs_ResultUnion_u
+#define ECSRESULT(result) ((result)->res.ecs_ResultUnion_u)
 
 /*
   ----------------------------------------------------------------
@@ -499,7 +499,7 @@ int ecs_GetDefaultInfo _ANSI_ARGS_((char* url, char* key, char** result));
   ----------------------------------------------------------------
   */
 
-#define ECSGEOMTYPE(result) result->res.ecs_ResultUnion_u.dob.geom.family
+#define ECSGEOMTYPE(result) ((result)->res.ecs_ResultUnion_u.dob.geom.family)
 
 /*
   ----------------------------------------------------------------
@@ -508,7 +508,7 @@ int ecs_GetDefaultInfo _ANSI_ARGS_((char* url, char* key, char** result));
   ----------------------------------------------------------------
   */
 
-#define ECSGEOM(result) result->res.ecs_ResultUnion_u.dob.geom.ecs_Geometry_u
+#define ECSGEOM(result) ((result)->res.ecs_ResultUnion_u.dob.geom.ecs_Geometry_u)
 
 /*
   ----------------------------------------------------------------
@@ -517,7 +517,7 @@ int ecs_GetDefaultInfo _ANSI_ARGS_((char* url, char* key, char** result));
   ----------------------------------------------------------------
   */
 
-#define ECSAREARING(result,pos) result->res.ecs_ResultUnion_u.dob.geom.ecs_Geometry_u.area.ring.ring_val[pos]
+#define ECSAREARING(result,pos) ((result)->res.ecs_ResultUnion_u.dob.geom.ecs_Geometry_u.area.ring.ring_val[(pos)])
 
 /*
   ----------------------------------------------------------------
@@ -525,7 +525,7 @@ int ecs_GetDefaultInfo _ANSI_ARGS_((char* url, char* key, char** result));
   ----------------------------------------------------------------
   */
 
-#define ECSERROR(r) (r->error != 0)
+#define ECSERROR(r) ((r)->error != 0)
 
 /*
   ----------------------------------------------------------------
@@ -533,7 +533,7 @@ int ecs_GetDefaultInfo _ANSI_ARGS_((char* url, char* key, char** result));
   ----------------------------------------------------------------
   */
 
-#define ECSSUCCESS(r) (r->error == 0)
+#define ECSSUCCESS(r) ((r)->error == 0)
 
 /*
   ----------------------------------------------------------------
@@ -542,7 +542,7 @@ int ecs_GetDefaultInfo _ANSI_ARGS_((char* url, char* key, char** result));
   ----------------------------------------------------------------
   */
 
-#define ECSEOF(r) (r->error == 2)
+#define ECSEOF(r) ((r)->error == 2)
 
 /*
   ----------------------------------------------------------------
@@ -551,7 +551,7 @@ int ecs_GetDefaultInfo _ANSI_ARGS_((char* url, char* key, char** result));
   ----------------------------------------------------------------
   */
 
-#define ECSPROJ(r) (r->error == 3)
+#define ECSPROJ(r) ((r)->error == 3)
 
 /*
   ----------------------------------------------------------------
@@ -560,7 +560,7 @@ int ecs_GetDefaultInfo _ANSI_ARGS_((char* url, char* key, char** result));
   ----------------------------------------------------------------
   */
 
-#define ECSMESSAGE(r) r->message
+#define ECSMESSAGE(r) ((r)->message)
 
 /*
   ----------------------------------------------------------------
@@ -569,7 +569,7 @@ int ecs_GetDefaultInfo _ANSI_ARGS_((char* url, char* key, char** result));
   ----------------------------------------------------------------
   */
 
-#define ECSREGION(r) ECSRESULT(r).gr
+#define ECSREGION(r) (ECSRESULT(r).gr)
 
 /*
   ----------------------------------------------------------------
@@ -578,7 +578,7 @@ int ecs_GetDefaultInfo _ANSI_ARGS_((char* url, char* key, char** result));
   ----------------------------------------------------------------
   */
 
-#define ECSTEXT(r) ECSRESULT(r).s
+#define ECSTEXT(r) (ECSRESULT(r).s)
 
 /*
   ----------------------------------------------------------------
@@ -587,7 +587,7 @@ int ecs_GetDefaultInfo _ANSI_ARGS_((char* url, char* key, char** result));
   ----------------------------------------------------------------
   */
 
-#define ECSRASTERINFO(r) ECSRESULT(r).ri
+#define ECSRASTERINFO(r) (ECSRESULT(r).ri)
 
 /*
   ----------------------------------------------------------------
@@ -596,7 +596,7 @@ int ecs_GetDefaultInfo _ANSI_ARGS_((char* url, char* key, char** result));
   ----------------------------------------------------------------
   */
 
-#define ECSRASTERINFONB(r) ECSRASTERINFO(r).cat.cat_len
+#define ECSRASTERINFONB(r) (ECSRASTERINFO(r).cat.cat_len)
 
 /*
   ----------------------------------------------------------------
@@ -606,7 +606,7 @@ int ecs_GetDefaultInfo _ANSI_ARGS_((char* url, char* key, char** result));
   ----------------------------------------------------------------
   */
 
-#define ECSRASTERINFOCAT(r,c) ECSRASTERINFO(r).cat.cat_val[c]
+#define ECSRASTERINFOCAT(r,c) (ECSRASTERINFO(r).cat.cat_val[(c)])
 
 /*
   ----------------------------------------------------------------
@@ -615,7 +615,7 @@ int ecs_GetDefaultInfo _ANSI_ARGS_((char* url, char* key, char** result));
   ----------------------------------------------------------------
   */
 
-#define ECSOBJECT(r) ECSRESULT(r).dob
+#define ECSOBJECT(r) (ECSRESULT(r).dob)
 
 /*
   ----------------------------------------------------------------
@@ -624,7 +624,7 @@ int ecs_GetDefaultInfo _ANSI_ARGS_((char* url, char* key, char** result));
   ----------------------------------------------------------------
   */
 
-#define ECSOBJECTID(r) ECSOBJECT(r).Id
+#define ECSOBJECTID(r) (ECSOBJECT(r).Id)
 
 /*
   ----------------------------------------------------------------
@@ -633,7 +633,7 @@ int ecs_GetDefaultInfo _ANSI_ARGS_((char* url, char* key, char** result));
   ----------------------------------------------------------------
   */
 
-#define ECSOBJECTATTR(r) ECSOBJECT(r).attr
+#define ECSOBJECTATTR(r) (ECSOBJECT(r).attr)
 
 /*
   ----------------------------------------------------------------
@@ -641,7 +641,7 @@ int ecs_GetDefaultInfo _ANSI_ARGS_((char* url, char* key, char** result));
   ----------------------------------------------------------------
   */
 
-#define ECSRASTER(r) ECSOBJECT(r).geom.ecs_Geometry_u.matrix.x.x_val
+#define ECSRASTER(r) (ECSOBJECT(r).geom.ecs_Geometry_u.matrix.x.x_val)
 
 /*
   ----------------------------------------------------------------
@@ -652,12 +652,12 @@ int ecs_GetDefaultInfo _ANSI_ARGS_((char* url, char* key, char** result));
   */
 
 #define ECS_SETGEOMBOUNDINGBOX(result,lxmin,lymin,lxmax,lymax) { \
-    if (result->res.type==Object) { \
-	result->res.ecs_ResultUnion_u.dob.xmin=lxmin; \
-	result->res.ecs_ResultUnion_u.dob.ymin=lymin; \
-	result->res.ecs_ResultUnion_u.dob.xmax=lxmax; \
-	result->res.ecs_ResultUnion_u.dob.ymax=lymax; \
-    } \
+    {if ((result)->res.type==Object) { \
+	(result)->res.ecs_ResultUnion_u.dob.xmin=(lxmin); \
+	(result)->res.ecs_ResultUnion_u.dob.ymin=(lymin); \
+	(result)->res.ecs_ResultUnion_u.dob.xmax=(lxmax); \
+	(result)->res.ecs_ResultUnion_u.dob.ymax=(lymax); \
+    }} \
 }
 
 /*
@@ -670,8 +670,10 @@ int ecs_GetDefaultInfo _ANSI_ARGS_((char* url, char* key, char** result));
   */
 
 #define ECS_SETGEOMLINECOORD(result,position,lx,ly) \
-result->res.ecs_ResultUnion_u.dob.geom.ecs_Geometry_u.line.c.c_val[position].x = lx; \
-result->res.ecs_ResultUnion_u.dob.geom.ecs_Geometry_u.line.c.c_val[position].y = ly;
+{ \
+  (result)->res.ecs_ResultUnion_u.dob.geom.ecs_Geometry_u.line.c.c_val[position].x = (lx); \
+  (result)->res.ecs_ResultUnion_u.dob.geom.ecs_Geometry_u.line.c.c_val[position].y = (ly); \
+}
 
 /*
   ----------------------------------------------------------------
@@ -685,8 +687,10 @@ result->res.ecs_ResultUnion_u.dob.geom.ecs_Geometry_u.line.c.c_val[position].y =
   */
 
 #define ECS_SETGEOMAREACOORD(result,ringpos,position,lx,ly) \
-result->res.ecs_ResultUnion_u.dob.geom.ecs_Geometry_u.area.ring.ring_val[ringpos].c.c_val[position].x = lx; \
-result->res.ecs_ResultUnion_u.dob.geom.ecs_Geometry_u.area.ring.ring_val[ringpos].c.c_val[position].y = ly;
+{ \
+(result)->res.ecs_ResultUnion_u.dob.geom.ecs_Geometry_u.area.ring.ring_val[ringpos].c.c_val[position].x = lx; \
+(result)->res.ecs_ResultUnion_u.dob.geom.ecs_Geometry_u.area.ring.ring_val[ringpos].c.c_val[position].y = ly; \
+}
 
 /*
   ----------------------------------------------------------------
@@ -698,7 +702,7 @@ result->res.ecs_ResultUnion_u.dob.geom.ecs_Geometry_u.area.ring.ring_val[ringpos
   */
 
 #define ECS_SETGEOMMATRIXVALUE(result,lpos,lval) \
-result->res.ecs_ResultUnion_u.dob.geom.ecs_Geometry_u.matrix.x.x_val[lpos] = lval
+{(result)->res.ecs_ResultUnion_u.dob.geom.ecs_Geometry_u.matrix.x.x_val[lpos] = (lval);}
 
 /*
   ----------------------------------------------------------------
@@ -710,7 +714,7 @@ result->res.ecs_ResultUnion_u.dob.geom.ecs_Geometry_u.matrix.x.x_val[lpos] = lva
   */
 
 #define ECS_SETGEOMIMAGEVALUE(result,lpos,lval) \
-result->res.ecs_ResultUnion_u.dob.geom.ecs_Geometry_u.image.x.x_val[lpos] = lval
+{((result)->res.ecs_ResultUnion_u.dob.geom.ecs_Geometry_u.image.x.x_val[lpos] = (lval);}
 
 /********************************/
 
