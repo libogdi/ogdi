@@ -814,6 +814,7 @@ vpf_table_type vpf_open_table (char *tablename, storage_type storage,
   uint32 ulval;
   char idxext,idxmaj;
 
+  memset( &table, 0, sizeof(table) );
   strcpy(tablepath,tablename);
 
   /* Parse out name and path */
@@ -1160,7 +1161,8 @@ void vpf_close_table( vpf_table_type *table )
 	}
       break;
     case DISK:
-      fclose (table->fp);
+      if( table->fp != NULL )
+          fclose (table->fp);
       break;
     default:
       xvt_note ("%s%s: unknown storage flag: %d\n",table->path,table->name,
