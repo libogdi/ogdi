@@ -40,8 +40,13 @@ COMMON_CFLAGS	= $(OPTIMIZATION) -W -Wall -ansi -fPIC -DUNIX=1 \
 SHLIB_LDFLAGS	= -shared 
 COMMON_LDFLAGS  = $(OPTIMIZATION) 
 
+RPC_INCLUDES = -DHAVE_STD_RPC_INCLUDES
+
 
 UCB_STATICLIB = 
+
+TCL_INCLUDE = -I/usr/include/tcl8.3
+TCL_LINKLIB =
 
 #
 # platform specific file locations
