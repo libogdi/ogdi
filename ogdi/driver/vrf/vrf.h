@@ -17,7 +17,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.9  2004-02-18 21:33:18  warmerda
+ * Revision 1.10  2004-04-04 04:33:01  warmerda
+ * added vrf_free_ObjAttributeBuffer
+ *
+ * Revision 1.9  2004/02/18 21:33:18  warmerda
  * free regex memory
  *
  * Revision 1.8  2001/08/16 21:02:37  warmerda
@@ -394,6 +397,7 @@ int  vrf_get_ring_coords _ANSI_ARGS_((ecs_Server *s, RING *ring, int32 face_id,
 				 int32 start_edge,vpf_table_type edgetable));
 int32 vrf_next_face_edge _ANSI_ARGS_((edge_rec_type *edge_rec,int32 *prevnode, int32 face_id));
 char *vrf_get_ObjAttributes _ANSI_ARGS_((vpf_table_type table,int32 row_pos));
+void vrf_free_ObjAttributeBuffer();
 int  vrf_checkLayerTables _ANSI_ARGS_((ecs_Server *s,ecs_Layer *l));
 
 /* vrfswq.c */
