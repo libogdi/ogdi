@@ -18,7 +18,12 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.11  2001-10-01 19:51:13  warmerda
+ * Revision 1.12  2003-08-27 05:26:36  warmerda
+ * Call ecs_SplitURL(NULL) in cln_DestroyClient() to free static resources.
+ * This makes use of memory checkers easier even though this wasn't a *real*
+ * memory leak.
+ *
+ * Revision 1.11  2001/10/01 19:51:13  warmerda
  * fixed bug in cln_CalcCtlPoints() with 1 pixel regions
  *
  * Revision 1.10  2001/08/16 15:34:23  warmerda
@@ -473,6 +478,10 @@ ecs_Result *cln_DestroyClient(ClientID)
   msg = svr_DestroyServer(&(cln->s));
   cln_FreeClient(&cln);
   soc[ClientID] = NULL;
+
+  /* free regex resources for spliturl */
+  ecs_SplitURL( NULL, NULL, NULL, NULL );
+
   return msg;
 }
 
