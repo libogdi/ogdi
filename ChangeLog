@@ -1,5 +1,8 @@
 2001-02-19  Frank Warmerdam  <warmerdam@pobox.com>
 
+	* Added configure, configure.in, aclocal, and config/generic.mak.in
+	as part of implementing "GNU configure" support for OGDI.
+
 	* config/common.mak: default TARGET based on $(shell uname).
 
 	* makefile: make compilation of proj conditional on PROJ_SETTING.
