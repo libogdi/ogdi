@@ -17,7 +17,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.7  2001-08-16 20:40:34  warmerda
+ * Revision 1.8  2004-10-19 14:17:03  warmerda
+ * primList leak fixed in vrf driver
+ *
+ * Revision 1.7  2001/08/16 20:40:34  warmerda
  * applied VITD fixes - merge primitive lines into a feature
  *
  * Revision 1.6  2001/06/21 20:30:15  warmerda
@@ -756,6 +759,12 @@ _getNextObjectLine(s,l)
       edgeCount = l->nbfeature;
 
   while(!found && l->index < edgeCount) {
+
+    if( primList != NULL )
+    {
+        free( primList );
+        primList = NULL;
+    }
 
     _getPrimList( s, l, l->index, &line_id, &tile_id, &primCount, &primList,
                   (int32 *) &(l->index));
