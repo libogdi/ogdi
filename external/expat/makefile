@@ -17,7 +17,7 @@
 # The names of the targets to build
 #
 TOBEGEN		= expat_ogdi$(OGDI_VERSION)
-TARGETGEN	= $(ARCHGEN)
+TARGETGEN	= $(DYNAGEN)
 
 #
 # Source files
@@ -49,6 +49,5 @@ endif
 all: MKOBJECTDIR
 	@echo "making $(TARGETGEN)"
 	$(MAKE) --directory $(OBJDIR) -f ../makefile PASS='depend' $(TARGETGEN)
-	$(MAKE) --directory $(OBJDIR) -f ../makefile PASS='depend' $(DYNAGEN)
 
 clean: default-clean

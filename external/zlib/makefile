@@ -17,7 +17,7 @@
 # The names of the targets to build
 #
 TOBEGEN		= zlib_ogdi$(OGDI_VERSION)
-TARGETGEN	= $(ARCHGEN)
+TARGETGEN	= $(DYNAGEN)
 
 #
 # Source files
@@ -54,6 +54,5 @@ CFLAGS 	= $(INCLUDES) $(COMMON_CFLAGS)
 all: MKOBJECTDIR
 	@echo "making $(TARGETGEN)"
 	$(MAKE) --directory $(OBJDIR) -f ../makefile PASS='depend' $(TARGETGEN)
-	$(MAKE) --directory $(OBJDIR) -f ../makefile PASS='depend' $(DYNAGEN)
 
 clean: default-clean
