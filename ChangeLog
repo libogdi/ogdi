@@ -1,3 +1,8 @@
+2001-08-16  Frank Warmerdam  <warmerdam@pobox.com>
+
+	* ogdi/driver/rpf/rpf.c: Ensure that only Image and Matrix types
+	are accepted by dyn_SelectLayer().
+
 2001-07-17  Frank Warmerdam  <warmerdam@pobox.com>
 
 	* ogdi/include/ecs_util.h: fixed case where DISABLE_CVSID is defined.

@@ -17,7 +17,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.9  2001-06-13 17:17:40  warmerda
+ * Revision 1.10  2001-08-16 13:06:52  warmerda
+ * ensure that only Matrix and Image are allowed by RPF SelectLayer
+ *
+ * Revision 1.9  2001/06/13 17:17:40  warmerda
  * fixed capabilities to match 6.2 spec
  *
  * Revision 1.8  2001/05/30 19:02:51  warmerda
@@ -253,6 +256,14 @@ ecs_Result *dyn_SelectLayer(s,sel)
   int layer;
   register LayerPrivateData *lpriv;
   ecs_Region region;
+
+  /* Disallow any families but Image and Matrix */
+  if( sel->F != Matrix && sel->F != Image )
+  {
+      ecs_SetError(&(s->result),1,
+               "RPF driver only supports Matrix and Image in SelectLayer.");
+      return &(s->result);
+  }
 
   /* first, try to find an existing layer with same request and family */
 
