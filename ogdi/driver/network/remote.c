@@ -4,7 +4,11 @@
 #include <rpc/rpc.h>
 #include <sys/fs/nfs/time.h>
 #endif
- 
+
+#ifndef _WINDOWS
+#  include <unistd.h>
+#endif
+
 struct ecs_Remote {
   CLIENT *handle;
   ecs_Result *result;
@@ -149,7 +153,7 @@ ecs_Result *dyn_CreateServer(s,Request)
 
   timeOut.tv_sec = CONTIMEOUT;
   timeOut.tv_usec = 0;
-  clnt_control(rc->handle, CLSET_TIMEOUT, &timeOut);
+  clnt_control(rc->handle, CLSET_TIMEOUT, (char *) &timeOut);
 
   /* Call the server creation method */
 
@@ -165,7 +169,7 @@ ecs_Result *dyn_CreateServer(s,Request)
 
   timeOut.tv_sec = DEFTIMEOUT;
   timeOut.tv_usec = 0;
-  clnt_control(rc->handle, CLSET_TIMEOUT, &timeOut);
+  clnt_control(rc->handle, CLSET_TIMEOUT, (char *) &timeOut);
 
   if (rc->result == NULL) {
     ecs_SetError(&(s->result),1,"No answer from server when CreateServer is called");
@@ -196,7 +200,7 @@ ecs_Result *dyn_DestroyServer(s)
   /* Free old rc->result */
 
   if (rc->result != NULL) {
-    xdr_free((xdrproc_t) xdr_ecs_Result,rc->result);
+    xdr_free((xdrproc_t) xdr_ecs_Result,(char *) rc->result);
     rc->result = NULL;
   }
 
@@ -204,7 +208,7 @@ ecs_Result *dyn_DestroyServer(s)
 
   timeOut.tv_sec = CONTIMEOUT;
   timeOut.tv_usec = 0;
-  clnt_control(rc->handle, CLSET_TIMEOUT, &timeOut);
+  clnt_control(rc->handle, CLSET_TIMEOUT, (char *) &timeOut);
 
   rc->result = (ecs_Result *) (destroyserver_1(NULL,rc->handle));  
   clnt_destroy(rc->handle);
@@ -213,7 +217,7 @@ ecs_Result *dyn_DestroyServer(s)
     ecs_SetError(&(s->result),
 		 1,"No answer from server when DestroyServer is called. The server is possibly orphan.");
   } else {
-    xdr_free((xdrproc_t) xdr_ecs_Result,rc->result);
+    xdr_free((xdrproc_t) xdr_ecs_Result,(char *) rc->result);
     ecs_SetSuccess(&(s->result));
   } 
   free(rc);
@@ -250,7 +254,7 @@ ecs_Result *dyn_SelectLayer(s,ls)
   /* Free old rc->result */
 
   if (rc->result != NULL) {
-    xdr_free((xdrproc_t) xdr_ecs_Result,rc->result);
+    xdr_free((xdrproc_t) xdr_ecs_Result,(char *) rc->result);
     rc->result = NULL;
   }
 
@@ -296,7 +300,7 @@ ecs_Result *dyn_ReleaseLayer(s,ls)
   /* Free old rc->result */
 
   if (rc->result != NULL) {
-    xdr_free((xdrproc_t) xdr_ecs_Result,rc->result);
+    xdr_free((xdrproc_t) xdr_ecs_Result,(char *) rc->result);
     rc->result = NULL;
   }
 
@@ -334,7 +338,7 @@ ecs_Result *dyn_SelectRegion(s,gr)
   /* Free old rc->result */
 
   if (rc->result != NULL) {
-    xdr_free((xdrproc_t) xdr_ecs_Result,rc->result);
+    xdr_free((xdrproc_t) xdr_ecs_Result,(char *) rc->result);
     rc->result = NULL;
   }
 
@@ -374,7 +378,7 @@ ecs_Result *dyn_GetDictionary(s)
   /* Free old rc->result */
 
   if (rc->result != NULL) {
-    xdr_free((xdrproc_t) xdr_ecs_Result,rc->result);
+    xdr_free((xdrproc_t) xdr_ecs_Result,(char *) rc->result);
     rc->result = NULL;
   }
 
@@ -407,7 +411,7 @@ ecs_Result *dyn_GetNextObject(s)
   /* Free old rc->result */
 
   if (rc->result != NULL) {
-    xdr_free((xdrproc_t) xdr_ecs_Result,rc->result);
+    xdr_free((xdrproc_t) xdr_ecs_Result,(char *) rc->result);
     rc->result = NULL;
   }
 
@@ -441,7 +445,7 @@ ecs_Result *dyn_GetObject(s,Id)
   /* Free old rc->result */
 
   if (rc->result != NULL) {
-    xdr_free((xdrproc_t) xdr_ecs_Result,rc->result);
+    xdr_free((xdrproc_t) xdr_ecs_Result,(char *) rc->result);
     rc->result = NULL;
   }
 
@@ -475,7 +479,7 @@ ecs_Result *dyn_UpdateDictionary(s,info)
   /* Free old rc->result */
 
   if (rc->result != NULL) {
-    xdr_free((xdrproc_t) xdr_ecs_Result,rc->result);
+    xdr_free((xdrproc_t) xdr_ecs_Result,(char *) rc->result);
     rc->result = NULL;
   }
 
@@ -508,7 +512,7 @@ ecs_Result *dyn_GetServerProjection(s)
   /* Free old rc->result */
 
   if (rc->result != NULL) {
-    xdr_free((xdrproc_t) xdr_ecs_Result,rc->result);
+    xdr_free((xdrproc_t) xdr_ecs_Result,(char *) rc->result);
     rc->result = NULL;
   }
 
@@ -543,7 +547,7 @@ ecs_Result *dyn_SetServerLanguage(s,language)
   /* Free old rc->result */
 
   if (rc->result != NULL) {
-    xdr_free((xdrproc_t) xdr_ecs_Result,rc->result);
+    xdr_free((xdrproc_t) xdr_ecs_Result,(char *) rc->result);
     rc->result = NULL;
   }
 
@@ -577,7 +581,7 @@ ecs_Result *dyn_SetServerProjection(s,projection)
   /* Free old rc->result */
 
   if (rc->result != NULL) {
-    xdr_free((xdrproc_t) xdr_ecs_Result,rc->result);
+    xdr_free((xdrproc_t) xdr_ecs_Result,(char *) rc->result);
     rc->result = NULL;
   }
 
@@ -611,7 +615,7 @@ ecs_Result *dyn_GetObjectIdFromCoord(s,c)
   /* Free old rc->result */
 
   if (rc->result != NULL) {
-    xdr_free((xdrproc_t) xdr_ecs_Result,rc->result);
+    xdr_free((xdrproc_t) xdr_ecs_Result,(char *) rc->result);
     rc->result = NULL;
   }
 
@@ -645,7 +649,7 @@ ecs_Result *dyn_GetAttributesFormat(s)
   /* Free old rc->result */
 
   if (rc->result != NULL) {
-    xdr_free((xdrproc_t) xdr_ecs_Result,rc->result);
+    xdr_free((xdrproc_t) xdr_ecs_Result,(char *) rc->result);
     rc->result = NULL;
   }
 
@@ -678,7 +682,7 @@ ecs_Result *dyn_GetRasterInfo(s)
   /* Free old rc->result */
 
   if (rc->result != NULL) {
-    xdr_free((xdrproc_t) xdr_ecs_Result,rc->result);
+    xdr_free((xdrproc_t) xdr_ecs_Result,(char *) rc->result);
     rc->result = NULL;
   }
 
@@ -711,7 +715,7 @@ ecs_Result *dyn_GetGlobalBound(s)
   /* Free old rc->result */
 
   if (rc->result != NULL) {
-    xdr_free((xdrproc_t) xdr_ecs_Result,rc->result);
+    xdr_free((xdrproc_t) xdr_ecs_Result,(char *) rc->result);
     rc->result = NULL;
   }
 
@@ -747,7 +751,7 @@ ecs_Result *dyn_SetRasterConversion(s,rasterconversion)
   /* Free old rc->result */
 
   if (rc->result != NULL) {
-    xdr_free((xdrproc_t) xdr_ecs_Result,rc->result);
+    xdr_free((xdrproc_t) xdr_ecs_Result,(char *) rc->result);
     rc->result = NULL;
   }
 
@@ -783,7 +787,7 @@ ecs_Result *dyn_SetCompression(s,compression)
   /* Free old rc->result */
 
   if (rc->result != NULL) {
-    xdr_free((xdrproc_t) xdr_ecs_Result,rc->result);
+    xdr_free((xdrproc_t) xdr_ecs_Result,(char *) rc->result);
     rc->result = NULL;
   }
 
