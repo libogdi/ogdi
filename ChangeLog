@@ -1,5 +1,15 @@
 2001-06-22  Frank Warmerdam  <warmerdam@pobox.com>
 
+	* contrib/ogdi_import/ogdi_import.c: enabled RGB support.
+
+	* ogdi/driver/adrg/ddadrg.tcl
+
+	new, came from DND.
+
+	* ogdi/driver/adrg: adrg.c, object.c, utils.c, adrg.h
+
+	Incorporated Image support from DND, added standard headers.
+
 	* ogdi/include/ecs_util.h: Fixed typo in ECS_SETGEOMIMAGEVALUE().
 
 2001-06-21  Frank Warmerdam  <warmerdam@pobox.com>
