@@ -17,7 +17,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.9  2001-06-21 20:30:15  warmerda
+ * Revision 1.10  2001-06-29 19:16:30  warmerda
+ * fixed memory leak if FCS not found
+ *
+ * Revision 1.9  2001/06/21 20:30:15  warmerda
  * added ECS_CVSID
  *
  * Revision 1.8  2001/06/20 21:49:31  warmerda
@@ -389,6 +392,9 @@ ecs_Result *dyn_SelectLayer(s,sel)
 
 
   if (!vrf_getFileNameFromFcs(s,lpriv)) {
+    free( lpriv->coverage );
+    free( lpriv->fclass );
+    free( lpriv->expression );
     free(s->layer[layer].priv);
     ecs_FreeLayer(s,layer);   
     return &(s->result);
