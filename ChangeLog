@@ -1,5 +1,13 @@
 2001-04-09  Frank Warmerdam  <warmerdam@pobox.com>
 
+	* config/common.mak: added OGDI_VERSION declaration. 
+
+	* external/zlib/makefile, ogdi/c-api/makefile, proj/makefile:
+	Added OGDI_VERISION to .so / .dll filename. 
+
+	* external/zlib: upgraded zlib to 1.1.3.  Added OGDI_ZLIB.TXT to
+	describe issues about ZLIB use within OGDI.
+
 	* contrib/ogdi_info/ogdi_info.c: added -no-proj option.  Fixed up 
 	test suite to use this to avoid projection availability differences
 	on Unix and Windows. 
