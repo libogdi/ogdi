@@ -129,7 +129,7 @@ ifndef PROGGEN
 PROGGEN = $(TOPDIR)/bin/$(TARGET)/$(TOBEGEN)$(APP_EXT)
 endif
 
-STANDARD_TARGETS	= clean test
+STANDARD_TARGETS	= clean
 
 #
 # Default target to be used if no others are specified.
@@ -169,15 +169,8 @@ $(DEPENDFILE): $(SOURCES)
 # Clean all possible junk
 #
 
-clean:
+default-clean:
 	-$(RMALL) $(OBJDIR) $(TOPDIR)/lib/$(TARGET)/static/$(LIB_PREFIX)$(TOBEGEN).* $(OBJDIR) $(TOPDIR)/lib/$(TARGET)/$(LIB_PREFIX)$(TOBEGEN).* $(TOPDIR)/bin/$(TARGET)/$(LIB_PREFIX)$(TOBEGEN).* $(PROGGEN)
-
-#
-# NULL test 
-#
-
-test:
-	@echo no test defined
 
 #
 # Include the auto-generated dependency rules.  Only include
