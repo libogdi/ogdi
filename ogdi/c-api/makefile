@@ -11,7 +11,7 @@
 # It is provided "as is" without express or implied warranty.
 #
 
-TOBEGEN	= ogdi
+TOBEGEN	= ogdi$(OGDI_VERSION)
 TARGETGEN=$(DYNAGEN)
 
 SOURCES = ecs_dyna.c ecsregex.c ecssplit.c \
