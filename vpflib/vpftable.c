@@ -822,19 +822,11 @@ vpf_table_type vpf_open_table (char *tablename, storage_type storage,
   i=strlen(tablepath);
   while (i>0)
     {
-#ifdef _MSDOS
-      if (tablepath[i] == '\\')
-#endif
-#ifdef _MAC			/*REM*/
-	if (tablepath[i] == ':')
-#endif
-#ifdef _UNIX			/*REM*/
-	  if (tablepath[i] == '/')
-#endif
-	    {
-	      j = i;
-	      break;
-	    }
+      if (tablepath[i] == '\\' || tablepath[i] == '/' || tablepath[i] == ':' )
+      {
+          j = i;
+          break;
+      }
       i--;
     }
   strncpy(table.name,&(tablepath[j+1]),12);

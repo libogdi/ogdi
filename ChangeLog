@@ -1,5 +1,8 @@
 2001-02-07  Frank Warmerdam  <warmerdam@pobox.com>
 
+	* vpflib/vpftable.c: Avoid problem in vpf_open_table() with mixture
+	of unix and dos style separators.
+
 	* ogdi/driver/dted/utils.c, dted.c: Fixed various memory leaks.
 
 	* ogdi/c-api/server.c: Modified svr_DestroyServer() to free 
