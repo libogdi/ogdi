@@ -20,7 +20,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.3  2001-05-30 19:13:06  warmerda
+ * Revision 1.4  2001-06-22 16:41:42  warmerda
+ * Enabled RGBA image support.
+ *
+ * Revision 1.3  2001/05/30 19:13:06  warmerda
  * utilize layer capabitilies if available to set region and resolution
  *
  * Revision 1.2  2000/11/23 19:15:57  warmerda
@@ -555,19 +558,20 @@ static void ImportImage( ecs_Region *region, const char * layer,
         }
             
         for( i = 0; i < xsize; i++ ) {
-            if( width_code == 5 ) {
+            if( width_code == 5 ) 
+            {
                 fprintf( fp_raw, "%c%c",
                          (ECSRASTER(result)[i] & 0xff),
                          (ECSRASTER(result)[i] >> 8) & 0xff );
-            } else {
-#ifdef notdef
+            } 
+            else if( width_code == 1 ) 
+            {
                 unsigned char red, green, blue, trans;
                 
-                ogdi_GetRGBFromPixel( ECSRASTER(result)[i],
-                                      &trans, &red, &green, &blue );
+                ecs_GetRGBFromPixel( ECSRASTER(result)[i],
+                                     &trans, &red, &green, &blue );
                 fprintf( fp_raw, "%c%c%c%c",
                          red, green, blue, trans );
-#endif                
             }
         }
 
