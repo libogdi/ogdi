@@ -1,5 +1,7 @@
 2001-06-23  Frank Warmerdam  <warmerdam@pobox.com>
 
+	* NEWS: added file.
+
 	* ogdi/driver/adrg: adrg.c, adrg.h
 
 	Added capabilities support.  Cache layer list when opening datastore.
