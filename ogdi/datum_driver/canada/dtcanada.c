@@ -86,6 +86,8 @@ int dyn_nad_init(privdata, table)
 {
   char *pathfile;
 
+  (void) table;
+
   *privdata = NULL;
   nad_count++;
   
@@ -161,6 +163,7 @@ int dyn_nad_init(privdata, table)
 int dyn_nad_close(privdata)
      void *privdata;
 {
+  (void) privdata;
   nad_count--;
   if (nad_count <= 0) {
     NAD_Close(dtptr);
@@ -216,6 +219,8 @@ int dyn_nad_forward(privdata,x,y)
      double *y;
 {
   double temp_x,temp_y;
+
+  (void) privdata;
 
   if (dtptr == NULL)
     return TRUE;
@@ -278,6 +283,8 @@ int dyn_nad_reverse(privdata,x,y)
      double *y;
 {
   double temp_x,temp_y;
+
+  (void) privdata;
 
   if (dtptr == NULL)
     return TRUE;

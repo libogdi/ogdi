@@ -234,7 +234,7 @@ int dyn_nad_forward(privdata,x,y)
      double *y;
 {
   datuminfo *ptr = (datuminfo *) privdata;
-  UV val,val1;
+  projUV val,val1;
 
   if (ptr == NULL) return TRUE;
 
@@ -301,7 +301,7 @@ int dyn_nad_reverse(privdata,x,y)
      double *y;
 {
   datuminfo *ptr = (datuminfo *) privdata;
-  UV val,val1;
+  projUV val,val1;
 
   if (ptr == NULL) return TRUE;
 

@@ -289,7 +289,7 @@ ecs_distance_meters (projection,X1, Y1, X2, Y2)
   int argc;
   double lon1,lat1,lon2,lat2;
   double result;
-  UV data;
+  projUV data;
   
   if (ecs_SplitList(projection,&argc,&argv)==FALSE) {
     return -1;

@@ -666,6 +666,8 @@ ecs_Result *cln_SelectMask(ClientID, mask, isInclusive)
   register ecs_Client *cln;
   int i;
 
+  (void) isInclusive;
+
   if (multiblock != 0) {
     msg = &cln_dummy_result;
     ecs_SetError(msg,1,cln_messages[14]);
@@ -2656,7 +2658,7 @@ int cln_ConvTtoS(ClientID, X, Y)
      double *X;
      double *Y;
 {
-  UV data1,data2;
+  projUV data1,data2;
   register ecs_Client *cln;
   double temp_x,temp_y,temp1_x,temp1_y;
 
@@ -2820,7 +2822,7 @@ int cln_ConvStoT(ClientID, X, Y)
      double *X;
      double *Y;
 {
-  UV data1,data2;
+  projUV data1,data2;
   register ecs_Client *cln;
   double temp_x,temp_y,temp1_x,temp1_y;
 
