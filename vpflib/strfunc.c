@@ -163,11 +163,16 @@
 
    {
    register char * eol;
+   const char *post_white;
 
    if (!str)
       return str;
 
-   strcpy (str, str + strspn (str, " \t\n\b"));
+   post_white = str + strspn(str, " \t\n\b");
+   if( post_white != str )
+   {
+       memmove( str, post_white, strlen(post_white)+1 );
+   }
 
    if ((eol = strchr (str, '\n')) != NULL)
       *eol = 0;
