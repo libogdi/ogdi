@@ -1,3 +1,9 @@
+2000-11-09    <warmerda@CS46980-B>
+
+	* remove files in the devdir/ogdi/doc directory.  They are out of
+	date (ogdi.ps), and available from other places (proj.4).  They also
+	add alot of heft to an ogdi cvs checkout.
+
 2000-11-02  Frank Warmerdam  <warmerda@cs46980-c>
 
 	* Added LICENSE file summarizing licenses in effect in source tree.
