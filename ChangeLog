@@ -1,3 +1,16 @@
+2002-02-21  Frank Warmerdam  <warmerdam@pobox.com>
+
+	* configure.in: Don't include /usr/local/lib in LIBS path, and
+	-I/usr/local/include in CFLAGS by default. 
+
+	* contrib/mkbindist.sh: completed (also added README-BIN.TXT). 
+
+	* contrib/ogdi_import/ogdi_import.c: fixed bug building with old
+	(included with OGDI) PROJ.4 library.
+
+	* ogdi/gltpd/{asyncsvr.c,ecs_svc.c}: Undefied svc_fdset if defined
+	to avoid dependence on recent libc on linux.
+
 2002-02-08  Frank Warmerdam  <warmerdam@pobox.com>
 
 	* contrib/ogdi_import/ogdi_import.c: Fixed serious bug importing
