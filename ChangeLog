@@ -1,5 +1,8 @@
 2001-02-20  Frank Warmerdam  <warmerdam@pobox.com>
 
+	* proj/biveval.c: upgraded to code from PROJ.4.4.2 to avoid 
+	bug in SGI compiler.
+
 	* ogdi/c-api/client.c: fixed cln_ConvRegion() bug, which was
 	screwing up region resolutions.  Updated test_suite accordingly.
 
