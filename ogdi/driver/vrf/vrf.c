@@ -765,61 +765,64 @@ ecs_Result *dyn_UpdateDictionary(s,arg)
      ecs_Server *s;
      char *arg;
 {
-  int i,count;
-  row_type row;
-  char *coverage;
-  char *description;
-  register ServerPrivateData *spriv = (ServerPrivateData *) s->priv;
+    int i,count;
+    row_type row;
+    char *coverage;
+    char *description;
+    register ServerPrivateData *spriv = (ServerPrivateData *) s->priv;
 
-  /* Get all the metadata and store them in a string*/
+    /* Get all the metadata and store them in a string*/
 
-  if (spriv->isMetaLoad == FALSE) {
-    if (!vrf_GetMetadata(s)) {
-      return &(s->result);
-    } 
-    spriv->isMetaLoad = TRUE;
-  }
+    if (spriv->isMetaLoad == FALSE) {
+        if (!vrf_GetMetadata(s)) {
+            return &(s->result);
+        } 
+        spriv->isMetaLoad = TRUE;
+    }
 
-  if ((arg == NULL) || (strcmp(arg,"") == 0)) 
+    if ((arg == NULL) || (strcmp(arg,"") == 0)) 
     {
 	 
-      ecs_SetText(&(s->result)," ");
-      ecs_AddText(&(s->result),spriv->metadatastring);
+        ecs_SetText(&(s->result)," ");
+        ecs_AddText(&(s->result),spriv->metadatastring);
     } 
-  else 
-    { 
-      if ((strncmp(arg,"cat_list",8)) == 0) 
-	{
-	  ecs_SetText(&(s->result)," ");
-	  for (i = 1; i <= spriv->catTable.nrows; ++i) 
-	    {
+    else if (strcmp(arg,"ogdi_capabilities") == 0 
+             || strcmp(arg,"ogdi_server_capabilities") == 0 )
+    {
+        if( !vrf_build_capabilities( s, arg ) )
+            return &(s->result);
+    }
+    else if ((strncmp(arg,"cat_list",8)) == 0) 
+    {
+        ecs_SetText(&(s->result)," ");
+        for (i = 1; i <= spriv->catTable.nrows; ++i) 
+        {
 				
       
-	      row = get_row(i, spriv->catTable);
-	      coverage = justify( (char *) get_table_element(1, row, spriv->catTable, NULL, &count));
-	      description = justify( (char *) get_table_element(2, row, spriv->catTable, NULL, &count));
+            row = get_row(i, spriv->catTable);
+            coverage = justify( (char *) get_table_element(1, row, spriv->catTable, NULL, &count));
+            description = justify( (char *) get_table_element(2, row, spriv->catTable, NULL, &count));
  
-	      free_row(row, spriv->catTable);
-	      /*	      if (strcmp(coverage,"libref") != 0 && strcmp(coverage,"tileref") != 0) {*/
-		ecs_AddText(&(s->result),"{ ");
-		ecs_AddText(&(s->result),coverage);	
-		ecs_AddText(&(s->result)," {");
-		ecs_AddText(&(s->result),description);
-		ecs_AddText(&(s->result),"}");
-		vrf_AllFClass(s,coverage);	
-		ecs_AddText(&(s->result),"} ");
-		/*	      }*/
-	      free(coverage);
-	      free(description); 
-	    }	
-	} else {	
-	  if (!vrf_feature_class_dictionary(s,arg))
-	    return &(s->result);	 
-	}  
-    }	
+            free_row(row, spriv->catTable);
+            /*	      if (strcmp(coverage,"libref") != 0 && strcmp(coverage,"tileref") != 0) {*/
+            ecs_AddText(&(s->result),"{ ");
+            ecs_AddText(&(s->result),coverage);	
+            ecs_AddText(&(s->result)," {");
+            ecs_AddText(&(s->result),description);
+            ecs_AddText(&(s->result),"}");
+            vrf_AllFClass(s,coverage);	
+            ecs_AddText(&(s->result),"} ");
+            /*	      }*/
+            free(coverage);
+            free(description); 
+        }	
+    } else {	
+        if (!vrf_feature_class_dictionary(s,arg))
+            return &(s->result);	 
+    }  
  
-  ecs_SetSuccess(&(s->result));
-  return &(s->result); 
+    ecs_SetSuccess(&(s->result));
+    return &(s->result); 
 
 }
 

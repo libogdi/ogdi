@@ -1815,9 +1815,202 @@ int vrf_feature_class_dictionary(s,request)
   free(coverage); 
   free(expression); 
   
+
   return 1;
 }
 
+static void  vrf_build_layer_capabilities( ecs_Server *s, const char *coverage,
+                                           const char *name )
+
+{
+    char	line[512];
+    char	short_name[128];
+    const char  *family;
+    int		i;
+
+/* -------------------------------------------------------------------- */
+/*      Establish the family of this feature type, and the shortened name.*/
+/* -------------------------------------------------------------------- */
+    for( i = 0; name[i] != '.' && name[i] != '\0'; i++ ) {}
+
+    if( strncmp(name+i,".A",2) == 0 || strncmp(name+i,".a",2) == 0 )
+        family = "Area";
+    else if( strncmp(name+i,".L",2) == 0 || strncmp(name+i,".l",2) == 0 )
+        family = "Line";
+    else if( strncmp(name+i,".p",2) == 0 || strncmp(name+i,".p",2) == 0 )
+        family = "Point";
+    else if( strncmp(name+i,".T",2) == 0 || strncmp(name+i,".t",2) == 0 )
+        family = "Text";
+    else
+    {
+        /* It isn't a geographic feature type, skip it */
+        return;
+    }
+
+    strncpy( short_name, name, i );
+    short_name[i] = '\0';
+
+/* -------------------------------------------------------------------- */
+/*      Create the various entries.                                     */
+/* -------------------------------------------------------------------- */
+    ecs_AddText(&(s->result),
+                "      <FeatureType>\n");
+    
+    sprintf( line, 
+             "        <Name>%s@%s(*)</Name>\n", 
+             short_name, coverage );
+    ecs_AddText(&(s->result), line);
+    
+    ecs_AddText(&(s->result),
+                "        <SRS>PROJ4:+proj=longlat +datum=nad83</SRS>\n" );
+
+    sprintf( line, 
+             "        <Family>%s</Family>\n", 
+             family );
+    ecs_AddText(&(s->result), line);
+    
+    sprintf( line, 
+             "        <QueryExpression qe_prefix=\"%s@%s(\"\n"
+             "                         qe_suffix=\")\"\n"
+             "                         qe_format=\"restricted_where\" />\n",
+             short_name, coverage );
+    ecs_AddText(&(s->result), line);
+
+    sprintf(line, 
+            "        <LongLatBoundingBox minx=\"%.9f\"  miny=\"%.9f\"\n"
+            "                            maxx=\"%.9f\"  maxy=\"%.9f\" />\n",
+            s->globalRegion.west, s->globalRegion.south, 
+            s->globalRegion.east, s->globalRegion.north );
+    
+    ecs_AddText(&(s->result),line);
+    
+    sprintf(line, 
+            "        <SRSBoundingBox minx=\"%.9f\"  miny=\"%.9f\"\n"
+            "                        maxx=\"%.9f\"  maxy=\"%.9f\"\n"
+            "                        x_res=\"%.9f\" y_res=\"%.9f\" />\n",
+            s->globalRegion.west, s->globalRegion.south, 
+            s->globalRegion.east, s->globalRegion.north,
+            s->globalRegion.ew_res, s->globalRegion.ns_res );
+    ecs_AddText(&(s->result),line);
+      
+    ecs_AddText(&(s->result),
+                "      </FeatureType>\n");
+}
+
+/* based on vrf_AllFClass() */					
+
+static void 
+vrf_build_coverage_capabilities( ecs_Server *s, const char *coverage)
+
+{  
+    vpf_table_type table;
+    row_type row;
+    unsigned int i, n;
+    char *temp;
+    char *name, *fclass;
+    char buffer[256];
+    register ServerPrivateData *spriv = s->priv;
+
+    /* Build path to feature class atrribute table */
+
+    sprintf(buffer,"%s/%s/fcs",spriv->library,coverage);
+    if (muse_access(buffer,0) != 0) {
+        sprintf(buffer,"%s/%s/FCS",spriv->library,coverage);
+    }
+
+    if (muse_access(buffer,0) == 0) {
+
+        table = vpf_open_table (buffer, DISK, "rb", NULL);
+
+        for (i=0; i < (unsigned int) table.nrows; i++) {
+
+            row = get_row ((i+1), table);
+            fclass = (char*)get_table_element (1, row, table, NULL, &n); /* Get feature class name */
+            fclass = justify (fclass);
+
+            /* Now find the name of the feature table that matches the feature class */
+
+            name = (char*)get_table_element (2, row, table, NULL, &n);
+            temp = (char*) malloc (strlen (fclass) + 1);
+            strncpy (temp, name, strlen (fclass));
+	
+            if (strcmp (fclass, temp) != 0) {
+                free (name);
+                name = (char*) get_table_element (4, row, table, NULL, &n);
+            }
+            free (temp);
+
+            vrf_build_layer_capabilities( s, coverage, name );
+
+            free (name);
+            free_row (row, table);
+        }
+
+        vpf_close_table (&table);
+    }
+}
+
+int vrf_build_capabilities(ecs_Server *s, const char *request)
+{
+    ServerPrivateData *spriv = (ServerPrivateData *) s->priv;
+
+    ecs_SetText(&(s->result), "" );
+    
+    ecs_AddText(&(s->result),
+                "<?xml version=\"1.0\" ?>\n"
+                "<OGDI_Capabilities version=\"3.1\">\n"
+                "  <Capability>\n"
+                "    <Extension>ogdi_unique_identity</Extension>\n"
+                "  </Capability>\n" );
+
+    if( strcmp(request,"ogdi_server_capabilities") != 0 )
+    {
+        int		i;
+
+        ecs_AddText(&(s->result),
+                    "  <FeatureTypeList>\n" );
+
+        for (i = 1; i <= spriv->catTable.nrows; ++i) 
+        {
+            row_type row;
+            char *coverage;
+            char *description;
+            int	count;
+
+            row = get_row(i, spriv->catTable);
+            coverage = justify( (char *) get_table_element(1, row, spriv->catTable, NULL, &count));
+            description = justify( (char *) get_table_element(2, row, spriv->catTable, NULL, &count));
+ 
+            free_row(row, spriv->catTable);
+
+            ecs_AddText(&(s->result),
+                        "    <FeatureTypeList>\n" );
+            
+            ecs_AddText(&(s->result),"      <Name>" );
+            ecs_AddText(&(s->result),coverage);
+            ecs_AddText(&(s->result),"</Name>\n" );
+
+            ecs_AddText(&(s->result),"      <Title>" );
+            ecs_AddText(&(s->result),description);
+            ecs_AddText(&(s->result),"</Title>\n" );
+
+            vrf_build_coverage_capabilities(s,coverage);	
+
+            free(coverage);
+            free(description); 
+
+            ecs_AddText(&(s->result),
+                        "    </FeatureTypeList>\n" );
+        }	
+        
+        ecs_AddText(&(s->result),
+                    "  </FeatureTypeList>\n" );
+    }
+
+    ecs_AddText(&(s->result),
+                "</OGDI_Capabilities>\n" );
+    return TRUE;
+}
 
 
 #ifndef _WINDOWS

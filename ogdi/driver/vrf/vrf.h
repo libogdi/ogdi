@@ -356,7 +356,7 @@ int  vrf_initTiling _ANSI_ARGS_((ecs_Server *s));
 int  vrf_IsOutsideRegion _ANSI_ARGS_((double n, double s, double e,double w, ecs_Region *region));
 void vrf_AllFClass _ANSI_ARGS_((ecs_Server *s, char *coverage));
 int vrf_feature_class_dictionary _ANSI_ARGS_((ecs_Server *s,char *request));
-
+int vrf_build_capabilities( ecs_Server *s, const char *request );
 
 /* feature.c */
 
