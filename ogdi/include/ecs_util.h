@@ -19,7 +19,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.10  2001-06-22 16:28:24  warmerda
+ * Revision 1.11  2001-07-18 03:55:09  warmerda
+ * Fixed case where DISABLE_CVSID is defined.
+ *
+ * Revision 1.10  2001/06/22 16:28:24  warmerda
  * fixed typo in ECS_SETGEOMIMAGEVALUE
  *
  * Revision 1.9  2001/04/12 19:25:39  warmerda
@@ -160,7 +163,7 @@ typedef unsigned long uint32;
 #  define ECS_CVSID(string)	static char ecs_cvsid[] = string; \
 static char *cvsid_aw() { return( cvsid_aw() ? ((char *) NULL) : ecs_cvsid ); }
 #else
-#  define RCSID(string)
+#  define ECS_CVSID(string)
 #endif
 
 /***********************************************************************/
