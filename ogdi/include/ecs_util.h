@@ -49,6 +49,12 @@
 #include <sys/stat.h>
 
 #include "projects.h"
+
+/* Ensure we are compatible with PROJ.4.4.x and PROJ.4.3.x */
+#ifndef USE_PROJUV
+#  define projUV UV
+#endif
+
 #include "ecs.h"
 
 #ifdef _SCO
