@@ -1,5 +1,8 @@
 2004-02-19  Frank Warmerdam  <warmerdam@pobox.com>
 
+	* vpflib/musedir.c: added some include files to avoid warnings in
+	unix builds.
+
 	* ogdi/c-api/client.c: ecs_DestroyServer() now does an ecs_CleanUp() on
 	cln_dummy_result to avoid noisy memory leak. 
 
