@@ -1,3 +1,9 @@
+2004-10-26  Frank Warmerdam  <warmerdam@pobox.com>
+
+	* README: slight improvements in build explanation.
+
+	* ogdi/contrib/ogdi_info/ogdi_info.c: minor improvements.
+
 2004-10-25  Frank Warmerdam  <warmerdam@pobox.com>
 
 	* ogdi/driver/vrf/vrfswq.c: fixed case of 1 character wide string
