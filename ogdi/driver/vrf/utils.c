@@ -17,7 +17,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.13  2003-05-21 18:47:31  warmerda
+ * Revision 1.14  2004-02-18 21:33:18  warmerda
+ * free regex memory
+ *
+ * Revision 1.13  2003/05/21 18:47:31  warmerda
  * initialize spriv->tile[0].path in untiled (VITD) case
  *
  * Revision 1.12  2001/08/16 19:59:08  warmerda
@@ -72,6 +75,8 @@ int vrf_parsePath(s,lpriv,sel)
  * ----------------------------------------------------------------------
  */
 
+static ecs_regexp *reg;
+
 int vrf_parsePathValue(s,request,fclass,coverage,expression)
      ecs_Server *s;
      char *request;
@@ -80,7 +85,6 @@ int vrf_parsePathValue(s,request,fclass,coverage,expression)
      char **expression;
 {
   static int compiled = 0;
-  static ecs_regexp *reg;
   char buffer[512],*temp;
   int i,pos;
 
@@ -163,6 +167,23 @@ int vrf_parsePathValue(s,request,fclass,coverage,expression)
 
   free(temp);
   return 1;
+}
+
+/* ----------------------------------------------------------------------
+ *  vrf_freePathRegex()
+ *     
+ *  free resources related to regex path checker.
+ * ----------------------------------------------------------------------
+ */
+
+void vrf_freePathRegex()
+
+{
+    if( reg != NULL )
+    {
+        free( reg );
+        reg = NULL;
+    }
 }
 
 /* 

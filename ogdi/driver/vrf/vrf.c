@@ -17,7 +17,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.11  2001-08-16 20:40:34  warmerda
+ * Revision 1.12  2004-02-18 21:33:18  warmerda
+ * free regex memory
+ *
+ * Revision 1.11  2001/08/16 20:40:34  warmerda
  * applied VITD fixes - merge primitive lines into a feature
  *
  * Revision 1.10  2001/06/29 19:16:30  warmerda
@@ -209,6 +212,8 @@ ecs_Result *dyn_DestroyServer(s)
   s->nblayer = 0; /* no layer selected so far */
 
   free(spriv);
+
+  vrf_freeParseRegex();
 
   ecs_SetSuccess(&(s->result));
 
@@ -410,6 +415,7 @@ ecs_Result *dyn_SelectLayer(s,sel)
 #ifdef TESTOPENTABLE
     printf("open spriv->featureTable:%s\n",buffer);
 #endif
+    printf("open spriv->featureTable:%s\n",buffer);
 
     lpriv->featureTable = vpf_open_table(buffer,disk,"rb",NULL);
     if (lpriv->featureTable.fp == NULL) {
@@ -539,6 +545,7 @@ ecs_Result *dyn_ReleaseLayer(s,sel)
 #endif
     vpf_close_table(&(lpriv->joinTable));
   }
+  printf( "vpf_close_table(featureTable)\n" );
   vpf_close_table(&(lpriv->featureTable));
   vpf_close_table(&(lpriv->fcsTable));
 

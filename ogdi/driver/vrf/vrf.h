@@ -17,7 +17,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.8  2001-08-16 21:02:37  warmerda
+ * Revision 1.9  2004-02-18 21:33:18  warmerda
+ * free regex memory
+ *
+ * Revision 1.8  2001/08/16 21:02:37  warmerda
  * Removed MAXSEGS and MAXRINGS fixed limits
  *
  * Revision 1.7  2001/08/16 20:40:34  warmerda
@@ -358,6 +361,7 @@ void vrf_releaseAllLayers _ANSI_ARGS_((ecs_Server *s));
 
 /* utils.c */
 
+void vrf_freePathRegex();
 int  vrf_parsePath _ANSI_ARGS_((ecs_Server *s,LayerPrivateData *lpriv,ecs_LayerSelection *sel));
 int  vrf_parsePathValue _ANSI_ARGS_((ecs_Server *s,char *request,char **fclass, char **coverage,char **expression));
 int  vrf_getFileNameFromFcs _ANSI_ARGS_((ecs_Server *s, LayerPrivateData *lpriv));
