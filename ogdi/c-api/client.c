@@ -18,7 +18,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.8  2001-04-12 18:14:16  warmerda
+ * Revision 1.9  2001-05-04 17:59:37  warmerda
+ * clear autoCache in cln_SelectRegion
+ *
+ * Revision 1.8  2001/04/12 18:14:16  warmerda
  * added/finished capabilities support
  *
  * Revision 1.7  2001/04/12 05:31:23  warmerda
@@ -691,6 +694,11 @@ ecs_Result *cln_SelectRegion(ClientID, gr)
   cln->isCurrentRegionSet = TRUE;
 
   msg = svr_SelectRegion(&(cln->s),&tmpgr);
+
+  if (cln->autoCache != NULL) {
+    cln_FreeCache(cln->autoCache);
+    cln->autoCache = NULL;
+  }
 
   if ((msg->error == 0) && ((cln->currentSelectionFamily == Matrix) || 
 			    (cln->currentSelectionFamily == Image))) {
