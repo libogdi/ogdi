@@ -1,3 +1,10 @@
+2001-02-20  Frank Warmerdam  <warmerdam@pobox.com>
+
+	* ogdi/c-api/client.c: fixed cln_ConvRegion() bug, which was
+	screwing up region resolutions.  Updated test_suite accordingly.
+
+       http://sourceforge.net/bugs/?func=detailbug&bug_id=133190&group_id=11181
+
 2001-02-19  Frank Warmerdam  <warmerdam@pobox.com>
 
 	* ogdi/glutil/iofile.c: added stdlib.h to avoid warnings.

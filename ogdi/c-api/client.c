@@ -2503,8 +2503,8 @@ int cln_ConvRegion(ClientID,gr,direction)
   width = (gr->east - gr->west) / gr->ew_res;
   height = (gr->north - gr->south) / gr->ns_res;
 
-  intwidth = (int) (width+1.0);
-  intheight = (int) (height+1.0);
+  intwidth = (int) ceil(width);
+  intheight = (int) ceil(height);
 
   /*
    * Calculate resolution. For that, calculate four points in
