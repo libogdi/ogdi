@@ -17,7 +17,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.10  2001-08-16 13:06:52  warmerda
+ * Revision 1.11  2001-08-27 14:56:29  warmerda
+ * RPF rasterinfo width fixed
+ *
+ * Revision 1.10  2001/08/16 13:06:52  warmerda
  * ensure that only Matrix and Image are allowed by RPF SelectLayer
  *
  * Revision 1.9  2001/06/13 17:17:40  warmerda
@@ -691,8 +694,8 @@ ecs_Result *dyn_GetRasterInfo(s)
 
   /* Put table contain in RasterInfo here */
   
-  rows = (int) ((region.north-region.south)/region.ns_res);
-  columns = (int) ((region.east-region.west)/region.ew_res);
+  rows = (int) floor((region.north-region.south)/region.ns_res + 0.5);
+  columns = (int) floor((region.east-region.west)/region.ew_res + 0.5);
 
   if (s->layer[s->currentLayer].sel.F == Matrix) {
     ecs_SetRasterInfo(&(s->result),columns,rows);
