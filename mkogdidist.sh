@@ -32,7 +32,7 @@ export CVSROOT=:pserver:anonymous@cvs.ogdi.sourceforge.net:/cvsroot/ogdi
 echo "Please hit enter when prompted for a password."
 cvs login
 
-cvs checkout devdir
+cvs checkout -P devdir
 
 if [ \! -d devdir ] ; then
   echo "cvs checkout reported an error ... abandoning mkogdidist"
