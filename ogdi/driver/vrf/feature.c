@@ -17,7 +17,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.8  2001-08-16 21:02:37  warmerda
+ * Revision 1.9  2003-05-21 18:50:19  warmerda
+ * verify that table_pos(COORDINATE) succeeds in point/line feature read
+ *
+ * Revision 1.8  2001/08/16 21:02:37  warmerda
  * Removed MAXSEGS and MAXRINGS fixed limits
  *
  * Revision 1.7  2001/08/16 20:40:34  warmerda
@@ -325,6 +328,12 @@ int vrf_get_line_feature (s, layer, prim_id, result)
   }
   pos = table_pos ("COORDINATES", lpriv->l.line.edgeTable);
 
+  if( pos == -1 )
+  {
+      ecs_SetError(result, 2, "No COORDINATE column");
+      free_row(row,lpriv->l.line.edgeTable);
+      return FALSE;
+  }
   
   /* 
      -----------------------------------------------------------
@@ -621,10 +630,11 @@ int vrf_get_point_feature (s, layer, prim_id)
   row = read_row (prim_id, table);	       /* Read the prim_id row from the point primitive table */
   pos = table_pos ("COORDINATE", table);       /* find the position in the primitive table */
   /* get the point coordinate, code will receive the result of th 0 = problem, 1 = success */
-  if ((code = vrf_get_xy (table, row, pos, &x, &y)) == TRUE) {
+  if ( pos != -1 && (code = vrf_get_xy (table, row, pos, &x, &y)) == TRUE) {
     code = ecs_SetGeomPoint(&(s->result),x,y); 
   } else {
     ecs_SetError(&(s->result), 1, "Unable to get coordinates");
+    code = FALSE;
   }
   free_row(row,PrivData->l.point.primTable);  
   /* here all the information needed is known in result (ecs_Result) that is in s (ecs_Server) */
