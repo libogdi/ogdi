@@ -373,8 +373,13 @@ int32 *token_value;
    /* Test for quoted strings */
    if (token[0] == '"')
       {
+/* 
+See http://sourceforge.net/bugs/?func=detailbug&bug_id=122597&group_id=11181 
+
       if (*expression)
           expression++;
+*/
+
       i = 0;
       while (*expression != '"')
          {
