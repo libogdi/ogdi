@@ -20,7 +20,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.4  2001-06-22 16:41:42  warmerda
+ * Revision 1.5  2001-07-17 19:03:42  warmerda
+ * Added support for exporting lines, text and areas.
+ *
+ * Revision 1.4  2001/06/22 16:41:42  warmerda
  * Enabled RGBA image support.
  *
  * Revision 1.3  2001/05/30 19:13:06  warmerda
@@ -158,11 +161,11 @@ static void ImportVectors( ecs_Region *region, const char * layer,
 {
     ecs_Result *result;
     ecs_LayerSelection selectionLayer;
-    SHPHandle   hShape;
+    SHPHandle   hShape = NULL;
     DBFHandle   hDBF;
     char	filename[1024];
     ecs_ObjAttributeFormat *oaf;
-    int		i, field_count;
+    int		i, field_count, iText = -1;
 
 /* -------------------------------------------------------------------- */
 /*      Select a region ... this should be overridable from the         */
@@ -175,8 +178,6 @@ static void ImportVectors( ecs_Region *region, const char * layer,
 /* -------------------------------------------------------------------- */
 /*      Define the layer to select.  For now we only support lines.     */
 /* -------------------------------------------------------------------- */
-    assert( featureType == Line );
-    
     selectionLayer.Select = (char *) layer;
     selectionLayer.F = featureType;
     
@@ -189,10 +190,27 @@ static void ImportVectors( ecs_Region *region, const char * layer,
 /*      Create the shapefile to write the lines to.                     */
 /* -------------------------------------------------------------------- */
     sprintf( filename, "%s.shp", out_file );
-    hShape = SHPCreate( filename, SHPT_ARC );
+    if( featureType == Line )
+        hShape = SHPCreate( filename, SHPT_ARC );
+    else if( featureType == Point || featureType == Text )
+        hShape = SHPCreate( filename, SHPT_POINT );
+    else if( featureType == Area )
+        hShape = SHPCreate( filename, SHPT_POLYGON );
+
+    if( hShape == NULL )
+    {
+        fprintf( stderr, "Unable to create shapefile dataset %s\n", filename );
+        return;
+    }
 
     sprintf( filename, "%s.dbf", out_file );
     hDBF = DBFCreate( filename );
+
+    if( hDBF == NULL )
+    {
+        fprintf( stderr, "Unable to create DBF file %s\n", filename );
+        return;
+    }
 
 /* -------------------------------------------------------------------- */
 /*      Setup DBF schema.                                               */
@@ -245,7 +263,11 @@ static void ImportVectors( ecs_Region *region, const char * layer,
 
         }
     }
-    
+
+    if( featureType == Text )
+    {
+        iText = DBFAddField( hDBF, "text", FTString, 64, 0 );
+    }    
 
 /* -------------------------------------------------------------------- */
 /*      Process objects.                                                */
@@ -260,7 +282,51 @@ static void ImportVectors( ecs_Region *region, const char * layer,
 /*      Write shapefile geometry                                        */
 /* -------------------------------------------------------------------- */
         
-        if( featureType == Line ) {
+        if( featureType == Area ) {
+            ecs_Area	*area = &(ECSGEOM(result).area);
+            double	*x, *y;
+            int		*parts, nPoints, iRing;
+            SHPObject   *psShape;
+
+            nPoints = 0;
+            for( iRing = 0; iRing < area->ring.ring_len; iRing++ )
+            {
+                ecs_FeatureRing	*ring = area->ring.ring_val + iRing;
+
+                nPoints += ring->c.c_len;
+            }
+            
+            parts = (int *) malloc(sizeof(int) * area->ring.ring_len);
+            x = (double *) malloc(sizeof(double) * nPoints);
+            y = (double *) malloc(sizeof(double) * nPoints);
+
+            nPoints = 0;
+            for( iRing = 0; iRing < area->ring.ring_len; iRing++ )
+            {
+                ecs_FeatureRing	*ring = area->ring.ring_val + iRing;
+
+                parts[iRing] = nPoints;
+                for( i = 0; i < ring->c.c_len; i++ )
+                {
+                    x[nPoints] = ring->c.c_val[i].x;
+                    y[nPoints] = ring->c.c_val[i].y;
+                    nPoints++;
+                }
+            }
+            
+            psShape = SHPCreateObject( SHPT_POLYGON, -1, area->ring.ring_len,
+                                       parts, NULL, nPoints, x, y, NULL, NULL);
+
+            free( x );
+            free( y );
+            free( parts );
+            
+            iShape = SHPWriteObject( hShape, -1, psShape );
+
+            SHPDestroyObject( psShape );
+        }
+
+        else if( featureType == Line ) {
             ecs_Line	*line = &(ECSGEOM(result).line);
             double	*x, *y;
             SHPObject   *psShape;
@@ -282,6 +348,34 @@ static void ImportVectors( ecs_Region *region, const char * layer,
             iShape = SHPWriteObject( hShape, -1, psShape );
 
             SHPDestroyObject( psShape );
+        }
+
+        else if( featureType == Point ) {
+            ecs_Point	*point = &(ECSGEOM(result).point);
+            SHPObject   *psShape;
+
+            psShape = SHPCreateSimpleObject( SHPT_POINT, 1, 
+                                             &(point->c.x), &(point->c.y), 
+                                             NULL );
+
+            iShape = SHPWriteObject( hShape, -1, psShape );
+
+            SHPDestroyObject( psShape );
+        }
+
+        else if( featureType == Text ) {
+            ecs_Text	*point = &(ECSGEOM(result).text);
+            SHPObject   *psShape;
+
+            psShape = SHPCreateSimpleObject( SHPT_POINT, 1, 
+                                             &(point->c.x), &(point->c.y), 
+                                             NULL );
+
+            iShape = SHPWriteObject( hShape, -1, psShape );
+
+            SHPDestroyObject( psShape );
+
+            DBFWriteStringAttribute( hDBF, iShape, iText, point->desc );
         }
 
 /* -------------------------------------------------------------------- */
