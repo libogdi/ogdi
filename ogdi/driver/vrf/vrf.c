@@ -17,7 +17,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.13  2004-02-18 21:49:18  warmerda
+ * Revision 1.14  2004-02-19 05:59:22  warmerda
+ * Removed temporary debug messages.
+ *
+ * Revision 1.13  2004/02/18 21:49:18  warmerda
  * Fixed typo in last fix.
  *
  * Revision 1.12  2004/02/18 21:33:18  warmerda
@@ -217,6 +220,7 @@ ecs_Result *dyn_DestroyServer(s)
   free(spriv);
 
   vrf_freePathRegex();
+  vrf_free_ObjAttributeBuffer();
 
   ecs_SetSuccess(&(s->result));
 
@@ -418,7 +422,6 @@ ecs_Result *dyn_SelectLayer(s,sel)
 #ifdef TESTOPENTABLE
     printf("open spriv->featureTable:%s\n",buffer);
 #endif
-    printf("open spriv->featureTable:%s\n",buffer);
 
     lpriv->featureTable = vpf_open_table(buffer,disk,"rb",NULL);
     if (lpriv->featureTable.fp == NULL) {
@@ -548,7 +551,6 @@ ecs_Result *dyn_ReleaseLayer(s,sel)
 #endif
     vpf_close_table(&(lpriv->joinTable));
   }
-  printf( "vpf_close_table(featureTable)\n" );
   vpf_close_table(&(lpriv->featureTable));
   vpf_close_table(&(lpriv->fcsTable));
 
