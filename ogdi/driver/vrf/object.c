@@ -141,10 +141,11 @@ _getTileAndPrimId(s,l,object_id,feature_id,tile_id,prim_id)
      int32 *prim_id;
 {
   int32 count;
-  register ServerPrivateData *spriv = (ServerPrivateData *) s->priv;
   register LayerPrivateData *lpriv = (LayerPrivateData *) l->priv;
   row_type row,join_row;
   int pos;
+
+  (void) s;
 
   *tile_id = -1;
   *prim_id = -1;
@@ -303,7 +304,7 @@ _getNextObjectArea(s,l)
 
   /* Add the identifier to the object */
 
-  sprintf(buffer,"%d",area_id);
+  sprintf(buffer,"%d",(int) area_id);
   ecs_SetObjectId(&(s->result),buffer);
 
   /* Add the attributes to the object */
@@ -329,7 +330,6 @@ _getObjectArea(s,l,id)
      ecs_Layer *l;
      char *id;
 {
-  register ServerPrivateData *spriv = (ServerPrivateData *) s->priv;
   register LayerPrivateData *lpriv = (LayerPrivateData *) l->priv;
   int object_id;
   int32 area_id;
@@ -397,7 +397,6 @@ _getObjectIdArea(s,l,coord)
   int32 fac_id;
   int feature_id;
   int32 area_id;
-  int found = 0;
   double xmin, xmax, ymin, ymax;
   int32 index;
   double distance,result;
@@ -644,7 +643,7 @@ _getNextObjectLine(s,l)
 
   /* Add the identifier to the object */
 
-  sprintf(buffer,"%d",line_id);
+  sprintf(buffer,"%d", (int) line_id);
   ecs_SetObjectId(&(s->result),buffer);
 
   /* Add the bounding box to the object */
@@ -671,7 +670,6 @@ _getObjectLine(s,l,id)
      char *id;
 {
 
-  register ServerPrivateData *spriv = (ServerPrivateData *) s->priv;
   register LayerPrivateData *lpriv = (LayerPrivateData *) l->priv;
   int object_id;
   int32 line_id;
@@ -739,7 +737,6 @@ _getObjectIdLine(s,l,coord)
   int32 edg_id;
   int feature_id;
   int32 line_id;
-  int found = 0;
   double xmin, xmax, ymin, ymax;
   int32 index;
   double distance,result;
@@ -941,7 +938,7 @@ _getNextObjectPoint(s,l)
 
   /* Add the identifier to the object */
 
-  sprintf(buffer,"%d",point_id+1);
+  sprintf(buffer,"%d",(int) point_id+1);
   ecs_SetObjectId(&(s->result),buffer);
 
   /* Add the bounding box to the object */
@@ -971,7 +968,6 @@ _getObjectPoint(s,l,id)
      ecs_Layer *l;
      char *id;
 {
-  register ServerPrivateData *spriv = (ServerPrivateData *) s->priv;
   register LayerPrivateData *lpriv = (LayerPrivateData *) l->priv;
   int object_id;
   int32 point_id;
@@ -1032,7 +1028,6 @@ _getObjectIdPoint(s,l,coord)
   int32 prim_id;
   int32 point_id;
   int feature_id;
-  int found = 0;
   int32 index;
   double distance,result;
 
@@ -1201,7 +1196,7 @@ _getNextObjectText(s,l)
 
   /* Add the identifier to the object */
 
-  sprintf(buffer,"%d",text_id);
+  sprintf(buffer,"%d", (int) text_id);
   ecs_SetObjectId(&(s->result),buffer);
 
   /* Add the bounding box to the object */
@@ -1232,7 +1227,6 @@ _getObjectText(s,l,id)
      ecs_Layer *l;
      char *id;
 {
-  register ServerPrivateData *spriv = (ServerPrivateData *) s->priv;
   register LayerPrivateData *lpriv = (LayerPrivateData *) l->priv;
   int object_id;
   short tile_id;
@@ -1292,7 +1286,6 @@ _getObjectIdText(s,l,coord)
   int32 prim_id;
   int32 text_id;
   int feature_id;
-  int found = 0;
   int32 index;
   double distance,result;
 
@@ -1401,6 +1394,8 @@ void _closeLayerTable(s,l)
      ecs_Layer *l;
 {
   register LayerPrivateData *lpriv;
+
+  (void) s;
 
   lpriv = (LayerPrivateData *) l->priv;
 

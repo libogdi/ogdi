@@ -461,7 +461,7 @@ int vrf_get_area_feature (s, layer, prim_id)
      */
 
   code = TRUE;
-  if (code = ecs_SetGeomArea(&(s->result), area.nr_rings)) {
+  if ((code = ecs_SetGeomArea(&(s->result), area.nr_rings))) {
     for(i=0;i<area.nr_rings;i++) {
 
       if (!code)
@@ -479,7 +479,7 @@ int vrf_get_area_feature (s, layer, prim_id)
 	Initialise the ring and add all the coordinates
 	*/
 
-      if (code = ecs_SetGeomAreaRing(&(s->result), i, qty, 0.0, 0.0)) { 
+      if( (code = ecs_SetGeomAreaRing(&(s->result), i, qty, 0.0, 0.0)) ) { 
 	qty = 0;
 	for(j=0;j<area.rings[i]->nr_segs;j++) {
 	  for(k=0; k<area.rings[i]->segs[j]->nr_coords;k++) {
@@ -534,7 +534,8 @@ int vrf_get_ring_coords (s,ring, face_id, start_edge, edgetable)
   
   edge_rec = read_edge (start_edge, edgetable, proj.inverse_proj);
   if (edge_rec.npts == 0) {
-    sprintf(buffer,"Unable to read the edge %d in the face %d",start_edge,face_id);
+    sprintf(buffer,"Unable to read the edge %d in the face %d",
+            (int) start_edge, (int) face_id);
     ecs_SetError(&(s->result), 1,buffer);
     return FALSE;
   }
@@ -615,7 +616,7 @@ int vrf_get_ring_coords (s,ring, face_id, start_edge, edgetable)
 	  edge_rec = read_edge( next_edge, edgetable, (int)proj.inverse_proj);
 	  if (edge_rec.npts == 0) {
 	    sprintf(buffer,"Unable to read the edge %d in the face %d",
-		    next_edge,face_id);
+		    (int) next_edge, (int) face_id);
 	    ecs_SetError(&(s->result), 1,buffer);
 	    return FALSE;
 	  }
@@ -988,7 +989,7 @@ char *vrf_get_ObjAttributes(table, row_pos)
       break;
     case 'R':
       get_table_element (i, row, table, &temp3, &count);
-      sprintf(buffer,"%lf",temp3);
+      sprintf(buffer,"%f",temp3);
       lenght += strlen(buffer) + 2;
       returnString = (char *) realloc(returnString,lenght);
       if (returnString == NULL) {

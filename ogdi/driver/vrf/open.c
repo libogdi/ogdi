@@ -32,7 +32,8 @@ _openAreaLayer(s,l)
 	ecs_Server *s;
 	ecs_Layer *l;
 {
-	register LayerPrivateData *lpriv = (LayerPrivateData *) l->priv;
+    (void) s;
+    (void) l;
 }
 
 void
@@ -40,9 +41,8 @@ _closeAreaLayer(s,l)
 	ecs_Server *s;
 	ecs_Layer *l;
 {
-	register LayerPrivateData *lpriv = (LayerPrivateData *) l->priv;
-
-
+    (void) s;
+    (void) l;
 }
 
 void
@@ -50,6 +50,8 @@ _rewindAreaLayer(s,l)
 	ecs_Server *s;
 	ecs_Layer *l;
 {
+    (void) s;
+    (void) l;
 }
 
 /*
@@ -65,6 +67,8 @@ _openLineLayer(s,l)
 	ecs_Server *s;
 	ecs_Layer *l;
 {
+    (void) s;
+    (void) l;
 }
 
 void
@@ -72,9 +76,8 @@ _closeLineLayer(s,l)
 	ecs_Server *s;
 	ecs_Layer *l;
 {
-	register LayerPrivateData *lpriv = (LayerPrivateData *) l->priv;
-
-
+    (void) s;
+    (void) l;
 }
 
 void
@@ -82,6 +85,8 @@ _rewindLineLayer(s,l)
 	ecs_Server *s;
 	ecs_Layer *l;
 {
+    (void) s;
+    (void) l;
 }
 
 
@@ -98,7 +103,8 @@ _openPointLayer(s,l)
 	ecs_Server *s;
 	ecs_Layer *l;
 {
-	register LayerPrivateData *lpriv = (LayerPrivateData *) l->priv;
+    (void) s;
+    (void) l;
 }
 
 
@@ -107,8 +113,8 @@ _closePointLayer(s,l)
 	ecs_Server *s;
 	ecs_Layer *l;
 {
-	register LayerPrivateData *lpriv = (LayerPrivateData *) l->priv;
-
+    (void) s;
+    (void) l;
 }
 
 void
@@ -116,7 +122,8 @@ _rewindPointLayer(s,l)
 	ecs_Server *s;
 	ecs_Layer *l;
 {
-
+    (void) s;
+    (void) l;
 }
 
 
@@ -133,7 +140,8 @@ _openTextLayer(s,l)
 	ecs_Server *s;
 	ecs_Layer *l;
 {
-	register LayerPrivateData *lpriv = (LayerPrivateData *) l->priv;
+    (void) s;
+    (void) l;
 }
 
 
@@ -142,9 +150,8 @@ _closeTextLayer(s,l)
 	ecs_Server *s;
 	ecs_Layer *l;
 {
-	register LayerPrivateData *lpriv = (LayerPrivateData *) l->priv;
-
-
+    (void) s;
+    (void) l;
 }
 
 
@@ -153,7 +160,8 @@ _rewindTextLayer(s,l)
 	ecs_Server *s;
 	ecs_Layer *l;
 {
-
+    (void) s;
+    (void) l;
 }
 
 

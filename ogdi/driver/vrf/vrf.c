@@ -61,6 +61,8 @@ ecs_Result *dyn_CreateServer(s,Request)
   int i;
   register ServerPrivateData *spriv; 
 
+  (void) Request;
+
 #ifdef VRF_DEBUG
   printf("dyn_CreateServer\n");
 #endif
@@ -475,7 +477,6 @@ ecs_Result *dyn_ReleaseLayer(s,sel)
 {
   int layer;
   char buffer[128];
-  register ServerPrivateData *spriv = s->priv;
   register LayerPrivateData *lpriv;
 
 #ifdef VRF_DEBUG
@@ -869,6 +870,7 @@ ecs_Result *dyn_SetServerLanguage(s,language)
      ecs_Server *s;
      u_int language;
 {
+  (void) language;
   ecs_SetSuccess(&(s->result));
   return &(s->result);
 }
@@ -884,6 +886,7 @@ ecs_Result *dyn_SetCompression(s,compression)
      ecs_Server *s;
      ecs_Compression *compression;
 {
+  (void) compression;
   ecs_SetSuccess(&(s->result));
   return &(s->result);
 }
