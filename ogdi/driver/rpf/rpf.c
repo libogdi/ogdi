@@ -646,14 +646,18 @@ ecs_Result *dyn_GetRasterInfo(s)
   register unsigned int i,j,k;
   char buffer[2];
   register LayerPrivateData *lpriv;
-  int count;
+  int count, rows, columns;
+  ecs_Region region = s->currentRegion;
 
   strcpy(buffer,"");
   lpriv = (LayerPrivateData *) s->layer[s->currentLayer].priv;
 
   /* Put table contain in RasterInfo here */
   
-  ecs_SetRasterInfo(&(s->result),lpriv->columns,lpriv->rows);
+  rows = (int) ((region.north-region.south)/region.ns_res);
+  columns = (int) ((region.east-region.west)/region.ew_res);
+
+  ecs_SetRasterInfo(&(s->result),columns,rows);
   count = 1;
   if (lpriv->isColor == TRUE) {
     for(i=0;i<6;i++) {
