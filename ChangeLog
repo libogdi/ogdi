@@ -1,3 +1,18 @@
+2001-04-10  Frank Warmerdam  <warmerdam@pobox.com>
+
+	* ogdi/drivers/dted/dted.c: add ogdi_capabilities support.
+
+	* contrib/ogdi_info/ogdi_info.c: added support for reporting Image
+	values.
+
+	* testsuite/scripts/dted: added Image test (test 3).
+
+	* ogdi/drivers/dted: dted.c, dted.h, object.c, utils.c
+
+	Upgraded with changes from DND to support Image layers.  Patch
+	also includes change to exclude zero elevations when computing
+	mincat/maxcat.  New style headers also applied.
+
 2001-04-09  Frank Warmerdam  <warmerdam@pobox.com>
 
 	* config/win32.mak: Strip down DLL name to get .def name without 
