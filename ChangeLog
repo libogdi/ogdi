@@ -1,5 +1,9 @@
 2004-10-26  Frank Warmerdam  <warmerdam@pobox.com>
 
+	* ogdi/drivers/vrf/utils.c: the path parsing regex was being freed,
+	but then not recompiled if needed again later.  Was breaking some 
+	efforts to open a second VRF datasource after the first was closed.
+
 	* README: slight improvements in build explanation.
 
 	* ogdi/contrib/ogdi_info/ogdi_info.c: minor improvements.
