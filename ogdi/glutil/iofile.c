@@ -6,6 +6,7 @@
 #include <stdio.h>
 #else
 #include <stdio.h>
+#include <stdlib.h>
 #endif
 
 #include "glutil.h"
