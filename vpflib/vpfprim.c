@@ -142,7 +142,7 @@
 	 get_table_element( left_face, row, edge_table, &key, &count );
 	 edge.left_face = key.id;
       } else if (edge_table.header[left_face].type=='I') {
-	 get_table_element( right_face, row, edge_table, &(edge.left_face),
+	 get_table_element( left_face, row, edge_table, &(edge.left_face),
 			    &count );
       } else {
 	 edge.left_face=1;
