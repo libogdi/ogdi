@@ -1,3 +1,30 @@
+2001-04-12  Frank Warmerdam  <warmerdam@pobox.com>
+
+	* ogdi/c-api/ecs_capabilities.c: initial implementation of
+	_ecs_ParseCapabilities(), still incomplete.
+
+	* ogdi/c-api/makefile: added ecs_capabilities.c
+
+	* ogdi/c-api/client.c: added support for initializing and freeing
+	new capabilities related fields in ecs_Client.
+
+	* ogdi/include/ecs_utils.h: added ecs_LayerCapabilities, and additions
+	to ecs_util.h.
+
+	* configure.in, configure, config/common.mak, config/generic.mak.in:
+		
+	Added a support for linking in Expat, and controlling whether it is
+	internal, external or disabled from configure.
+
+	* external/expat/*: added using Expat release 1.95.1.
+
+	* external/makefile: optionally add expat to subdirs.
+
+2001-04-11  Frank Warmerdam  <warmerdam@pobox.com>
+
+	* ogdi/drivers/vrf: vrf.c, utils.c, vrf.h
+	Added ogdi_capabilities support. 
+
 2001-04-10  Frank Warmerdam  <warmerdam@pobox.com>
 
 	* ogdi/drivers/dted/dted.c: add ogdi_capabilities support.
