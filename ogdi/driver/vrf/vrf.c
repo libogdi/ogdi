@@ -17,7 +17,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.12  2004-02-18 21:33:18  warmerda
+ * Revision 1.13  2004-02-18 21:49:18  warmerda
+ * Fixed typo in last fix.
+ *
+ * Revision 1.12  2004/02/18 21:33:18  warmerda
  * free regex memory
  *
  * Revision 1.11  2001/08/16 20:40:34  warmerda
@@ -213,7 +216,7 @@ ecs_Result *dyn_DestroyServer(s)
 
   free(spriv);
 
-  vrf_freeParseRegex();
+  vrf_freePathRegex();
 
   ecs_SetSuccess(&(s->result));
 
