@@ -1,5 +1,12 @@
 2001-08-16  Frank Warmerdam  <warmerdam@pobox.com>
 
+	* ogdi/contrib/ogdi_import/ogdi_import.c: fixed roundoff
+	error in calcuation of xsize/ysize from region.
+
+	* ogdi/c-api/client.c: Modified cln_ConvRegion() to avoid roundoff
+	errors in initial computation of intwidth and intheight.  As per
+	bug 450042.
+	
 	* ogdi/driver/rpf/rpf.c: Ensure that only Image and Matrix types
 	are accepted by dyn_SelectLayer().
 

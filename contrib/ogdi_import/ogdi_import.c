@@ -20,7 +20,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.5  2001-07-17 19:03:42  warmerda
+ * Revision 1.6  2001-08-16 13:44:52  warmerda
+ * fixed roundoff bug xsize/ysize calc from region
+ *
+ * Revision 1.5  2001/07/17 19:03:42  warmerda
  * Added support for exporting lines, text and areas.
  *
  * Revision 1.4  2001/06/22 16:41:42  warmerda
@@ -463,8 +466,8 @@ static void ImportMatrix( ecs_Region *region, const char * layer,
     if( CheckError( result ) )
         return;
 
-    xsize = (region->east - region->west) / region->ew_res;
-    ysize = (region->north - region->south) / region->ns_res;
+    xsize = (int) ((region->east - region->west) / region->ew_res + 0.5);
+    ysize = (int) ((region->north - region->south) / region->ns_res + 0.5);
 
 /* -------------------------------------------------------------------- */
 /*      Define the layer to select.                                     */
