@@ -1,0 +1,44 @@
+		
+				OGDI README
+				===========
+
+
+OGDI developer and user resources can be found online at:
+
+  http://ogdi.sourceforge.net/
+
+
+Building
+--------
+
+Detailed building instructions are available at:
+
+  http://ogdi.sourceforge.net/build.html
+
+Briefly, set the environment variables TOPDIR (to point to devdir directory)
+and TARGET (to one of win32, linux or solaris - case matters) then type
+make in the devdir directory (this directory).  
+
+On windows the Cygwin environment (http://www.cygwin.com) is required. 
+
+
+Running
+-------
+
+Briefly, ensure that $TOPDIR/bin/$TARGET is in the path.  Ensure that
+$TOPDIR/bin/$TARGET is in the LD_LIBRARY_PATH on Unix. 
+
+To use in local mode try a command like:
+
+ ogdi_info -u gltp:/dted/d:/toronto/dted -f Matrix -l 'DTED(DISK)' -dl
+
+To use via the server, run gltpd.exe first in the background.  On windows, run 
+portmap.exe before running gltpd.exe.  Then use a command like:
+
+ ogdi_info -u gltp://localhost/dted/d:/toronto/dted -f Matrix -l 'DTED(DISK)' -dl
+
+
+
+
+  
+
