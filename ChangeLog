@@ -1,4 +1,13 @@
+2001-06-20  Frank Warmerdam  <warmerdam@pobox.com>
+
+	* ogdi/driver/vrf: vrf.c, swq.c, swq.h, vrf.h, makefile
+
+	Added full implementation of restricted_where support based on SWQ. 
+	This adds brackets to expressions. 
+
 2001-06-13  Frank Warmerdam  <warmerdam@pobox.com>
+
+	* ogdi/driver/vrf/*: Updated source headers.
 
 	* ogdi/c-api/ecs_capabililties.c, ogdi/driver/dted/dted.c, 
 	ogdi/driver/vrf/util.c, ogdi/driver/rpf/rpf.c: Fixed capabilities
