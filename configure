@@ -533,7 +533,7 @@ if test "$TOPDIR" = "" ; then
   { echo "configure: error: Required TOPDIR environment variable not set, see README." 1>&2; exit 1; }
 fi
 
-if test "$OS" == Windows_NT ; then
+if test "$OS" = "Windows_NT" ; then
   { echo "configure: error: Please don't use configure for Windows, see README." 1>&2; exit 1; }
 fi
 

@@ -9,7 +9,7 @@ if test "$TOPDIR" = "" ; then
   AC_MSG_ERROR([Required TOPDIR environment variable not set, see README.])
 fi
 
-if test "$OS" == Windows_NT ; then
+if test "$OS" = "Windows_NT" ; then
   AC_MSG_ERROR([Please don't use configure for Windows, see README.])
 fi
 
