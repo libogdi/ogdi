@@ -20,7 +20,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.2  2000-11-23 19:15:57  warmerda
+ * Revision 1.3  2001-05-30 19:13:06  warmerda
+ * utilize layer capabitilies if available to set region and resolution
+ *
+ * Revision 1.2  2000/11/23 19:15:57  warmerda
  * added header block
  *
  */
@@ -109,6 +112,36 @@ static int AccessURL( char * url, ecs_Region * region )
     printf( "Projection = `%s'\n", ECSTEXT(result) );
   
     return( TRUE );
+}
+
+/************************************************************************/
+/*                           GetLayerRegion()                           */
+/*                                                                      */
+/*      Fetch the region and resolution for the named layer if          */
+/*      possible, from the capabilities.                                */
+/************************************************************************/
+
+static void GetLayerRegion( const char *layerName, ecs_Region *region )
+
+{
+    const ecs_LayerCapabilities *layer;
+    int			   layer_index;
+
+    for( layer_index = 0; 
+         (layer = cln_GetLayerCapabilities(ClientID,layer_index)) != NULL;
+         layer_index++ )
+    {
+        if( strcmp(layer->name,layerName) == 0 )
+        {
+            region->north = layer->srs_north;
+            region->south = layer->srs_south;
+            region->east = layer->srs_east;
+            region->west = layer->srs_west;
+            region->ew_res = layer->srs_ewres;
+            region->ns_res = layer->srs_nsres;
+            return;
+        }
+    }
 }
 
 /************************************************************************/
@@ -584,6 +617,9 @@ int main( int argc, char ** argv )
         }
         else if( strcmp(argv[i], "-l") == 0 ) {
             layer = argv[++i];
+
+            if( region == &reg )
+                GetLayerRegion( layer, region );
 
             if( featureType == Matrix ) {
                 ImportMatrix( region, layer, out_file );
