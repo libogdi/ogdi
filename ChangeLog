@@ -1,5 +1,15 @@
 2001-02-02  Frank Warmerdam  <warmerdam@pobox.com>
 
+	* ogdi/driver/rpf/utils.c: Fixed bug with lpriv->ff being freed
+	multiple times when it wasn't reinitialized to NULL in case of error.
+
+       http://sourceforge.net/bugs/?func=detailbug&bug_id=130944&group_id=11181
+
+	* ogdi/driver/rpf/rpf.c: Fixed dyn_GetRasterInfo() to return proper
+	row/column values for current region.  As per:
+
+       http://sourceforge.net/bugs/?func=detailbug&group_id=11181&bug_id=130943
+
 	* config/win32.mak: don't force debugtype to be coff. 
 
 2001-01-09  Frank Warmerdam  <warmerdam@pobox.com>
