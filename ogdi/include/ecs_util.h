@@ -19,7 +19,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.13  2002-03-28 16:09:07  warmerda
+ * Revision 1.14  2002-12-18 14:31:47  warmerda
+ * provide more precision for PI and use M_PI if available
+ *
+ * Revision 1.13  2002/03/28 16:09:07  warmerda
  * updated version/release info
  *
  * Revision 1.12  2001/09/28 18:56:20  warmerda
@@ -157,7 +160,11 @@ typedef unsigned long uint32;
 #define ECSGETI(s,i1,j1) (int)(((s->rasterconversion.coef.coef_val[2]*j1 + s->rasterconversion.coef.coef_val[3]*i1 + s->rasterconversion.coef.coef_val[7]) / (s->rasterconversion.coef.coef_val[4]*j1 + s->rasterconversion.coef.coef_val[5]*i1 + 1)) + 0.5)
 
 #ifndef PI
-#define PI 3.14159265359
+#  ifdef M_PI
+#    define PI M_PI
+#  else
+#    define PI 3.1415926535897932384626433832795029
+#  endif
 #endif
 
 /***********************************************************************
