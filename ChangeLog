@@ -1,5 +1,7 @@
 2000-11-02  Frank Warmerdam  <warmerda@cs46980-c>
 
+	* Added LICENSE file summarizing licenses in effect in source tree.
+
 	* Change LAS copyright message to crown copyright on the following
  	  files:
 	  ogdi/c-api: client.c, ecsdist.c, server.c
