@@ -1,5 +1,8 @@
 2001-01-09  Frank Warmerdam  <warmerdam@pobox.com>
 
+	* Updated test scripts to support operating against a server
+	(OGDI_HOST), and updated to reflect the VRF bug fix.
+
 	* Fixed bug in reading and display of VALUE DESCRRIPTION TABLE's 
 	in the vrf_Getmetadata() call of the vrf driver.  See 
      http://sourceforge.net/bugs/?func=detailbug&bug_id=128211&group_id=11181
