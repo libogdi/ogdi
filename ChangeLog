@@ -16,6 +16,12 @@
 	distant past.  This bug was discovered while investigating the leaks
 	described in sourceforge bug 795612.
 
+2003-05-22  Frank Warmerdam  <warmerdam@pobox.com>
+
+	* ogdi/driver/vrf/feature.c, utils.c: Fixed several problems related
+	to bug 741854, primarily related to VITD area features causing hangs
+	and crashes.  
+
 2003-01-29  Frank Warmerdam  <warmerdam@pobox.com>
 
 	* ogdi/include/ecs_util.h: fixed spelling of length in a few places.
