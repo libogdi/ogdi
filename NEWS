@@ -1,0 +1,45 @@
+	OGDI 3.x Core News
+	==================
+
+View the ChangeLog file for detailed, file by file notes on changes.  The
+NEWS file is just used to sumarize major changes, and new features. 
+
+3.1Beta1
+========
+
+ o Implement support for XML Capabilities (as per Proposal 6: Capabilities
+   Metadata).  This includes:
+
+     - Added support for reaturning correct capabilities to adrg, dted, rpf
+       and vpf drivers. 
+
+     - Added support for parsing capabilities documents, in libogdi utilizing
+       Expat (incorporated into the source tree under devdir/external). 
+
+     - Added public client side API for accessing capabilities and version
+       information (cln_GetLayerCapabilities(), cln_GetVersion()). 
+
+ o Upgraded VPF driver to support brackets in query expression.  Implemented
+   using generic "restricted_where" processor (swq.c).
+
+ o Upgraded ADRG, RPF and DTED drivers to support Image (as well as Matrix)
+   family support based on updates supplied by DND. 
+
+ o Added contributed GDAL raster driver as contrib/gdal.
+
+
+3.1Alpha
+========
+
+ o Incorporated contrib/ogdi_import, and contrib/ogdi_info sample applications.
+
+ o Updated build system to include configure script, install target, and 
+   various cleanups and simplifications.  RPCGEN is no longer run by default.
+   External versions of libz and PROJ.4 can be utilized.
+
+ o Updated licenses within source code to reflect the redistributable nature
+   of code written by LAS on contract to DND.  
+
+ o Variety of bug fixes, primarily to drivers. 
+
+ o Remove warnings during build from core code. 
