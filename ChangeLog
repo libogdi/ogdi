@@ -1,3 +1,8 @@
+2004-02-19  Frank Warmerdam  <warmerdam@pobox.com>
+
+	* ogdi/drivers/vrf/feature.c: fixed leak of edge_rec.coords memory
+	in the bug 741854 fix in vrf_get_ring_coords().
+
 2004-02-18  Frank Warmerdam  <warmerdam@pobox.com>
 
 	* contrib/ogdi_info/ogdi_info.c: use ecs_CleanUp() to free contents
