@@ -17,8 +17,8 @@ dnl Checks for programs.
 AC_PROG_CC
 
 dnl We always want to check /usr/local for stuff.
-LIBS="$LIBS -L/usr/local/lib"
-CFLAGS="$CFLAGS -I/usr/local/include"
+dnl LIBS="$LIBS -L/usr/local/lib"
+dnl CFLAGS="$CFLAGS -I/usr/local/include"
 
 dnl Checks for libraries.
 AC_CHECK_LIB(dl,dlopen,,,)
