@@ -37,13 +37,13 @@ static char *gl = NULL;
 
 }
 
-/*********************************************************************************
-/* Retreive the information related to where is the home user path of GRASSLAND 
-*
-*  Results:
-*	A string
-*
-*********************************************************************************/
+/****************************************************************************
+ * Retreive the information related to where is the home user path of GRASSLAND
+ *
+ *  Results:
+ *	A string
+ *
+ ****************************************************************************/
 char *getUSRHOMEenv()
 {
 static char *gl = NULL;
