@@ -403,6 +403,7 @@ int dyn_read_rpftile(s, l, tile_row, tile_col)
     lpriv->isActive = FALSE;
     ecs_SetError(&(s->result),1,"Cannot parse frame file"); 
     free(lpriv->ff);
+    lpriv->ff = NULL;
     return FALSE; 
   }
   strcpy(framefile,lpriv->entry->frames[tile_col][tile_row].directory);
@@ -416,6 +417,7 @@ int dyn_read_rpftile(s, l, tile_row, tile_col)
     free(framefile);
     ecs_SetError(&(s->result),1,"Cannot parse frame file"); 
     free(lpriv->ff);
+    lpriv->ff = NULL;
     return FALSE; 
   }
 
