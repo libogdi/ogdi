@@ -1,5 +1,8 @@
 2001-10-01  Frank Warmerdam  <warmerdam@pobox.com>
 
+	* contrib/ogdi_import/ogdi_import.c: various fixes related to region
+	overriding, and computing the size of the output raster.
+
 	* ogdi/c-api/client.c: fixed problems in cln_CalcCtlPoints() with 
 	very small regions, equivelent to one pixel of data.  Sometimes 
 	produced a degenerate transformation.
