@@ -19,7 +19,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.14  2002-12-18 14:31:47  warmerda
+ * Revision 1.15  2003-01-29 15:46:45  warmerda
+ * fixed spelling of length
+ *
+ * Revision 1.14  2002/12/18 14:31:47  warmerda
  * provide more precision for PI and use M_PI if available
  *
  * Revision 1.13  2002/03/28 16:09:07  warmerda
@@ -784,13 +787,13 @@ int ecs_AddRasterInfoCategory _ANSI_ARGS_((ecs_Result *r, long no_cat,
 int ecs_SetObjAttributeFormat _ANSI_ARGS_((ecs_Result *r));
 int ecs_AddAttributeFormat _ANSI_ARGS_((ecs_Result *r, char *name,
 					ecs_AttributeFormat type,
-					int lenght, int precision,
+					int length, int precision,
 					int nullable));
 int ecs_SetGeomPoint _ANSI_ARGS_((ecs_Result *r, double x, double y));
 int ecs_SetGeomText _ANSI_ARGS_((ecs_Result *r, double x, 
 				 double y, char *desc));
-int ecs_SetGeomLine _ANSI_ARGS_((ecs_Result *r, unsigned int lenght));
-int ecs_SetGeomArea _ANSI_ARGS_((ecs_Result *r, unsigned int lenght));
+int ecs_SetGeomLine _ANSI_ARGS_((ecs_Result *r, unsigned int length));
+int ecs_SetGeomArea _ANSI_ARGS_((ecs_Result *r, unsigned int length));
 int ecs_SetGeomAreaRing _ANSI_ARGS_((ecs_Result *r, int position, 
 				     unsigned int length,
 				     double centroid_x, double centroid_y));

@@ -1,3 +1,7 @@
+2003-01-29  Frank Warmerdam  <warmerdam@pobox.com>
+
+	* ogdi/include/ecs_util.h: fixed spelling of length in a few places.
+
 2002-12-18  Frank Warmerdam  <warmerdam@pobox.com>
 
 	* ogdi/include/ecs_util.h: If PI is undefined try to use M_PI.  If
