@@ -34,6 +34,10 @@ ifndef CFG
 CFG = release
 endif
 
+ifndef TARGET
+TARGET = $(shell uname)
+endif
+
 #
 # Standard location of external components (not maintained
 # by LAS)

@@ -1,5 +1,7 @@
 2001-02-19  Frank Warmerdam  <warmerdam@pobox.com>
 
+	* config/common.mak: default TARGET based on $(shell uname).
+
 	* makefile: make compilation of proj conditional on PROJ_SETTING.
 
 	* restored compilation of ogdi/glutil, still used in some places.
