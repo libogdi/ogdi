@@ -19,7 +19,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.17  2004-10-04 15:53:12  warmerda
+ * Revision 1.18  2004-10-26 20:45:52  warmerda
+ * Uupdated to 3.1.4.
+ *
+ * Revision 1.17  2004/10/04 15:53:12  warmerda
  * Updated to version 3.1.3.
  *
  * Revision 1.16  2003/12/15 18:11:21  warmerda
@@ -60,8 +63,8 @@
 #ifndef ECS_UTIL
 #define ECS_UTIL 1
 
-#define OGDI_VERSION     313
-#define OGDI_RELEASEDATE 20041004
+#define OGDI_VERSION     314
+#define OGDI_RELEASEDATE 20041026
 
 #include <stdio.h>
 #include <stdlib.h>
