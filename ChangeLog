@@ -1,5 +1,15 @@
 2001-02-19  Frank Warmerdam  <warmerdam@pobox.com>
 
+	* ogdi/c-api/ecs_dyna.c: use MISSING_DLFCN_H instead of _LINUX.
+
+	* vpflib/coorgeom.c: use MISSING_FLOAT_H flag. 
+
+	* vpflib/include/machine.h: make unix platforms more generic.
+
+	* vpflib/makefile: pass BIG_ENDIAN flag into compiles. 
+
+	* win32.mak: switch to BIG_ENDIAN, and add /DMISSING_DLFCN_H.
+
 	* Added configure, configure.in, aclocal, and config/generic.mak.in
 	as part of implementing "GNU configure" support for OGDI.
 
