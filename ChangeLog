@@ -1,8 +1,11 @@
 2001-04-09  Frank Warmerdam  <warmerdam@pobox.com>
 
+	* config/win32.mak: Strip down DLL name to get .def name without 
+	version.
+
 	* config/common.mak: added OGDI_VERSION declaration. 
 
-	* external/zlib/makefile, ogdi/c-api/makefile, proj/makefile:
+	* external/zlib/makefile, ogdi/c-api/makefile:
 	Added OGDI_VERISION to .so / .dll filename. 
 
 	* external/zlib: upgraded zlib to 1.1.3.  Added OGDI_ZLIB.TXT to
