@@ -1,4 +1,11 @@
+2001-05-30  Frank Warmerdam  <warmerdam@pobox.com>
+
+	* ogdi/drivers/rpf/rpf.c: Modified capabilities returned to have real
+	information about each layer instead of just dummy global bounds info.
+
 2001-05-04  Frank Warmerdam  <warmerdam@pobox.com>
+
+	* contrib/gdal: added contributed GDAL raster server.
 
 	* ogdi/c-api/client.c: clear autoCache in cln_SelectRegion().
 

@@ -17,7 +17,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.7  2001-04-16 21:32:05  warmerda
+ * Revision 1.8  2001-05-30 19:02:51  warmerda
+ * return real per-layer bounds in capabilities
+ *
+ * Revision 1.7  2001/04/16 21:32:05  warmerda
  * added capabilities support
  *
  * Revision 1.6  2001/04/12 19:22:46  warmerda
@@ -864,12 +867,16 @@ ecs_Result *dyn_UpdateDictionary(s,info)
 
         for (i=0; i<(int)toc->num_boundaries; i++)
         {
-            if (toc->entries[i].invalid_geographics == 1L)
+            Toc_entry	*entry = toc->entries + i;
+
+            if (entry->invalid_geographics == 1L)
                 continue;
             
-            sprintf(buffer,"%s@%s@%s@%s@%d",toc->entries[i].scale,
-                    toc->entries[i].zone,toc->entries[i].type,
-                    toc->entries[i].producer,toc->entries[i].boundary_id);
+            sprintf(buffer,"%s@%s@%s@%s@%d",
+                    entry->scale,
+                    entry->zone, entry->type,
+                    entry->producer,
+                    entry->boundary_id);
 
             /* Remove the spaces */
             k = 0;
@@ -894,8 +901,8 @@ ecs_Result *dyn_UpdateDictionary(s,info)
             sprintf(line, 
                     "         <LongLatBoundingBox minx=\"%.9f\"  miny=\"%.9f\"\n"
                     "                             maxx=\"%.9f\"  maxy=\"%.9f\" />\n",
-                    s->globalRegion.west, s->globalRegion.south, 
-                    s->globalRegion.east, s->globalRegion.north );
+                    entry->nw_long, entry->se_lat, 
+                    entry->se_long, entry->nw_lat );
             
             ecs_AddText(&(s->result),line);
             
@@ -903,9 +910,9 @@ ecs_Result *dyn_UpdateDictionary(s,info)
                     "         <SRSBoundingBox minx=\"%.9f\"  miny=\"%.9f\"\n"
                     "                         maxx=\"%.9f\"  maxy=\"%.9f\"\n"
                     "                         x_res=\"%.9f\" y_res=\"%.9f\" />\n",
-                    s->globalRegion.west, s->globalRegion.south, 
-                    s->globalRegion.east, s->globalRegion.north,
-                    s->globalRegion.ew_res, s->globalRegion.ns_res );
+                    entry->nw_long, entry->se_lat, 
+                    entry->se_long, entry->nw_lat,
+                    entry->horiz_interval, entry->vert_interval );
             ecs_AddText(&(s->result),line);
             
             ecs_AddText(&(s->result),
