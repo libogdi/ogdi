@@ -20,7 +20,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.6  2001-08-16 13:44:52  warmerda
+ * Revision 1.7  2001-10-02 02:06:25  warmerda
+ * various bug fixes related to region setting
+ *
+ * Revision 1.6  2001/08/16 13:44:52  warmerda
  * fixed roundoff bug xsize/ysize calc from region
  *
  * Revision 1.5  2001/07/17 19:03:42  warmerda
@@ -292,7 +295,7 @@ static void ImportVectors( ecs_Region *region, const char * layer,
             SHPObject   *psShape;
 
             nPoints = 0;
-            for( iRing = 0; iRing < area->ring.ring_len; iRing++ )
+            for( iRing = 0; iRing < (int) area->ring.ring_len; iRing++ )
             {
                 ecs_FeatureRing	*ring = area->ring.ring_val + iRing;
 
@@ -304,12 +307,12 @@ static void ImportVectors( ecs_Region *region, const char * layer,
             y = (double *) malloc(sizeof(double) * nPoints);
 
             nPoints = 0;
-            for( iRing = 0; iRing < area->ring.ring_len; iRing++ )
+            for( iRing = 0; iRing < (int) area->ring.ring_len; iRing++ )
             {
                 ecs_FeatureRing	*ring = area->ring.ring_val + iRing;
 
                 parts[iRing] = nPoints;
-                for( i = 0; i < ring->c.c_len; i++ )
+                for( i = 0; i < (int) ring->c.c_len; i++ )
                 {
                     x[nPoints] = ring->c.c_val[i].x;
                     y[nPoints] = ring->c.c_val[i].y;
@@ -423,8 +426,8 @@ static void ImportVectors( ecs_Region *region, const char * layer,
                 break;
 
               case FTDouble:
-                DBFWriteIntegerAttribute( hDBF, iShape, iField,
-                                          atof(pszFieldStart) );
+                DBFWriteDoubleAttribute( hDBF, iShape, iField,
+                                         atof(pszFieldStart) );
                 break;
 
               default:
@@ -575,8 +578,8 @@ static void ImportImage( ecs_Region *region, const char * layer,
     if( CheckError( result ) )
         return;
 
-    xsize = (region->east - region->west) / region->ew_res;
-    ysize = (region->north - region->south) / region->ns_res;
+    xsize = (int) ((region->east - region->west) / region->ew_res + 0.5);
+    ysize = (int) ((region->north - region->south) / region->ns_res + 0.5);
 
 /* -------------------------------------------------------------------- */
 /*      Define the layer to select.                                     */
@@ -688,7 +691,7 @@ int main( int argc, char ** argv )
     char *layer = "";
     static ecs_Region	reg, *region;
     ecs_Result *result;
-    int		i;
+    int		i, set_region = FALSE, set_res = FALSE;
     char	*out_file = "ogdi_out";
 
     if( argc == 1 )
@@ -719,8 +722,17 @@ int main( int argc, char ** argv )
         else if( strcmp(argv[i], "-l") == 0 ) {
             layer = argv[++i];
 
-            if( region == &reg )
-                GetLayerRegion( layer, region );
+            if( !set_region )
+            {
+                ecs_Region   reg2;
+                GetLayerRegion( layer, &reg2 );
+                if( set_res )
+                {
+                    reg2.ew_res = region->ew_res;
+                    reg2.ns_res = region->ns_res;
+                }
+                *region = reg2;
+            }
 
             if( featureType == Matrix ) {
                 ImportMatrix( region, layer, out_file );
@@ -754,11 +766,18 @@ int main( int argc, char ** argv )
             reg.south = atof(argv[++i]);
             reg.east = atof(argv[++i]);
             reg.west = atof(argv[++i]);
+
+            set_region = TRUE;
         }
         else if( strcmp(argv[i], "-res") == 0 && i < argc - 2 ) {
 
+            reg = *region;
+            region = &reg;
+            
             reg.ns_res = atof(argv[++i]);
             reg.ew_res = atof(argv[++i]);
+
+            set_res = TRUE;
         }
     }
 
