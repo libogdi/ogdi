@@ -1,8 +1,9 @@
-/*
- * feature.c --
+/******************************************************************************
  *
- * Implementation of vrf Server getObject* functions
- *
+ * Component: OGDI VRF Driver
+ * Purpose: Implementation of vrf Server getObject* functions
+ * 
+ ******************************************************************************
  * Copyright (C) 1995 Logiciels et Applications Scientifiques (L.A.S.) Inc
  * Permission to use, copy, modify and distribute this software and
  * its documentation for any purpose and without fee is hereby granted,
@@ -13,6 +14,12 @@
  * without specific, written prior permission. L.A.S. Inc. makes no
  * representations about the suitability of this software for any purpose.
  * It is provided "as is" without express or implied warranty.
+ ******************************************************************************
+ *
+ * $Log$
+ * Revision 1.5  2001-06-13 17:33:59  warmerda
+ * upgraded source headers
+ *
  */
 
 
