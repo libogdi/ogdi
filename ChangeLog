@@ -1,3 +1,7 @@
+2001-02-02  Frank Warmerdam  <warmerdam@pobox.com>
+
+	* config/win32.mak: don't force debugtype to be coff. 
+
 2001-01-09  Frank Warmerdam  <warmerdam@pobox.com>
 
 	* Updated test scripts to support operating against a server
