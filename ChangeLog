@@ -1,3 +1,9 @@
+2001-06-29  Frank Warmerdam  <warmerdam@pobox.com>
+
+	* ogdi/driver/vrf/utils.c: Fixed unterminated string.
+
+	* ogdi/driver/vrf/vrf.c: Fix memory leaks if FCS not found.
+
 2001-06-26  Frank Warmerdam  <warmerdam@pobox.com>
 
 	* vpflib: musedir.h, musedir.c, vpfbrows.c, vpfspx.c, vpftable.c,
