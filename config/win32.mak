@@ -155,8 +155,7 @@ $(subst :,\:,$(ARCHGEN)): $(OBJECTS)
 	$(AR) /OUT:$@ $^ 
 	@echo $@ made successfully ...
 
-
-DEF_FILE=$(TOBEGEN).def
+DEF_FILE=$(TOBEGEN_STRIPPED).def
 RES_FILE=$(TOBEGEN).res
 RC_FILE=$(TOBEGEN).rc
 
@@ -165,6 +164,7 @@ $(subst :,\:,$(DYNAGEN)): $(DEF_FILE) $(OBJECTS)
 	@echo 
 	$(SHLIB_LD) /DLL $(LINK_OPTIMIZATION) \
 	$(filter %.$(OBJ_EXT),$^) $(LINK_LIBS) /DEF:$(filter %.def,$^) \
+	/OUT:$(TOBEGEN).dll \
 	/IMPLIB:$(TOPDIR)/lib/$(TARGET)/$(LIB_PREFIX)$(TOBEGEN).$(ARCH_EXT) \
 	/OUT:$@
 

@@ -124,6 +124,8 @@ VPATH		= ..
 # already been set in the enclosing makefile.
 #
 
+TOBEGEN_STRIPPED=$(patsubst %$(OGDI_VERSION),%,$(TOBEGEN))
+
 ifndef ARCGEN
 ARCHGEN = $(TOPDIR)/lib/$(TARGET)/static/$(LIB_PREFIX)$(TOBEGEN).$(ARCH_EXT)
 endif
