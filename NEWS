@@ -4,6 +4,19 @@
 View the ChangeLog file for detailed, file by file notes on changes.  The
 NEWS file is just used to sumarize major changes, and new features. 
 
+3.1.2
+=====
+
+ o Minor fixes for MacOS 10.3 support (older versions of MacOS won't work 
+   easily)
+
+ o Fixed minor memory leaks in core.
+
+ o Fixed major file handle leak in ADRG driver. 
+
+ o Fixed bugs in VPF driver, especially for VITD datasets.
+
+
 3.1.1
 =====
 
