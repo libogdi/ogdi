@@ -65,7 +65,7 @@ ecs_Result *dyn_CreateServer(s,Request)
   printf("dyn_CreateServer\n");
 #endif
 
-  spriv = s->priv = (void *) malloc(sizeof(ServerPrivateData));
+  spriv = s->priv = (void *) calloc(1,sizeof(ServerPrivateData));
   if (s->priv == NULL) {
     ecs_SetError(&(s->result), 1, "Could not create VRF server, not enough memory");
     return &(s->result);		
@@ -107,7 +107,7 @@ ecs_Result *dyn_CreateServer(s,Request)
   /* Is it a DCW database (in the path) */
 
   spriv->isDCW = FALSE;
-  for (i=0;i<(strlen(s->pathname)-3);i++) {
+  for (i=0;i<(int) (strlen(s->pathname)-3);i++) {
     ptr = &(s->pathname[i]);
     if (strnicmp(ptr,"dcw",3) == 0) {
       spriv->isDCW = TRUE;
@@ -180,6 +180,13 @@ ecs_Result *dyn_DestroyServer(s)
 
   /* DAP  6/19/97 */
   if (spriv->tile != NULL) {
+    int     iTile;
+
+    for( iTile=0; iTile < spriv->nbTile; iTile++ )
+    {
+        if( spriv->tile[iTile].path != NULL )
+            free( spriv->tile[iTile].path );
+    }
     free(spriv->tile);
     spriv->tile = NULL;
   }

@@ -1,5 +1,11 @@
 2001-02-07  Frank Warmerdam  <warmerdam@pobox.com>
 
+	* ogdi/driver/vrf: vrf.c, utils.c
+	Fixed a variety of memory leak problems, partly based on contributions
+	from PCI, and Intergraph.
+	
+       http://sourceforge.net/bugs/?func=detailbug&bug_id=122434&group_id=11181
+
 	* vpflib/vpftable.c: Avoid problem in vpf_open_table() with mixture
 	of unix and dos style separators.
 

@@ -780,6 +780,7 @@ vrf_GetMetadata(s)
     free(buf1);
     get_table_element(3, row, spriv->catTable, &buffint, &count);
     sprintf(spriv->metadatastring,"%sLevel: %d\n",spriv->metadatastring,buffint);
+    free_row(row, spriv->catTable); 		
   }
 
 
@@ -1154,18 +1155,23 @@ vrf_GetMetadata(s)
 		    bufdesc = justify((char*)get_table_element(table_pos("DESCR",spriv->fcaTable), rowfca, spriv->fcaTable, NULL, &count));
 		    /*intbuf = get_table_element(, rowfca, spriv->fcaTable, NULL, &count));*/
 		    if (flag==0)
-		      {
+                    {
 			if (strcmp(buf1,bufname)==0)
-			  {
+                        {
 			    sprintf(spriv->metadatastring,"%s { %s { %s } } ",spriv->metadatastring,bufname,bufdesc);
 			    flag=1;
-			  }
-		      }
+                        }
+                    }
+                    free_row(rowfca, spriv->fcaTable);
+                    free(bufname);
+                    free(bufdesc);
 		  }
 	      }
 
 	    free(buf1);
 	    free(buf2);
+            free_row(row, spriv->fcsTable);
+	    free_row(rowcomp, spriv->fcsTable);
 	  }
 	vpf_close_table(&(spriv->fcaTable));		
     }
@@ -1249,29 +1255,28 @@ vrf_GetMetadata(s)
 		  sprintf(spriv->metadatastring,"%s%s",spriv->metadatastring,buffer);
 		}
 	    
-	    
-
+                free(des_buf);	  
+                free(item_buf);
+                free(att_buf);
+                free_row(row, table);
 	      }  /** for k on table.nrows **/
 #ifdef TESTOPENTABLE
 	    printf("close: table\n");
 #endif
 	    vpf_close_table(&table);
-	    free(des_buf);	  
-	    free(item_buf);
-	    free(att_buf);
-	    free_row(row,table);
-
-
 	  } /**if muse access**/
 	
 
       }  /**for j=1,j<=3**/
 
+    free(covname);
+    
     if (existtableflag==0)
       sprintf(spriv->metadatastring,"%snodata",spriv->metadatastring);
 
     /* ferme la chaine covinfo*/
     sprintf(spriv->metadatastring,"%s} } } ",spriv->metadatastring);	  
+    free_row(rowcat, spriv->catTable);
   } /**(i = 1; i <= spriv->catTable.nrows**/
   /*ferme la chaine generale*/
   sprintf(spriv->metadatastring,"%s }",spriv->metadatastring);
