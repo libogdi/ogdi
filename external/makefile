@@ -22,6 +22,10 @@ ifeq ($(TARGET),win32)
 subdirs += rpc_win32
 endif
 
+ifeq ($(EXPAT_SETTING),internal)
+subdirs := expat $(subdirs) 
+endif
+
 #
 # Default target to build everything in all sub-directories
 #
