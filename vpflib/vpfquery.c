@@ -1238,7 +1238,7 @@ vpf_table_type table;
 		     get_table_element( expr.field, row, table, &fval, &count );
 		     if (!is_vpf_null_float(fval))
               {
-		        fval2 = atof(expr.value);
+		        fval2 = (float) atof(expr.value);
 		        booltemp = fcompare( fval, fval2, expr.op );
 		        }
            else
