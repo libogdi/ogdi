@@ -1,5 +1,9 @@
 2001-08-16  Frank Warmerdam  <warmerdam@pobox.com>
 
+	* ogdi/ogdi/driver/vrf/utils.c: partially rewrite 
+	vrf_build_coverage_capabilities() to avoid repeating entries and
+	to get rid of temp. 
+
 	* ogdi/contrib/ogdi_import/ogdi_import.c: fixed roundoff
 	error in calcuation of xsize/ysize from region.
 

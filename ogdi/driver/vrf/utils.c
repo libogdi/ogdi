@@ -17,7 +17,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.11  2001-07-05 14:16:06  warmerda
+ * Revision 1.12  2001-08-16 19:59:08  warmerda
+ * partially rewrite vrf_build_coverage_capabilities to avoid repeating entries
+ *
+ * Revision 1.11  2001/07/05 14:16:06  warmerda
  * fixed vrf_GetMetadata error duplicating first layer in a class, bug 111181
  *
  * Revision 1.10  2001/06/29 19:17:00  warmerda
@@ -1915,7 +1918,6 @@ vrf_build_coverage_capabilities( ecs_Server *s, const char *coverage)
     vpf_table_type table;
     row_type row;
     unsigned int i, n;
-    char *temp;
     char *name, *fclass;
     char buffer[256];
     register ServerPrivateData *spriv = s->priv;
@@ -1928,8 +1930,12 @@ vrf_build_coverage_capabilities( ecs_Server *s, const char *coverage)
     }
 
     if (muse_access(buffer,0) == 0) {
-
+        char **list;
+        int count = 0, j;
+        
         table = vpf_open_table (buffer, DISK, "rb", NULL);
+
+        list = (char**) malloc ((table.nrows+1) * sizeof(char *));
 
         for (i=0; i < (unsigned int) table.nrows; i++) {
 
@@ -1940,24 +1946,32 @@ vrf_build_coverage_capabilities( ecs_Server *s, const char *coverage)
             /* Now find the name of the feature table that matches the feature class */
 
             name = (char*)get_table_element (2, row, table, NULL, &n);
-            temp = (char*) malloc (strlen (fclass) + 1);
-            strncpy (temp, name, strlen (fclass));
-            temp[strlen(fclass)] = '\0';
-	
-            if (strcmp (fclass, temp) != 0) {
+            if (strncmp (fclass, name, strlen(fclass)) != 0) {
                 free (name);
                 name = (char*) get_table_element (4, row, table, NULL, &n);
             }
-            free (temp);
             free( fclass );
 
-            vrf_build_layer_capabilities( s, coverage, name );
+            /* Have we already processed this name? */
+            for( j = 0; j < count && strcmp(list[j],name) != 0; j++ ) {}
 
-            free (name);
+            if( j == count )
+            {
+                vrf_build_layer_capabilities( s, coverage, name );
+                list[count++] = name;
+            }
+            else
+                free( name );
+
             free_row (row, table);
         }
-
+        
         vpf_close_table (&table);
+
+        for( i = 0; i < count; i++ )
+            free( list[i] );
+
+        free( list );
     }
 }
 
