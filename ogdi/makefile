@@ -10,18 +10,12 @@
 # representations about the suitability of this software for any purpose.
 # It is provided "as is" without express or implied warranty.
 
-# MOD: Bruno Savard, INFOMAR INC., bsavard@infomar.com, 1998/09/21
-# Description: Addition of examples in the build subdirs list.
-
-
 include $(TOPDIR)/config/common.mak
 
 #
 # Sub-directories that need to be built
 #
-# MOD START
-subdirs	= include c-api attr_driver datum_driver driver gltpd examples
-# MOD END
+subdirs	= include c-api glutil attr_driver datum_driver driver gltpd examples
 
 #
 # Default target to build everything in all sub-directories
