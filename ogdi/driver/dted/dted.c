@@ -48,6 +48,8 @@ ecs_Result *dyn_CreateServer(s,Request)
 {
   ServerPrivateData *spriv = s->priv =
       (void *) calloc(1,sizeof(ServerPrivateData));
+
+  (void) Request;
   
   if (spriv == NULL) {
     ecs_SetError(&(s->result),1,
@@ -265,8 +267,6 @@ ecs_Result *
 dyn_GetAttributesFormat(s)
      ecs_Server *s;
 {
-  register ServerPrivateData *spriv = s->priv;
-  
   ecs_SetObjAttributeFormat(&(s->result));
 
   ecs_AddAttributeFormat(&(s->result),"category",Integer,5,0,0);
@@ -532,8 +532,10 @@ ecs_Result *dyn_UpdateDictionary(s,info)
      char *info;
 {
   ServerPrivateData *spriv = s->priv;
-  
   char buffer[64];
+
+  (void) info;
+  
   strcpy(buffer,spriv->layername);
   ecs_AddText(&(s->result),buffer);
   ecs_SetSuccess(&(s->result));
@@ -585,6 +587,8 @@ ecs_Result *dyn_SetServerLanguage(s,language)
      ecs_Server *s;
      u_int language;
 {
+  (void) language;
+
   ecs_SetSuccess(&(s->result));
   return &(s->result);
 }
@@ -601,6 +605,8 @@ ecs_Result *dyn_SetCompression(s,compression)
      ecs_Server *s;
      ecs_Compression *compression;
 {
+  (void) compression;
+
   ecs_SetSuccess(&(s->result));
   return &(s->result);
 }

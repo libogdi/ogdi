@@ -67,7 +67,8 @@ _getObjectRaster(s,l,id)
      ecs_Layer *l;
      char *id;
 {
-/*  register LayerPrivateData *lpriv = (LayerPrivateData *) l->priv;*/
+  (void) l;
+  (void) id;
   ecs_SetSuccess(&(s->result));
 }
 
@@ -77,6 +78,9 @@ _getObjectIdRaster(s,l,coord)
      ecs_Layer *l;
      ecs_Coordinate *coord;
 {
+  (void) l;
+  (void) coord;
+
   ecs_SetSuccess(&(s->result));
 }	
 
@@ -259,9 +263,13 @@ int _calcPosValue(ecs_Server *s, ecs_TileStructure *t, int xtile,
 /* figures out what the "global" resolution is for this coordinate */
 /* x, y : point in the tile */
 
-int _getTileDim(ecs_Server *s, ecs_TileStructure *t, double x, double y, int *width, int  *height) {
+int _getTileDim(ecs_Server *s, ecs_TileStructure *t, double x, double y, 
+                int *width, int  *height) {
   int ns_int, ew_int;  /* interval value in seconds*/
   ServerPrivateData *spriv= s->priv;
+
+  (void) t;
+  (void) x;
 
   if (y < 0)
     y=-y;
