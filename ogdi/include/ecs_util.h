@@ -19,7 +19,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.7  2001-04-12 05:29:47  warmerda
+ * Revision 1.8  2001-04-12 18:15:25  warmerda
+ * added/finished capabilities support
+ *
+ * Revision 1.7  2001/04/12 05:29:47  warmerda
  * added ecs_LayerCapabilities structure, and additions to ecs_Client
  *
  * Revision 1.6  2001/04/09 15:04:35  warmerda
@@ -791,6 +794,7 @@ int ecs_CopyMatrix _ANSI_ARGS_((ecs_Matrix *source, ecs_Matrix *copy));
 int ecs_CopyImage _ANSI_ARGS_((ecs_Image *source, ecs_Image *copy));
 void ecs_FreeObject _ANSI_ARGS_((ecs_Object *obj));
 
+
 /***********************************************************************/
 
 /* ecs_split.c declarations */
@@ -1055,7 +1059,7 @@ typedef struct {
   ecs_Region maskregion;
   int isMaskInclusive;
 
-  int           have_server_capabilties;				       
+  int           have_server_capabilities;				       
   char		server_version_str[32];
   int           server_version; /* version times 1000, ie. 3100 for 3.1 */
 
@@ -1152,6 +1156,18 @@ void cln_BlockOGDI();
 void cln_UnBlockOGDI();
 int cln_IsGeoObjectInsideMask        _ANSI_ARGS_((int ClientID,ecs_Result *obj));
 int cln_ConvMBR                      _ANSI_ARGS_((int ClientID,double *xl,double *yl,double *xu,double *yu,int direction));
+
+/* capabilities */
+
+ecs_Result *cln_GetVersion( int ClientID );
+int         cln_CheckExtension( int ClientID, const char *extension,
+                                const char *layer_name );
+const ecs_LayerCapabilities *
+            cln_GetLayerCapabilities( int ClientID, int layer_index );
+
+ecs_Result *cln_LoadCapabilities( int ClientID, const char *arg, int err );
+void ecs_ParseCapabilities( ecs_Client *cln, const char *cap_doc, 
+                            ecs_Result *result );
 
 #endif /* ECS_UTIL */
 

@@ -18,7 +18,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.7  2001-04-12 05:31:23  warmerda
+ * Revision 1.8  2001-04-12 18:14:16  warmerda
+ * added/finished capabilities support
+ *
+ * Revision 1.7  2001/04/12 05:31:23  warmerda
  * added init/free support for capabilities fields in ecs_Client
  *
  * Revision 1.6  2001/04/09 15:04:34  warmerda
@@ -28,6 +31,7 @@
 
 #include "ecs.h"
 #include "gmath.h"
+#include <assert.h>
 
 ECS_CVSID("$Id$");
 
@@ -280,6 +284,8 @@ int cln_AllocClient(URL, error_code)
     cln->nad_reverse = NULL;
     cln->nad_close = NULL;
     cln->mask = NULL;
+    strcpy( cln->server_version_str, "3.0" );
+    cln->server_version = 3000;
   }
 
   if ((cln == NULL) || (cln->url == NULL)) {
@@ -885,6 +891,7 @@ ecs_Result *cln_GetDictionary(ClientID)
     ecs_SetError(&cln_dummy_result,1,cln_messages[2]);
     return &cln_dummy_result;
   }
+
   msg = svr_GetDictionary(&(cln->s));
   return msg;
 }
@@ -4191,6 +4198,287 @@ ecs_Result *cln_SetCompression(ClientID,compression)
   }
   msg = svr_SetCompression(&(cln->s),compression);
   return msg;
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * cln_LoadCapabilities(): Load and parse capabilities document.
+ *
+ * IN 
+ *	int ClientID: Client identifier
+ *	const char *arg: Either "ogdi_capabilities" or 
+ *                       "ogdi_server_capabilities".
+ *      
+ * OUT
+ *	return ecs_Result: Operation result (success is ecs_Text or error)
+ *
+ *----------------------------------------------------------------------
+ */
+
+ecs_Result *cln_LoadCapabilities(int ClientID, const char *arg, 
+                                 int error_if_unsupported)
+
+{
+  ecs_Client *cln;
+  ecs_Result *msg, *result;
+  char       *cap_doc;
+
+  if (multiblock != 0) {
+    msg = &cln_dummy_result;
+    ecs_SetError(msg,1,cln_messages[14]);
+    return msg;
+  }
+  
+  cln = soc[ClientID];
+  if (cln == NULL) {
+    ecs_SetError(&cln_dummy_result,1,cln_messages[2]);
+    return &cln_dummy_result;
+  }
+
+  /*
+   * Don't do anything, if these capabilities already loaded.  Eventually
+   * we should allow re-loading of capabilities document in case the 
+   * application wants to test error reports, or force a refresh.
+   */
+  if( (cln->have_server_capabilities 
+       && strcmp(arg,"ogdi_server_capabilities") == 0)
+      || (cln->have_capabilities 
+          && strcmp(arg,"ogdi_capabilities") == 0) )
+  {
+      msg = &cln_dummy_result;
+      ecs_SetText(msg,"");
+      ecs_SetSuccess(msg);
+      return msg;
+  }
+
+  /*
+   * Load the requested capabilities document. 
+   */
+  result = cln_UpdateDictionary(ClientID, (char *) arg);
+  if( ECSERROR(result) && error_if_unsupported )
+      return result;
+
+  /*
+   * Did we get an error, or is this clearly not a capabilities document?  
+   * If not, apply a default configuration for pre 3.1 compatibility. 
+   */
+  if( ECSERROR(result) 
+      || strncmp(ECSTEXT(result),"<?xml",5) != 0 
+      || strstr(ECSTEXT(result),"OGDI_Capabilities") == NULL )
+  {
+      if( error_if_unsupported )
+      {
+          assert( result == &cln_dummy_result );
+          if( !ECSERROR(result) )
+          {
+              char	error[1024];
+
+              sprintf( error, 
+                       "Return value of cln_UpdateDictionary(%s) is clearly "
+                       "not an OGDI_Capabilities result.", 
+                       arg );
+              ecs_SetError(&cln_dummy_result,1, error );
+          }
+
+          return &cln_dummy_result;
+      }
+
+      ecs_SetText(&cln_dummy_result,"");
+      ecs_SetSuccess(&cln_dummy_result);
+      
+      cln->have_server_capabilities = TRUE;
+      strcpy( cln->server_version_str, "3.0" );
+      cln->server_version = 3000;
+      
+      cln->have_capabilities = TRUE;
+
+      return &cln_dummy_result;
+  }
+
+  /*
+   * Make a copy of the document so nothing weird happens as our static
+   * result object is modified during parsing.
+   */
+  cap_doc = strdup(ECSTEXT(result));
+  if (cap_doc == NULL) {
+      ecs_SetError(&cln_dummy_result,1,cln_messages[1]);
+      return &cln_dummy_result;
+  }
+
+  /*
+   * Parse it. 
+   */
+  ecs_SetSuccess( &cln_dummy_result );
+  ecs_ParseCapabilities( cln, cap_doc, &cln_dummy_result );
+
+  free( cap_doc );
+
+  return &cln_dummy_result;
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * cln_GetVersion(): Return the driver version string.
+ *
+ * IN 
+ *	int ClientID: Client identifier
+ *      
+ * OUT
+ *	return ecs_Result: Operation result (ecs_Text with version string)
+ *
+ *----------------------------------------------------------------------
+ */
+
+ecs_Result *cln_GetVersion(int ClientID)
+
+{
+  ecs_Client *cln;
+  ecs_Result *msg;
+
+  if (multiblock != 0) {
+    msg = &cln_dummy_result;
+    ecs_SetError(msg,1,cln_messages[14]);
+    return msg;
+  }
+  
+  cln = soc[ClientID];
+  if (cln == NULL) {
+    ecs_SetError(&cln_dummy_result,1,cln_messages[2]);
+    return &cln_dummy_result;
+  }
+
+  cln_LoadCapabilities(ClientID, "ogdi_server_capabilities", 0 );
+
+  msg = &cln_dummy_result;
+  ecs_SetText(msg,cln->server_version_str);
+  ecs_SetSuccess(msg);
+
+  return msg;
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * cln_CheckExtension(): Test if requested extension is enabled.
+ *
+ * IN 
+ *	int ClientID: Client identifier
+ *      const char *extension: the name of the extension to test for.
+ *      const char *layer_name: the name of the layer to test on or NULL.
+ *      
+ * OUT
+ *	return ecs_Result: Operation result (ecs_Text with version string)
+ *
+ *----------------------------------------------------------------------
+ */
+
+int cln_CheckExtension(int ClientID, const char *extension,
+                       const char *layer_name )
+
+{
+  ecs_Client *cln;
+  ecs_Result *result;
+  char	**extensions;
+  int         i, layer;
+
+  if (multiblock != 0) {
+    return FALSE;
+  }
+  
+  cln = soc[ClientID];
+  if (cln == NULL) {
+    return FALSE;
+  }
+
+  if( layer_name == NULL )
+      result = cln_LoadCapabilities(ClientID, "ogdi_server_capabilities", 0 );
+  else
+      result = cln_LoadCapabilities(ClientID, "ogdi_capabilities", 0 );
+
+  if( ECSERROR(result) )
+      return FALSE;
+  
+  /*
+   * Test in global extensions. 
+   */
+  
+  extensions = cln->global_extensions;
+  for( i = 0; extensions != NULL && extensions[i] != NULL; i++ )
+  {
+      if( strcmp(extensions[i],extension) == 0 )
+          return TRUE;
+  }
+
+  if( layer_name == NULL )
+      return FALSE;
+
+  /* 
+   * Test within layer.
+   */
+  for( layer = 0; layer < cln->layer_cap_count; layer++ )
+  {
+      if( strcmp(layer_name, cln->layer_cap[layer]->name) == 0 )
+      {
+          extensions = cln->layer_cap[layer]->extensions; 
+          for( i = 0; extensions != NULL && extensions[i] != NULL; i++ )
+          {
+              if( strcmp(extensions[i],extension) == 0 )
+                  return TRUE;
+          }
+          
+          return FALSE;
+      }
+  }
+
+  return FALSE;
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * cln_GetLayerCapabilities(): Get layer definition.
+ *
+ * Note that there is no way to find out the number of layers explicitly.
+ * Applications are intended to call cln_GetLayerCapabilities() repeatedly
+ * with incrementing layer_index values till a NULL is returned.
+ *
+ * IN 
+ *	int ClientID: Client identifier
+ *      int layer_index: The zero based index of the layer.
+ *      
+ * OUT
+ *	return ecs_LayerCapabilities of layer or NULL if unavailable.  The
+ *             returned pointer is to internal data and should not be 
+ *             modified or freed.  It will be invalidated when the client
+ *             is destroyed.
+ *
+ *----------------------------------------------------------------------
+ */
+
+const ecs_LayerCapabilities *
+cln_GetLayerCapabilities( int ClientID, int layer_index )
+
+{
+  ecs_Client *cln;
+
+  if (multiblock != 0) {
+    return NULL;
+  }
+  
+  cln = soc[ClientID];
+  if (cln == NULL) {
+      return NULL;
+  }
+
+  if( ECSERROR(cln_LoadCapabilities(ClientID, "ogdi_capabilities", 0 )) )
+      return NULL;
+
+  if( layer_index < 0 || layer_index >= cln->layer_cap_count )
+      return NULL;
+  else
+      return cln->layer_cap[layer_index];
 }
 
 /*

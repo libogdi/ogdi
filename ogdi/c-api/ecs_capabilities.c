@@ -17,7 +17,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.1  2001-04-12 05:30:31  warmerda
+ * Revision 1.2  2001-04-12 18:14:16  warmerda
+ * added/finished capabilities support
+ *
+ * Revision 1.1  2001/04/12 05:30:31  warmerda
  * New
  *
  */
@@ -57,6 +60,7 @@ typedef struct {
     int		element_depth;
     char	*element_stack[STACK_MAX];
 
+    int         found_feature_type_list;
     int		layer_count;
     ecs_LayerCapabilities **layers;
     
@@ -81,6 +85,9 @@ static void recordError( capParseInfo *pi, const char *fmt, ... )
     va_end(args);
 
     pi->error = strdup(buffer);
+#ifdef DEBUG
+    fprintf( stderr, "ecs_capabilities.c recordError():\n%s\n", pi->error );
+#endif    
 }
 
 /************************************************************************/
@@ -118,10 +125,22 @@ static void startElementHandler( void *cbData, const char *element,
     }
 
 /* -------------------------------------------------------------------- */
+/*      Pull driver OGDI version off the OGDI_Capabilities tag.         */
+/* -------------------------------------------------------------------- */
+    if( strcmp(element,"OGDI_Capabilities") == 0 )
+    {
+        for( i = 0; attr != NULL && attr[i] != NULL; i += 2 )
+        {
+            if( strcmp(attr[i],"version") == 0 )
+                pi->version = strdup(attr[i+1]);
+        }
+    }
+
+/* -------------------------------------------------------------------- */
 /*      If we encounter a <FeatureType> element, create a new layer     */
 /*      object and initialize it.                                       */
 /* -------------------------------------------------------------------- */
-    if( strcmp(element,"FeatureType") == 0 )
+    else if( strcmp(element,"FeatureType") == 0 )
     {
         pi->layers = (ecs_LayerCapabilities **) 
             realloc(pi->layers, sizeof(void*) * (1 + ++pi->layer_count));
@@ -139,6 +158,25 @@ static void startElementHandler( void *cbData, const char *element,
         /* eventually we need to capture the "parents" at this point */
 
         pi->cur_layer = pi->layers[pi->layer_count-1];
+    }
+
+/* -------------------------------------------------------------------- */
+/*	We try to capture cdata as a query expression description,      */
+/*      if available.                                                   */
+/* -------------------------------------------------------------------- */
+    else if( strcmp(element,"QueryExpression") == 0 && pi->cur_layer != NULL )
+    {
+        pi->cur_layer->query_expression_set = TRUE;
+
+        for( i = 0; attr != NULL && attr[i] != NULL; i += 2 )
+        {
+            if( strcmp(attr[i],"qe_prefix") == 0 )
+                pi->cur_layer->qe_prefix = strdup(attr[i+1]);
+            else if( strcmp(attr[i],"qe_suffix") == 0 )
+                pi->cur_layer->qe_suffix = strdup(attr[i+1]);
+            else if( strcmp(attr[i],"qe_format") == 0 )
+                pi->cur_layer->qe_format = strdup(attr[i+1]);
+        }
     }
 
 /* -------------------------------------------------------------------- */
@@ -307,6 +345,16 @@ static void endElementHandler( void *cbData, const char *element )
     }
 
 /* -------------------------------------------------------------------- */
+/*	We try to capture cdata as a query expression description,      */
+/*      if available.                                                   */
+/* -------------------------------------------------------------------- */
+    else if( strcmp(element,"QueryExpression") == 0
+             && pi->cur_layer != NULL && strlen(pi->cdata) > 0 )
+    {
+        pi->cur_layer->qe_description = strdup(pi->cdata);
+    }
+
+/* -------------------------------------------------------------------- */
 /*      If we are processing a layer and encounter a family, add to     */
 /*      the layer.                                                      */
 /* -------------------------------------------------------------------- */
@@ -332,6 +380,40 @@ static void endElementHandler( void *cbData, const char *element )
             pi->cur_layer->families[Node] = 1;
         else if( strcmp(pi->cdata,"Ring") == 0 )
             pi->cur_layer->families[Ring] = 1;
+    }
+
+/* -------------------------------------------------------------------- */
+/*	We keep track of whether we got through to the end of a 	*/
+/*	FeatureTypeList to know if this is really a full capabilities	*/
+/*	document, rather than just a server capabilities document.      */
+/* -------------------------------------------------------------------- */
+    else if( strcmp(element,"FeatureTypeList") == 0 )
+    {
+        pi->found_feature_type_list = TRUE;
+    }
+
+/* -------------------------------------------------------------------- */
+/*      Append extensions to the global, or layer list as appropriate.  */
+/* -------------------------------------------------------------------- */
+    else if( strcmp(element,"Extension") == 0 )
+    {
+        char	***list;
+        int	count;
+
+        if( pi->cur_layer != NULL )
+            list = &(pi->cur_layer->extensions);
+        else
+            list = &(pi->extensions);
+
+        for( count = 0; *list != NULL && (*list)[count] != NULL; count++ ) {}
+            
+        if( *list == NULL )
+            *list = (char **) calloc(2,sizeof(char*));
+        else
+            *list = (char **) realloc(*list,(count+2) * sizeof(char*));
+
+        (*list)[count++] = strdup( pi->cdata );
+        (*list)[count] = NULL;
     }
 
 /* -------------------------------------------------------------------- */
@@ -381,18 +463,17 @@ static void charDataHandler( void *cbData, const char *text, int len )
 /*                       _ecs_ParseCapabilities()                       */
 /************************************************************************/
 
-ecs_LayerCapabilities **
-_ecs_ParseCapabilities( ecs_Client *cln, const char *cap_doc )
+void ecs_ParseCapabilities( ecs_Client *cln, const char *cap_doc,
+                            ecs_Result *result )
 
 {
 #ifdef EXPAT_DISABLED
-    fprintf( stderr, 
-             "Expat not configured, capabilities parsing disabled.\n" );
-
-    return NULL;
+    ecs_SetError( result, 1,
+                  "XML capabilities parsing disabled during compilation, parse fails." );
 #else
     capParseInfo	pi;
     XML_Parser		parser;
+    int			i;
     
     memset( &pi, 0, sizeof(pi) );
 
@@ -414,20 +495,72 @@ _ecs_ParseCapabilities( ecs_Client *cln, const char *cap_doc )
     XML_Parse( parser, cap_doc, strlen(cap_doc), TRUE );
 
 /* -------------------------------------------------------------------- */
-/*      Cleanup                                                         */
-/* -------------------------------------------------------------------- */
-    XML_ParserFree( parser );
-
-/* -------------------------------------------------------------------- */
 /*      Report error.  This will need to be substantially improved.     */
 /* -------------------------------------------------------------------- */
     if( pi.error != NULL )
     {
-        fprintf( stderr, "_ecs_ParseCapabilities Error:\n%s", pi.error );
-        free( pi.error );
+        ecs_SetError( result, 1, pi.error );
+    }
+    
+/* -------------------------------------------------------------------- */
+/*      Apply captured information to the ecs_Client object.            */
+/* -------------------------------------------------------------------- */
+    else
+    {
+        ecs_SetSuccess( result );
+        ecs_SetText( result, "" );
+
+        cln->have_server_capabilities = TRUE;
+        if( pi.version != NULL )
+            strcpy( cln->server_version_str, pi.version );
+        else
+            strcpy( cln->server_version_str, "3.0" );
+
+        cln->server_version = (int) (atof(cln->server_version_str)*1000 + 0.5);
+
+        if( cln->global_extensions != NULL )
+        {
+            for( i = 0; cln->global_extensions[i] != NULL; i++ )
+                free( cln->global_extensions[i] );
+            free( cln->global_extensions );
+        }
+
+        cln->global_extensions = pi.extensions;
+        pi.extensions = NULL;
+
+        cln->have_capabilities = pi.found_feature_type_list;
+
+        cln->layer_cap_count = pi.layer_count;
+        cln->layer_cap = pi.layers;
+
+        pi.layer_count = 0;
+        pi.layers = NULL;
     }
 
-    return pi.layers;
+/* -------------------------------------------------------------------- */
+/*      Cleanup                                                         */
+/* -------------------------------------------------------------------- */
+    XML_ParserFree( parser );
+
+    if( pi.version )
+        free( pi.version );
+    if( pi.error )
+        free( pi.error );
+
+    if( pi.extensions )
+    {
+        for( i = 0; pi.extensions[i] != NULL; i++ )
+            free( pi.extensions[i] );
+        free( pi.extensions );
+    }
+    
+    for( i = 0; i < pi.element_depth; i++ )
+        free( pi.element_stack[i] );
+
+    /* 
+     * We should likely free layers in case of error, but that's complicated,
+     * so we will add this later perhaps with on centralized ecs_FreeLayerCap.
+     */
 #endif
 }
 
