@@ -1,5 +1,10 @@
 2004-10-25  Frank Warmerdam  <warmerdam@pobox.com>
 
+	* ogdi/driver/vrf/utils.c: Use short for "buffint" variable.  This is
+	the level number used in forming metadata.  This corrects a complaint
+	noticed in valgrind.  Likely to cause problems on big endian systems
+	as well (crazy level numbers).
+
 	* ogdi/driver/vrf/vrfswq.c: Fixed so that comparisons to string fields
 	longer than one character work.  Fixed so that trailing spaces are
 	trimmed off string values read from disk before applying comparisons. 
