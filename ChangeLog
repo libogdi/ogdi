@@ -1,3 +1,8 @@
+2002-02-08  Frank Warmerdam  <warmerdam@pobox.com>
+
+	* contrib/ogdi_import/ogdi_import.c: Fixed serious bug importing
+	floating point fields with unknown precision.  
+
 2001-12-14  Frank Warmerdam  <warmerdam@pobox.com>
 
 	* contrib/ogdi_info/ogdi_info.c: don't try to reproject to latlong
