@@ -9,22 +9,71 @@ OGDI developer and user resources can be found online at:
 
 
 Building
---------
+========
 
 Detailed building instructions are available at:
 
   http://ogdi.sourceforge.net/build.html
 
-Briefly, set the environment variables TOPDIR (to point to home directory
-of the OGDI source tree) and TARGET (to one of win32, linux or solaris - case 
-matters).  $TOPDIR/bin/$TARGET must be in the LD_LIBRARY_PATH.  Then type make
-in the root directory of the distribution (this directory).  
+Unix
+----
 
-On windows the Cygwin environment (http://www.cygwin.com) is required. 
+1) Set TOPDIR to point to the home directory of the OGDI source tree. 
+
+   eg. 
+   TOPDIR=/usr/ogdi-3.1.3
+   export TOPDIR
+
+2) Run configure.
+
+   eg. 
+   ./configure
+
+3) Build with make (GNUmake is required). 
+
+   make
+
+   NOTE: on some platforms you will need to add the shared libraries to
+   your LD_LIBRARY_PATH for the link phase to complete.  
+ 
+   eg. 
+
+   LD_LIBRARY_PATH=$TOPDIR/bin/Linux
+   export LD_LIBRARY_PATH
+
+4) Install.
+
+   make install
+
+Windows
+-------
+
+Windows works similarly, but a preset configuration is used instead of
+building one with configure.
+
+Requirements:
+  o Cygwin (build shell) from http://www.cygwin.com/
+  o Microsoft Visual C++ 6.x (make sure it works at the commandline from bash).
+
+1) Set TOPDIR to point to the home directory of the OGDI source tree. 
+
+   eg. 
+   TOPDIR=c:/ogdi-3.1.3
+   export TOPDIR
+
+2) Set the target build configuration
+
+   eg.
+   TARGET=win32
+   export TARGET
+
+3) Build with make.
+
+   make
 
 
 Running
--------
+=======
 
 Briefly, ensure that $TOPDIR/bin/$TARGET is in the path.  Ensure that
 $TOPDIR/bin/$TARGET is in the LD_LIBRARY_PATH on Unix. 
