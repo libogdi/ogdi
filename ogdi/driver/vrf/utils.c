@@ -17,7 +17,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.12  2001-08-16 19:59:08  warmerda
+ * Revision 1.13  2003-05-21 18:47:31  warmerda
+ * initialize spriv->tile[0].path in untiled (VITD) case
+ *
+ * Revision 1.12  2001/08/16 19:59:08  warmerda
  * partially rewrite vrf_build_coverage_capabilities to avoid repeating entries
  *
  * Revision 1.11  2001/07/05 14:16:06  warmerda
@@ -1386,6 +1389,7 @@ vrf_initTiling(s)
       spriv->tile[0].xmax = (float) s->globalRegion.north;
       spriv->tile[0].ymin = (float) s->globalRegion.west;
       spriv->tile[0].ymax = (float) s->globalRegion.east;
+      spriv->tile[0].path = NULL;
       spriv->nbTile = 1;
       return 1;
     }
@@ -1409,6 +1413,8 @@ vrf_initTiling(s)
     ecs_SetError(&(s->result),1,"Can't allocate enough memory to read tile reference");
     return 0;	
   }
+  memset( spriv->tile, 0, sizeof(VRFTile) * tile_table.nrows );
+
   sprintf(buffer,"%s/tileref/fbr",spriv->library);
   if (muse_access(buffer,0)!=0) {
     sprintf(buffer,"%s/TILEREF/FBR",spriv->library);
@@ -1442,7 +1448,7 @@ vrf_initTiling(s)
     } else {
       named_table_element("FAC_ID",i+1,tile_table,&fac_id,&count);
     }
-    
+
     spriv->tile[i].path = justify((char *) named_table_element("TILE_NAME",i+1,tile_table,dummy,&count));
     
     named_table_element("XMIN",fac_id,mbr_tile_table,&(spriv->tile[i].xmin),&count);
