@@ -1,11 +1,34 @@
-2000-11-21  Frank Warmerdam  <warmerda@cs46980-c>
+2000-11-22  Frank Warmerdam  <warmerdam@pobox.com>
+
+	* Added .cvsignore files marking off OBJ.* directories.
+
+2000-11-21  Frank Warmerdam  <warmerdam@pobox.com>
+
+	* vpflib/vpftable.c: vpf_open_table() - memset() the table
+	structure to zero to ensure no fields are uninitialized thereby
+	causing problems in vpf_close_table()
+	
+      http://sourceforge.net/bugs/?func=detailbug&bug_id=123132&group_id=11181
+
+	* vpflib/vpftable.c: vpf_close_table() ... don't fclose(table->fp)
+	if it is NULL.  This can occur if no features are selected (for
+	instance the wrong family type is used for a layer). 
+
+      http://sourceforge.net/bugs/?func=detailbug&bug_id=123132&group_id=11181
+
+	* Query strings passed to VRF driver with double quoted strings
+	  wouldn't work properly (ie. contourl@elev(hqc="1")) because
+	  one extra character was being eaten by code in vpflib/vpfquery.c.
+	  Applied fix suggested by Duncan Chaundy (PCI). 
+	
+      http://sourceforge.net/bugs/?func=detailbug&bug_id=122597&group_id=11181
 
 	* Added Ecs_tcl_Init() entry point in ecs_tcl.c.  This
 	appears to be needed for Tcl8.x dynamic loading on Unix.
 
       http://sourceforge.net/bugs/?func=detailbug&bug_id=123077&group_id=11181
 
-2000-11-10  Frank Warmerdam  <warmerda@cs46980-c>
+2000-11-10  Frank Warmerdam  <warmerdam@pobox.com>
 
 	* Change Crown copyrigh back to LAS copyright, but with the same 
 	rights of use and distributions as the crown copyright code.
@@ -34,13 +57,13 @@
 	  ogdi/include/sun: ecs.h
 	  ogdi/tcl_interface: ecs_tcl.c, makefile
 
-2000-11-09    <warmerda@CS46980-B>
+2000-11-09  Frank Warmerdam  <warmerdam@pobox.com>
 
 	* remove files in the devdir/ogdi/doc directory.  They are out of
 	date (ogdi.ps), and available from other places (proj.4).  They also
 	add alot of heft to an ogdi cvs checkout.
 
-2000-11-02  Frank Warmerdam  <warmerda@cs46980-c>
+2000-11-02  Frank Warmerdam  <warmerdam@pobox.com>
 
 	* Added LICENSE file summarizing licenses in effect in source tree.
 
@@ -71,7 +94,7 @@
 	  ogdi/include/sun: ecs.h
 	  ogdi/tcl_interface: ecs_tcl.c, makefile
 
-2000-10-29  Frank Warmerdam  <warmerda@cs46980-c>
+2000-10-29  Frank Warmerdam  <warmerdam@pobox.com>
 
 	* Made config/mkinstalldirs executable.
 
