@@ -1,3 +1,9 @@
+2004-10-25  Frank Warmerdam  <warmerdam@pobox.com>
+
+	* ogdi/driver/vrf/vrfswq.c: Fixed so that comparisons to string fields
+	longer than one character work.  Fixed so that trailing spaces are
+	trimmed off string values read from disk before applying comparisons. 
+
 2004-10-19  Frank Warmerdam  <warmerdam@pobox.com>
 
 	* ogdi/drivers/vrf/object.c: Fixed memory leak for line layers with
