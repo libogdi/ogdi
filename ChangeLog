@@ -1,4 +1,13 @@
+2001-02-18  Frank Warmerdam  <warmerdam@pobox.com>
+
+	* ogdi/gltpd: ecs_sif.c, asyncsvr.c
+	Cleanup lots of compiler warnings. 
+
 2001-02-17  Frank Warmerdam  <warmerdam@pobox.com>
+
+	* ogdi/c-api: ecs_xdrz.c, ecshash.c ecstile.c server.c
+	Avoid compiler warnings about unused variables, and signed/unsigned
+	stuff.
 
 	* ogdi/c-api/makefile, ogdi/gltpd/makefile:
 	Disable running rpcgen unless explicitly requested due to problems.
