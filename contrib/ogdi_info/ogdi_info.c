@@ -20,7 +20,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.5  2001-04-10 14:41:47  warmerda
+ * Revision 1.6  2001-04-12 18:12:42  warmerda
+ * Added lots of capabilities related to capabilities
+ *
+ * Revision 1.5  2001/04/10 14:41:47  warmerda
  * Added support for reporting Image values.
  *
  * Revision 1.4  2001/04/09 16:06:53  warmerda
@@ -41,6 +44,107 @@ static int	ClientID = -1;
 static int      bNoDict = FALSE;
 static int      bNoProj = FALSE;
 static int      nSampleFrequency = 1;
+
+/************************************************************************/
+/*                             CheckError()                             */
+/************************************************************************/
+
+static int CheckError( ecs_Result * result )
+
+{
+    if( ECSERROR( result ) ) {
+        printf( "ECSERROR: %s\n", result->message );
+        return TRUE;
+    }
+    else
+        return FALSE;
+}
+
+/************************************************************************/
+/*                          DumpCapabilities()                          */
+/************************************************************************/
+
+static void DumpCapabilities()
+
+{
+    const ecs_LayerCapabilities *layer;
+    int			   layer_index;
+    ecs_Result		  *result;
+
+    result = cln_GetVersion( ClientID );
+    if( CheckError( result ) )
+        return;
+
+    printf( "Version: `%s'\n", ECSTEXT(result) );
+
+    for( layer_index = 0; 
+         (layer = cln_GetLayerCapabilities(ClientID,layer_index)) != NULL;
+         layer_index++ )
+    {
+        printf( "Layer %d: %s\n", layer_index, layer->name );
+
+        if( layer->title )
+            printf( "  Title: %s\n", layer->title );
+
+        if( layer->srs )
+            printf( "  SRS: %s\n", layer->srs );
+
+        printf( "  Families: " );
+        if( layer->families[Area] )
+            printf( "Area " );
+        if( layer->families[Point] )
+            printf( "Point " );
+        if( layer->families[Line] )
+            printf( "Line " );
+        if( layer->families[Image] )
+            printf( "Image " );
+        if( layer->families[Matrix] )
+            printf( "Matrix " );
+        printf( "\n" );
+
+        printf( "  Bounds: n=%g, s=%g, e=%g, w=%g, nsres=%g, ewres=%g\n", 
+                layer->srs_north, 
+                layer->srs_south, 
+                layer->srs_east, 
+                layer->srs_west, 
+                layer->srs_nsres, 
+                layer->srs_ewres );
+        if( layer->ll_bounds_set )
+        {
+            printf( "  LLBounds: n=%g, s=%g, e=%g, w=%g\n", 
+                    layer->ll_north, 
+                    layer->ll_south, 
+                    layer->ll_east, 
+                    layer->ll_west );
+        }
+
+        if( layer->extensions != NULL )
+        {
+            int		i;
+
+            printf( "  Extensions:" );
+
+            for( i = 0; layer->extensions[i] != NULL; i++ )
+                printf( " %s", layer->extensions[i] );
+            
+            printf( "\n" );
+        }
+
+        if( layer->query_expression_set )
+        {
+            printf( "  Query Expression:\n" );
+            if( layer->qe_prefix != NULL )
+                printf( "    prefix=\"%s\"\n", layer->qe_prefix );
+            if( layer->qe_suffix != NULL )
+                printf( "    suffix=\"%s\"\n", layer->qe_suffix );
+            if( layer->qe_format != NULL )
+                printf( "    format=\"%s\"\n", layer->qe_format );
+            if( layer->qe_description != NULL )
+                printf( "    description=\"%s\"\n", layer->qe_description );
+        }
+    }
+}
+
 
 /************************************************************************/
 /*                              DecToDMS()                              */
@@ -176,21 +280,6 @@ static void DumpVectorObject( ecs_Result * result, ecs_Family featureType )
         }
     }
     printf( "\n" );
-}
-
-/************************************************************************/
-/*                             CheckError()                             */
-/************************************************************************/
-
-static int CheckError( ecs_Result * result )
-
-{
-    if( ECSERROR( result ) ) {
-        printf( "ECSERROR: %s\n", result->message );
-        return TRUE;
-    }
-    else
-        return FALSE;
 }
 
 /************************************************************************/
@@ -390,13 +479,11 @@ static void DumpDict( const char * pszDictName )
 {
     ecs_Result *result;
 
-    printf( "Dumping Dictionary `%s':\n", pszDictName );
-    
     result = cln_UpdateDictionary( ClientID, (char *) pszDictName );
     if( CheckError( result ) )
         return;
 
-    printf( "UpdateDictionary = \n%s\n", ECSTEXT(result) );
+    printf( "UpdateDictionary(%s) = \n%s\n", pszDictName, ECSTEXT(result) );
 }
 
 /************************************************************************/
@@ -581,11 +668,12 @@ static void DumpLayer( const char * options, ecs_Region * region,
 static void Usage()
 
 {
-    printf("Usage: ogdi_info [-no-dict] [-no-proj]\n"
-           "                 -u url -l layername -f family\n" );
-    printf("                 [-r north south east west] -dl \n" );
-    printf("                 [-cs easting northing] \n" );
-    printf("                 [-id object_id] [-sf sample_frequency] \n" );
+    printf(
+        "Usage: ogdi_info [-no-dict] [-no-proj] -u url\n"
+        "            [-dict arg] [-cap] [-ext name [layer]]\n"
+        "            -l layername -f family [-r north south east west]\n" 
+        "            [-dl] [-cs easting northing]\n" 
+        "            [-id object_id] [-sf sample_frequency]\n" );
     exit( 1 );
 }
 
@@ -602,6 +690,9 @@ int main( int argc, char ** argv )
     ecs_Result *result;
     int		i;
 
+    if( argc == 1 )
+        Usage();
+
 /* -------------------------------------------------------------------- */
 /*      Handle commandline arguments.                                   */
 /* -------------------------------------------------------------------- */
@@ -616,12 +707,15 @@ int main( int argc, char ** argv )
         else if( strcmp(argv[i], "-no-dict") == 0 ) {
             bNoDict = TRUE;
         }
-        else if( strcmp(argv[i], "-dict") == 0 ) {
-            DumpDict( argv[++i] );
+        else if( strcmp(argv[i], "-cap") == 0 ) {
+            DumpCapabilities();
         }
         else if( i == argc - 1 ) {
             /* skip ... the rest require arguments.  */
             Usage();
+        }
+        else if( strcmp(argv[i], "-dict") == 0 ) {
+            DumpDict( argv[++i] );
         }
         else if( strcmp(argv[i],"-u") == 0 ) {
             AccessURL( argv[++i], &reg );
@@ -665,6 +759,27 @@ int main( int argc, char ** argv )
         else if( strcmp(argv[i], "-id") == 0 && i < argc - 1 ) {
             IdSearch( layer, featureType, argv[i+1] );
             i += 1;
+        }
+        else if( strcmp(argv[i], "-ext") == 0 && i < argc - 1 ) {
+            const char	*layer = NULL;
+
+            printf( "Check Extension %s", argv[i+1] );
+
+            if( i < argc - 2 && argv[i+2][0] != '-' )
+            {
+                layer = argv[i+2];
+                printf( " on layer %s", layer );
+            }
+            
+            if( cln_CheckExtension( ClientID, argv[i+1], layer ) )
+                printf( ": enabled\n" );
+            else
+                printf( ": not enabled\n" );
+
+            if( layer != NULL )
+                i += 2;
+            else
+                i += 1;
         }
         else
             Usage();
