@@ -1,8 +1,9 @@
-/*
- * adrg.c --
+/******************************************************************************
  *
- * Implementation of ADRG Driver
- *
+ * Component: OGDI ADRG Driver
+ * Purpose: External (dyn_*) entry points for ADRG driver.
+ * 
+ ******************************************************************************
  * Copyright (C) 1995 Logiciels et Applications Scientifiques (L.A.S.) Inc
  * Permission to use, copy, modify and distribute this software and
  * its documentation for any purpose and without fee is hereby granted,
@@ -13,11 +14,20 @@
  * without specific, written prior permission. L.A.S. Inc. makes no
  * representations about the suitability of this software for any purpose.
  * It is provided "as is" without express or implied warranty.
+ ******************************************************************************
+ *
+ * $Log$
+ * Revision 1.5  2001-06-22 16:37:50  warmerda
+ * added Image support, upgraded headers
+ *
  */
 
 #include "adrg.h"
 #include "datadict.h"
 
+ECS_CVSID("$Id$");
+
+static void	_releaseAllLayers _ANSI_ARGS_((ecs_Server *s));
 int colorintensity[6] = {0,63,105,147,189,255};
 
 /* layer oriented functions are keeped in data structure to simplify code */
@@ -28,7 +38,7 @@ LayerMethod adrg_layerMethod[11] = {
   /* Line */	{ NULL, NULL, NULL, NULL, NULL, NULL },
   /* Point */	{ NULL, NULL, NULL, NULL, NULL, NULL },
   /* Matrix */	{ NULL, NULL, _rewindRasterLayer, _getNextObjectRaster, _getObjectRaster, _getObjectIdRaster },
-  /* Image */	{ NULL, NULL, NULL, NULL, NULL, NULL },
+  /* Image */	{ NULL, NULL, _rewindImageLayer, _getNextObjectImage, _getObjectImage, _getObjectIdImage },
   /* Text */	{ NULL, NULL, NULL, NULL, NULL, NULL },
   /* Edge */	{ NULL, NULL, NULL, NULL, NULL, NULL },
   /* Face */	{ NULL, NULL, NULL, NULL, NULL, NULL },
@@ -54,8 +64,6 @@ ecs_Result *dyn_CreateServer(s,Request)
   char *c;
   char buffer[125];
   char cc,sc[3];
-
-  (void) Request;
 
   if (spriv == NULL) {
     ecs_SetError(&(s->result),1,"Not enough memory to allocate server private data");
@@ -207,18 +215,6 @@ ecs_Result *dyn_CreateServer(s,Request)
 
   ecs_SetSuccess(&(s->result));
   return &(s->result);
-}
-
-/* deselect all layer */
-
-static void
-_releaseAllLayers(s)
-     ecs_Server *s;
-{
-  int i;
-
-  for (i = 0; i < s->nblayer; ++i)
-    dyn_ReleaseLayer(s,&(s->layer[i].sel));
 }
 
 
@@ -436,6 +432,18 @@ ecs_Result *dyn_ReleaseLayer(s,sel)
   return &(s->result);
 }
 
+/* deselect all layer */
+
+static void
+_releaseAllLayers(s)
+     ecs_Server *s;
+{
+  int i;
+
+  for (i = 0; i < s->nblayer; ++i)
+    dyn_ReleaseLayer(s,&(s->layer[i].sel));
+}
+
 /* ----------------------------------------------------------------------
  *  dyn_SelectRegion: 
  *     
@@ -546,21 +554,26 @@ ecs_Result *dyn_GetRasterInfo(s)
   lpriv = (LayerPrivateData *) s->layer[s->currentLayer].priv;
 
   /* Put table contain in RasterInfo here */
-  
-  ecs_SetRasterInfo(&(s->result),lpriv->columns,lpriv->rows);
-  count = 1;
-  for(i=0;i<6;i++) {
-    for(j=0;j<6;j++) {
-      for(k=0;k<6;k++) {
-	ecs_AddRasterInfoCategory(&(s->result),count,
-				  colorintensity[i],
-				  colorintensity[j],
-				  colorintensity[k],buffer,0);
-	count++;
+
+  if (s->layer[s->currentLayer].sel.F == Matrix) {
+    ecs_SetRasterInfo(&(s->result),lpriv->columns,lpriv->rows);
+    count = 1;
+    for(i=0;i<6;i++) {
+      for(j=0;j<6;j++) {
+	for(k=0;k<6;k++) {
+	  ecs_AddRasterInfoCategory(&(s->result),count,
+				    colorintensity[i],
+				    colorintensity[j],
+				    colorintensity[k],buffer,0);
+	  count++;
+	}
       }
     }
+  } else {
+    ecs_SetRasterInfo(&(s->result),1,0);
+    ecs_AddRasterInfoCategory(&(s->result),1, 255, 255, 255,"No data",0);
   }
-
+  
   ecs_SetSuccess(&(s->result));
   return &(s->result);
 }
@@ -621,8 +634,6 @@ ecs_Result *dyn_UpdateDictionary(s,info)
   DIR *dirlist;
   register ServerPrivateData *spriv = s->priv;
   char *c;
-
-  (void) info;
 
   dirlist = opendir(spriv->imgdir);
   if (dirlist==NULL) {
@@ -704,7 +715,6 @@ ecs_Result *dyn_SetServerLanguage(s,language)
      ecs_Server *s;
      u_int language;
 {
-  (void) language;
   ecs_SetSuccess(&(s->result));
   return &(s->result);
 }

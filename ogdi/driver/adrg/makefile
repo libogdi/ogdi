@@ -27,4 +27,7 @@ include $(TOPDIR)/config/common.mak
 all:  MKOBJECTDIR datadict.h
 	$(MAKE) --directory $(OBJDIR) -f ../makefile PASS='depend' $(TARGETGEN)
 
+datadict.h: ddadrg.tcl
+	$(STRINGIFY) -file ddadrg.tcl datadict.h
+
 clean: default-clean

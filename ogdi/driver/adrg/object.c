@@ -1,8 +1,9 @@
-/*
- * object.c --
+/******************************************************************************
  *
- * Implementation of DTED Server getObject* functions
- *
+ * Component: OGDI ADRG Driver
+ * Purpose: Implementation of ADRG getObject* functions.
+ * 
+ ******************************************************************************
  * Copyright (C) 1995 Logiciels et Applications Scientifiques (L.A.S.) Inc
  * Permission to use, copy, modify and distribute this software and
  * its documentation for any purpose and without fee is hereby granted,
@@ -13,10 +14,18 @@
  * without specific, written prior permission. L.A.S. Inc. makes no
  * representations about the suitability of this software for any purpose.
  * It is provided "as is" without express or implied warranty.
+ ******************************************************************************
+ *
+ * $Log$
+ * Revision 1.5  2001-06-22 16:37:50  warmerda
+ * added Image support, upgraded headers
+ *
  */
 
 #include "ecs.h"
 #include "adrg.h"
+
+ECS_CVSID("$Id$");
 
 /*
  *  --------------------------------------------------------------------------
@@ -277,9 +286,6 @@ _getObjectIdRaster(s,l,coord)
      ecs_Coordinate *coord;
 {
 
-  (void) l;
-  (void) coord;
-
   ecs_SetSuccess(&(s->result));
 }	
 
@@ -287,8 +293,6 @@ void _rewindRasterLayer(s,l)
      ecs_Server *s;
      ecs_Layer *l;
 {
-    (void) s;
-    (void) l;
 }
 
 
@@ -445,3 +449,227 @@ void _calPosWithCoord(s,l,pos_x,pos_y,i,j,UseOverview)
 
   return;
 }
+
+
+
+/*
+ *  --------------------------------------------------------------------------
+ *  _get*Object*Image: 
+ *   
+ *      a set of functions to acheive Line objects retrieval
+ *  --------------------------------------------------------------------------
+ */
+
+void _getNextObjectImage(s,l)
+     ecs_Server *s;
+     ecs_Layer *l;
+{
+  int i,i2,j2;
+  char buffer[128];
+  static int UseOverview;
+
+  int totalcol,totalrow;
+  int value;
+  double pos;
+
+  if (l->index >= l->nbfeature) {
+    ecs_SetError(&(s->result),2,"End of selection");
+    return;
+  }
+
+  _LoadADRGTiles(s,l,&UseOverview);
+
+  totalcol = (int) ((s->currentRegion.east - s->currentRegion.west)/s->currentRegion.ew_res);
+  totalrow = (int) ((s->currentRegion.north - s->currentRegion.south)/s->currentRegion.ns_res);
+  ecs_SetGeomImage(&(s->result),totalcol);
+
+  if (s->rasterconversion.isProjEqual) {
+    for (i=0; i<totalcol; i++) {
+      value = _calcImagePosValue(s,l,i,l->index,UseOverview);
+      ECS_SETGEOMIMAGEVALUE(&(s->result),i,value);
+    }
+  } else {
+    for (i=0; i<totalcol; i++) {
+      i2 = ECSGETI(s,((double) l->index),((double)i));
+      j2 = ECSGETJ(s,((double) l->index),((double)i));
+      value = _calcImagePosValue(s,l,j2,i2,UseOverview);
+      
+      ECS_SETGEOMIMAGEVALUE((&(s->result)),i,value);
+    }
+  }
+  
+
+  sprintf(buffer,"%d",l->index);
+  if (!ecs_SetObjectId(&(s->result),buffer)) {
+    return;
+  }
+
+  pos = s->currentRegion.north - l->index*s->currentRegion.ns_res;
+  ECS_SETGEOMBOUNDINGBOX((&(s->result)),s->currentRegion.west,
+			 pos+s->currentRegion.ns_res,
+			 s->currentRegion.east,pos)
+
+
+  l->index++;
+  ecs_SetSuccess(&(s->result));
+}
+
+void 
+_getObjectImage(s,l,id)
+     ecs_Server *s;
+     ecs_Layer *l;
+     char *id;
+{
+  int i,i2,j2;
+  char buffer[128];
+  int totalcol,totalrow;
+  int value;
+  int index;
+  double pos;
+
+  index = atoi(id);
+
+  if (index >= l->nbfeature) {
+    ecs_SetError(&(s->result),2,"Bad index value");
+    return;
+  }
+
+  totalcol = (int) ((s->currentRegion.east - s->currentRegion.west)/s->currentRegion.ew_res);
+  totalrow = (int) ((s->currentRegion.north - s->currentRegion.south)/s->currentRegion.ns_res);
+  ecs_SetGeomImage(&(s->result),totalcol);
+
+  if (s->rasterconversion.isProjEqual) {
+    for (i=0; i<totalcol; i++) {
+      value = _calcImagePosValue(s,l,i,index,FALSE);
+      ECS_SETGEOMMATRIXVALUE((&(s->result)),i,value);
+    }
+  } else {
+    for (i=0; i<totalcol; i++) {
+      i2 = ECSGETI(s,((double) index),((double)i));
+      j2 = ECSGETJ(s,((double) index),((double)i));
+      value = _calcImagePosValue(s,l,j2,i2,FALSE);
+      ECS_SETGEOMIMAGEVALUE((&(s->result)),i,value);
+    }
+  }
+
+  sprintf(buffer,"%d",index);
+  if (!ecs_SetObjectId(&(s->result),buffer)) {
+    return;
+  }
+
+  pos = s->currentRegion.north - index*s->currentRegion.ns_res;
+  ECS_SETGEOMBOUNDINGBOX((&(s->result)),s->currentRegion.west,
+			 pos+s->currentRegion.ns_res,
+			 s->currentRegion.east,pos)
+
+  ecs_SetSuccess(&(s->result));
+}
+
+void 
+_getObjectIdImage(s,l,coord)
+     ecs_Server *s;
+     ecs_Layer *l;
+     ecs_Coordinate *coord;
+{
+
+  ecs_SetSuccess(&(s->result));
+}	
+
+void _rewindImageLayer(s,l)
+     ecs_Server *s;
+     ecs_Layer *l;
+{
+}
+
+
+int _calcImagePosValue(s,l,i,j,UseOverview)
+     ecs_Server *s;
+     ecs_Layer *l;
+     int i;
+     int j;
+     int UseOverview;
+{
+  register LayerPrivateData *lpriv = (LayerPrivateData *) l->priv;
+  register LayerPrivateData *ptrlpriv;
+  register ServerPrivateData *spriv = s->priv;
+  double pos_x, pos_y;
+  int pix_c,pix_r;
+  register int value,tile,tile_physique,tile_x,tile_y;
+  register int tile_r,tile_c;
+  register unsigned int Red,Green,Blue,PosRed;
+
+  if (UseOverview == TRUE) {
+    ptrlpriv = &(spriv->overview);
+  } else {
+    ptrlpriv = lpriv;
+  }
+
+  pos_x = s->currentRegion.west + i*s->currentRegion.ew_res;
+  pos_y = s->currentRegion.north - j*s->currentRegion.ns_res;
+
+  _calPosWithCoord(s,l,pos_x,pos_y,&pix_c,&pix_r,UseOverview);
+
+  if ((pix_c>=0) && (pix_c<ptrlpriv->columns) &&
+      (pix_r>=0) && (pix_r<ptrlpriv->rows)) {
+
+    /* Trouver la tile correspondante a pix_c,pix_r */
+    
+    tile_x = pix_c/128;
+    tile_y = pix_r/128;
+    tile = (tile_y * ptrlpriv->coltiles) + tile_x;
+
+    /* Trouver a quel numero de tile correspond cette tile */
+
+    if ((tile < 0) || (tile > (ptrlpriv->coltiles*ptrlpriv->rowtiles)))
+      tile_physique = 0;
+    else 
+      tile_physique = ptrlpriv->tilelist[tile];
+    
+    /* Si cette tile physique est 0, c'est une tile vide */
+    
+    if (tile_physique == 0) {
+      value = ecs_GetPixelFromRGB(0,0,0,0);
+    } else {
+      tile_r = pix_r - tile_y * 128;
+      tile_c = pix_c - tile_x * 128;
+
+      if (ptrlpriv->buffertile != NULL) {
+	tile_physique = tile_x - ptrlpriv->firsttile;
+
+	if (ptrlpriv->buffertile[tile_physique].isActive == TRUE) {
+	  PosRed = tile_r*128 + tile_c;
+	  Red = (ptrlpriv->buffertile[tile_physique].data[PosRed]);
+	  Green = (ptrlpriv->buffertile[tile_physique].data[PosRed+16384]);
+	  Blue = (ptrlpriv->buffertile[tile_physique].data[PosRed+32768]);
+	} else {
+	  value = ecs_GetPixelFromRGB(0,0,0,0);
+	  return value;
+	}
+      } else {
+	if ((tile_physique--) < 0)
+	  tile_physique = 0;
+	
+	PosRed = ptrlpriv->firstposition + tile_physique*49152 + tile_r*128 + tile_c;
+	fseek(ptrlpriv->imgfile,PosRed-1,SEEK_SET);
+	Red = ((unsigned int) getc(ptrlpriv->imgfile));
+	fseek(ptrlpriv->imgfile,16383,SEEK_CUR);
+	Green = ((unsigned int) getc(ptrlpriv->imgfile));
+	fseek(ptrlpriv->imgfile,16383,SEEK_CUR);
+	Blue = ((unsigned int) getc(ptrlpriv->imgfile));
+	
+      }
+      value = ecs_GetPixelFromRGB(1,Red,Green,Blue);
+    }
+  } else {
+    value = ecs_GetPixelFromRGB(0,0,0,0);
+  }
+  
+  return value;
+}
+
+
+
+
+
+
+

@@ -1,9 +1,9 @@
-
-/*
- * utils.c --
+/******************************************************************************
  *
- * Implementation of ADRG functions
- *
+ * Component: OGDI ADRG Driver
+ * Purpose: Supporting ADRG functions.
+ * 
+ ******************************************************************************
  * Copyright (C) 1995 Logiciels et Applications Scientifiques (L.A.S.) Inc
  * Permission to use, copy, modify and distribute this software and
  * its documentation for any purpose and without fee is hereby granted,
@@ -14,10 +14,17 @@
  * without specific, written prior permission. L.A.S. Inc. makes no
  * representations about the suitability of this software for any purpose.
  * It is provided "as is" without express or implied warranty.
+ ******************************************************************************
+ *
+ * $Log$
+ * Revision 1.5  2001-06-22 16:37:50  warmerda
+ * added Image support, upgraded headers
+ *
  */
 
-
 #include "adrg.h"
+
+ECS_CVSID("$Id$");
 
 /* 
    ----------------------------------------------------------

@@ -1,8 +1,9 @@
-/*
- * adrg.h --
+/******************************************************************************
  *
- * Data structure definition for ADRG server
- *
+ * Component: OGDI ADRG Driver
+ * Purpose: Data structure and prototype declarations for ADRG driver.
+ * 
+ ******************************************************************************
  * Copyright (C) 1995 Logiciels et Applications Scientifiques (L.A.S.) Inc
  * Permission to use, copy, modify and distribute this software and
  * its documentation for any purpose and without fee is hereby granted,
@@ -13,6 +14,12 @@
  * without specific, written prior permission. L.A.S. Inc. makes no
  * representations about the suitability of this software for any purpose.
  * It is provided "as is" without express or implied warranty.
+ ******************************************************************************
+ *
+ * $Log$
+ * Revision 1.5  2001-06-22 16:37:50  warmerda
+ * added Image support, upgraded headers
+ *
  */
 
 #include "ecs.h"
@@ -76,6 +83,13 @@ void		_getNextObjectRaster _ANSI_ARGS_((ecs_Server *s,ecs_Layer *layer));
 void		_getObjectRaster _ANSI_ARGS_((ecs_Server *s,ecs_Layer *layer, char *objectId));
 void		_getObjectIdRaster _ANSI_ARGS_((ecs_Server *s,ecs_Layer *layer, ecs_Coordinate *coord));
 int             _calcPosValue _ANSI_ARGS_((ecs_Server *s,ecs_Layer *l,int i,int j,int UseOverview));
+void		_openImageLayer _ANSI_ARGS_((ecs_Server *s,ecs_Layer *layer));
+void		_closeImageLayer _ANSI_ARGS_((ecs_Server *s,ecs_Layer *layer));
+void		_rewindImageLayer _ANSI_ARGS_((ecs_Server *s,ecs_Layer *layer));
+void		_getNextObjectImage _ANSI_ARGS_((ecs_Server *s,ecs_Layer *layer));
+void		_getObjectImage _ANSI_ARGS_((ecs_Server *s,ecs_Layer *layer, char *objectId));
+void		_getObjectIdImage _ANSI_ARGS_((ecs_Server *s,ecs_Layer *layer, ecs_Coordinate *coord));
+int             _calcImagePosValue _ANSI_ARGS_((ecs_Server *s,ecs_Layer *l,int i,int j,int UseOverview));
 void            _LoadADRGTiles _ANSI_ARGS_((ecs_Server *s,ecs_Layer *l,int *UseOverview));
 
 /* layer oriented method are keeped into a single data structure to simplify the code */
