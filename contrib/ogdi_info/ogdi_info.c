@@ -1,3 +1,29 @@
+/******************************************************************************
+ * $Id$
+ *
+ * Project:  OGDI Contributed Clients
+ * Purpose:  Simple console query program for testing OGDI.
+ * Author:   Frank Warmerdam <warmerdam@pobox.com>
+ *
+ ******************************************************************************
+ * Copyright (c) 2000, Frank Warmerdam <warmerdam@pobox.com>
+ *
+ * Permission to use, copy, modify and distribute this software and
+ * its documentation for any purpose and without fee is hereby granted,
+ * provided that the above copyright notice appear in all copies, that
+ * both the copyright notice and this permission notice appear in
+ * supporting documentation, and that the name of the author not be used 
+ * in advertising or publicity pertaining to distribution of the software 
+ * without specific, written prior permission.   The author makes no
+ * representations about the suitability of this software for any purpose.
+ * It is provided "as is" without express or implied warranty.
+ ******************************************************************************
+ *
+ * $Log$
+ * Revision 1.2  2000-11-23 19:10:36  warmerda
+ * added copyright header
+ *
+ */
 
 #include "ecs.h"
 #include "projects.h"
