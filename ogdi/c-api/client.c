@@ -18,7 +18,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.9  2001-05-04 17:59:37  warmerda
+ * Revision 1.10  2001-08-16 15:34:23  warmerda
+ * fixed roundoff bug with width/height in cln_ConvRegion
+ *
+ * Revision 1.9  2001/05/04 17:59:37  warmerda
  * clear autoCache in cln_SelectRegion
  *
  * Revision 1.8  2001/04/12 18:14:16  warmerda
@@ -2587,8 +2590,8 @@ int cln_ConvRegion(ClientID,gr,direction)
   width = (gr->east - gr->west) / gr->ew_res;
   height = (gr->north - gr->south) / gr->ns_res;
 
-  intwidth = (int) ceil(width);
-  intheight = (int) ceil(height);
+  intwidth = (int) floor(width+0.5);
+  intheight = (int) floor(height+0.5);
 
   /*
    * Calculate resolution. For that, calculate four points in
