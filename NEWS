@@ -4,6 +4,19 @@
 View the ChangeLog file for detailed, file by file notes on changes.  The
 NEWS file is just used to sumarize major changes, and new features. 
 
+3.1.5
+=====
+
+ o Fixed serious bugs with untiled VPF products (like rference layer in VMAP0)
+ 
+ o Fixed a few minor memory leaks, and at least one major one in VPF driver
+   when using query expression. 
+
+ o Fixed serious bug in VPF reader when reader is re-loaded after one use. 
+
+ o Fixed several other issues in VPF driver.
+
+
 3.1.4
 =====
 
