@@ -1,5 +1,7 @@
 2001-04-19  Frank Warmerdam  <warmerdam@pobox.com>
 
+	Collectively the following fix DTED bug 233252.
+
 	* ogdi/c-api/ecstile.c: fixed round off errors in calculation
 	of t->linelength, and placed coord.x/y at center of pixel instead of
 	the corner.
