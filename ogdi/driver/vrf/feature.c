@@ -17,7 +17,13 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.13  2004-04-04 04:33:01  warmerda
+ * Revision 1.14  2004-10-26 20:29:43  warmerda
+ * Removed hack that was dropping some inner rings from polygons unnecessarily.
+ * The hack appears to be to deal with some problem of inner rings duplicating
+ * outer rings in browse products, but I don't know how to check the original
+ * case.  See bug report 692844.
+ *
+ * Revision 1.13  2004/04/04 04:33:01  warmerda
  * added vrf_free_ObjAttributeBuffer
  *
  * Revision 1.12  2004/02/19 05:46:28  warmerda
@@ -732,13 +738,24 @@ int vrf_get_area_feature (s, layer, prim_id)
       break;
 
     /*
-      The Browse Case: It is possible the last island cover the same
-      region than the first one.
-      */
+    ** The Browse Case: It is possible the last island cover the same
+    ** region than the first one.
+    **
+    ** NFW/2004: The following logic seems unreasonably broad and has for 
+    ** certain been causing some island polygons (such as for the island at
+    ** 14.85E, 60.55N in inwatera@hydro(*) of the eurasia VMAP0 dataset) to 
+    ** disappear without reason.  There may be a case where this logic should
+    ** apply, but without detail on how to reproduce the original issue, I am
+    ** just removing the logic completely. 
+    **
+    ** See ogdi.sf.net bug tracker bug: 692844
+    */
+#ifdef notdef
     if (n>=2 && ring_rec.face != prim_id && area.rings[n-1]->nr_segs == firstlength) {
-      n--;
-      break;
+        n--;
+        break;
     }
+#endif
 
     if (ring_rec.face == prim_id) {
       if( n == max_rings )
