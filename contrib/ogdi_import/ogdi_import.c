@@ -1,3 +1,30 @@
+/******************************************************************************
+ * $Id$
+ *
+ * Project:  OGDI Contributed Clients
+ * Purpose:  Simple console import to shapefile/raw raster.
+ * Author:   Frank Warmerdam <warmerdam@pobox.com>
+ *
+ ******************************************************************************
+ * Copyright (c) 2000, Frank Warmerdam <warmerdam@pobox.com>
+ *
+ * Permission to use, copy, modify and distribute this software and
+ * its documentation for any purpose and without fee is hereby granted,
+ * provided that the above copyright notice appear in all copies, that
+ * both the copyright notice and this permission notice appear in
+ * supporting documentation, and that the name of the author not be used 
+ * in advertising or publicity pertaining to distribution of the software 
+ * without specific, written prior permission.   The author makes no
+ * representations about the suitability of this software for any purpose.
+ * It is provided "as is" without express or implied warranty.
+ ******************************************************************************
+ *
+ * $Log$
+ * Revision 1.2  2000-11-23 19:15:57  warmerda
+ * added header block
+ *
+ */
+
 #include "ecs.h"
 #include "shapefil.h"
 #include <assert.h>
