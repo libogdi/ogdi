@@ -18,7 +18,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.6  2001-04-09 15:04:34  warmerda
+ * Revision 1.7  2001-04-12 05:31:23  warmerda
+ * added init/free support for capabilities fields in ecs_Client
+ *
+ * Revision 1.6  2001/04/09 15:04:34  warmerda
  * applied new source headers
  *
  */
@@ -85,7 +88,6 @@ void cln_FreeClient(cln)
      ecs_Client **cln;
 {
   if ((*cln) != NULL) {
-/**MOD START**/
     if ((*cln)->url != NULL) {
       free((*cln)->url);
       (*cln)->url = NULL;
@@ -135,10 +137,73 @@ void cln_FreeClient(cln)
       (*cln)->dthandle = NULL;
     }      
 
+    if( (*cln)->global_extensions != NULL )
+    {
+        int	i;
+
+        for( i = 0; (*cln)->global_extensions[i] != NULL; i++ )
+            free( (*cln)->global_extensions[i] );
+        free( (*cln)->global_extensions );
+        (*cln)->global_extensions = NULL;
+    }
+
+    if( (*cln)->layer_cap_count > 0 )
+    {
+        int	lindex;
+
+        for( lindex = 0; lindex < (*cln)->layer_cap_count; lindex++ )
+        {
+            ecs_LayerCapabilities *layer;
+            int			  i;
+
+            layer = (*cln)->layer_cap[lindex];
+
+            if( layer->name != NULL )
+                free( layer->name );
+            if( layer->title != NULL )
+                free( layer->title );
+            if( layer->srs != NULL )
+                free( layer->srs );
+
+            for( i = 0; 
+                 layer->parents != NULL && layer->parents[i] != NULL; 
+                 i++ )
+            {
+                free( layer->parents[i] );
+            }
+            if( layer->parents != NULL )
+                free( layer->parents );
+
+            for( i = 0; 
+                 layer->extensions != NULL && layer->extensions[i] != NULL; 
+                 i++ )
+            {
+                free( layer->extensions[i] );
+            }
+            if( layer->extensions != NULL )
+                free( layer->extensions );
+
+            if( layer->qe_prefix != NULL )
+                free( layer->qe_prefix );
+            if( layer->qe_suffix != NULL )
+                free( layer->qe_suffix );
+            if( layer->qe_format != NULL )
+                free( layer->qe_format );
+            if( layer->qe_description != NULL )
+                free( layer->qe_description );
+
+            free( layer );
+        }
+
+        free( (*cln)->layer_cap );
+
+        (*cln)->layer_cap = NULL;
+        (*cln)->layer_cap_count = 0;
+    }
+
     free((*cln));
     (*cln) = NULL;
   }
-/**MOD END**/
 }
 
 /*
@@ -189,7 +254,7 @@ int cln_AllocClient(URL, error_code)
    * Client allocation 
    */
 
-  cln = (ecs_Client *) malloc(sizeof(ecs_Client));
+  cln = (ecs_Client *) calloc(1,sizeof(ecs_Client));
   if (cln != NULL) {
     cln->url = (char *) malloc(strlen(URL)+1);
     if (cln->url != NULL)
