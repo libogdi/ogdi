@@ -28,6 +28,8 @@ CFLAGS 	= $(INCLUDES) $(COMMON_CFLAGS)
 LINK_LIBS= $(RPC_LINKLIB) $(ZLIB_LINKLIB) $(EXPAT_LINKLIB) $(WIN_LINKLIB) \
 		$(PROJ_STATICLIB) $(MATH_LINKLIB)
 
+EXTRA_INSTALL_TARGETS	=	install-so-link
+
 include $(TOPDIR)/config/common.mak
 
 all: MKOBJECTDIR ecs_xdr.c
@@ -51,3 +53,4 @@ rpcgen:
 	$(RM) -f ecs.x
 
 clean: default-clean
+
