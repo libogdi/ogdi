@@ -17,7 +17,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.7  2001-04-10 14:29:43  warmerda
+ * Revision 1.8  2001-04-10 16:18:28  warmerda
+ * added ogdi_server_capabilities, and ogdi_capabilities support
+ *
+ * Revision 1.7  2001/04/10 14:29:43  warmerda
  * Upgraded with changes from DND (hand applied to avoid losing bug fixes).
  * Patch also includes change to exclude zero elevations when computing
  * mincat/maxcat.
@@ -552,13 +555,81 @@ ecs_Result *dyn_UpdateDictionary(s,info)
      char *info;
 {
   ServerPrivateData *spriv = s->priv;
-  char buffer[64];
 
-  (void) info;
-  
-  strcpy(buffer,spriv->layername);
-  ecs_AddText(&(s->result),buffer);
-  ecs_SetSuccess(&(s->result));
+  if( strcmp(info,"ogdi_server_capabilities") == 0 )
+  {
+      ecs_AddText(&(s->result),
+                  "<?xml version=\"1.0\" ?>\n"
+                  "<OGDI_Capabilities version=\"3.1\">\n"
+                  "</OGDI_Capabilities>\n" );
+      ecs_SetSuccess(&(s->result));
+  }
+
+  else if( strcmp(info,"ogdi_capabilities") == 0 )
+  {
+      char		line[256];
+
+      ecs_AddText(&(s->result),
+                  "<?xml version=\"1.0\" ?>\n"
+                  "<OGDI_Capabilities version=\"3.1\">\n" );
+      ecs_AddText(&(s->result),
+                  "   <FeatureTypeList>\n"
+                  "      <Operations>\n"
+                  "         <Query/>\n"
+                  "      </Operations>\n"
+                  "      <FeatureType>\n" );
+
+      sprintf( line, "         <Name>%s(RAM)</Name>\n", spriv->layername);
+      ecs_AddText(&(s->result),line);
+
+      sprintf( line, "         <SRS>PROJ4:%s</SRS>\n", PROJ_LONGLAT );
+      ecs_AddText(&(s->result),line);
+
+      sprintf(line, 
+              "         <LongLatBoundingBox minx=\"%.9f\"  miny=\"%.9f\"\n"
+              "                             maxx=\"%.9f\"  maxy=\"%.9f\" />\n",
+              s->globalRegion.west, s->globalRegion.south, 
+              s->globalRegion.east, s->globalRegion.north );
+
+      ecs_AddText(&(s->result),line);
+      
+      sprintf(line, 
+              "         <SRSBoundingBox minx=\"%.9f\"  miny=\"%.9f\"\n"
+              "                         maxx=\"%.9f\"  maxy=\"%.9f\"\n"
+              "                         x_res=\"%.9f\" y_res=\"%.9f\" />\n",
+              s->globalRegion.west, s->globalRegion.south, 
+              s->globalRegion.east, s->globalRegion.north,
+              s->globalRegion.ew_res, s->globalRegion.ns_res );
+      ecs_AddText(&(s->result),line);
+      
+      ecs_AddText(&(s->result),
+                  "         <Family>Matrix</Family>\n" ); 
+      ecs_AddText(&(s->result),
+                  "         <Family>Image</Family>\n" ); 
+      ecs_AddText(&(s->result),
+                  "      </FeatureType>\n"
+                  "   </FeatureTypeList>\n" 
+                  "</OGDI_Capabilities>\n" );
+      ecs_SetSuccess(&(s->result));
+  }
+
+  else if( strcmp(info,"") == 0 )
+  {
+      char buffer[64];
+
+      strcpy(buffer,spriv->layername);
+      ecs_AddText(&(s->result),buffer);
+      ecs_SetSuccess(&(s->result));
+  }
+  else
+  {
+      char emsg[129];
+
+      sprintf( emsg, "DTED driver UpdateDictionary(%s) unsupported.", info );
+      
+      ecs_SetError(&(s->result), 1, emsg );
+  }
+
   return (&(s->result));
 }
 
