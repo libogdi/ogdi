@@ -1,0 +1,38 @@
+2000-11-02  Frank Warmerdam  <warmerda@cs46980-c>
+
+	* Change LAS copyright message to crown copyright on the following
+ 	  files:
+	  ogdi/c-api: client.c, ecsdist.c, server.c
+	  ogdi/attr_driver/odbc: odbc.c, makefile, odbc.h
+	  ogdi/attr_drier: makefile
+	  datum_driver: makefile
+	  datum_driver/canada: dtcanada.c, makefile, nadconv.c, navconv.h, 
+	                       sdms.c
+	  datum_driver/usa: dtusa.c, makefile
+	  external/rpc_win32/makefile
+	  external/rpc_win32/LICRPC/makefile
+	  external/rpc_win32/RPCGEN/makefile
+	  external/zlib/makefile
+	  ogdi/driver/adrg: adrg.c, adrg.h, utils.c, object.c, makefile
+	  ogdi/driver/dted: dted.c, dted.h, object.c, utils.c, makefile
+	  ogdi/driver/network: makefile
+	  ogdi/driver/rpf: makefile, rpf.c, utils.c, rpf.h
+	  ogdi/driver/skeleton: makefile, skeleton.c, object.c, open.c, 
+	                        skeleton.h, utils.c
+	  ogdi/driver/vrf: feature.c, object.c, vrf.c, utils.c, open.c, vrf.h,
+	                   makefile
+	  ogdi/gltp: makefile
+	  ogdi/glutil: makefile
+	  ogdi/include: ecs.x, ecs_util.h, makefile, ecs.h
+	  ogdi/include/sun: ecs.h
+	  ogdi/tcl_interface: ecs_tcl.c, makefile
+
+2000-10-29  Frank Warmerdam  <warmerda@cs46980-c>
+
+	* Made config/mkinstalldirs executable.
+
+	* Added config/linux.mak.
+
+	* Added ChangeLog file.
+
+	* Imported OGDI 3.0 Beta into CVS.
