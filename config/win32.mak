@@ -72,7 +72,7 @@ LINK_SW		=
 # Endian definition, could be little or big
 #
 
-ENDIAN          = little
+BIG_ENDIAN          = 0
 
 #
 #Compilation and linking flags
@@ -144,6 +144,7 @@ COMMON_CFLAGS = /D_WINDOWS /DWIN32 /D_MBCS \
 	/DSIGQUIT=SIGBREAK /Dioctl=Ioctl /DSIGPIPE=SIGTERM \
 	/DSIGHUP=SIGTERM /DSIGALRM=SIGTERM   /Dpopen=_popen \
 	/Dpclose=_pclose \
+	/DMISSING_DLFCN_H \
 	$(OPTIMIZATION) \
 	/W3 /YX /MD /c /Fpheaders.pch
 
