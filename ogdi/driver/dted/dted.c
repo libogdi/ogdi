@@ -143,6 +143,7 @@ ecs_Result *dyn_DestroyServer(s)
   _releaseAllLayers(s);
 
   if(spriv != NULL) {
+    ecs_TileClearBuffer(&(spriv->t));
     if (spriv->pathname != NULL) {
       free(spriv->pathname);
     }
