@@ -20,7 +20,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.8  2001-04-19 05:28:50  warmerda
+ * Revision 1.9  2001-07-17 19:08:01  warmerda
+ * Fixed reporting of Text layers.
+ *
+ * Revision 1.8  2001/04/19 05:28:50  warmerda
  * improve region bounds reporting
  *
  * Revision 1.7  2001/04/12 19:26:08  warmerda
@@ -102,6 +105,8 @@ static void DumpCapabilities()
             printf( "Point " );
         if( layer->families[Line] )
             printf( "Line " );
+        if( layer->families[Text] )
+            printf( "Text " );
         if( layer->families[Image] )
             printf( "Image " );
         if( layer->families[Matrix] )
