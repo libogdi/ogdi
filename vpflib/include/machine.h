@@ -15,7 +15,7 @@ typedef struct
     long            output;
 } xBYTE_ORDER;
 
-#if BIG_ENDIAN == 1
+#if SYS_BIG_ENDIAN == 1
 #define MACHINE_BYTE_ORDER MOST_SIGNIFICANT
 #else
 #define MACHINE_BYTE_ORDER LEAST_SIGNIFICANT
