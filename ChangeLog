@@ -1,4 +1,10 @@
+=============================================================================
+
 2003-12-15  Frank Warmerdam  <warmerdam@pobox.com>
+
+	* Release OGDI 3.1.2.
+
+	* ogdi/include/ecs_util.h: updated version to 3.1.2.
 
 	* config/darwin.cfg: new configuration file for MacOS 10.3.
 
