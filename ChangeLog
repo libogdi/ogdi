@@ -1,3 +1,14 @@
+2001-04-19  Frank Warmerdam  <warmerdam@pobox.com>
+
+	* ogdi/c-api/ecstile.c: fixed round off errors in calculation
+	of t->linelength, and placed coord.x/y at center of pixel instead of
+	the corner.
+
+	* ogdi/drvers/dted/object.c: moved pos_y to the middle of the
+	desired row.  Generated errors in unsupported functions.
+
+	* ogdi/drivers/dted/dted.c: fixed bugs with computing nbfeature.
+
 2001-04-16  Frank Warmerdam  <warmerdam@pobox.com>
 
 	* ogdi/drivers/rpf/rpf.c: added capabilities support.
