@@ -59,6 +59,9 @@ RPC_LINKLIB	=	-ldl
 #
 BIG_ENDIAN          = @BIG_ENDIAN@
 
+#
+# Handle internal/external PROJ.4 library usage.
+#
 
 PROJ_SETTING=@PROJ_SETTING@
 
@@ -66,3 +69,21 @@ ifeq ($(PROJ_SETTING),external)
 PROJ_INCLUDE :=	@PROJ_INCLUDE@
 PROJ_STATICLIB := @PROJ_LIB@
 endif
+
+#
+# Handle internal/external/disabled "Expat" library handling.
+#
+
+EXPAT_SETTING=@EXPAT_SETTING@
+
+ifeq ($(EXPAT_SETTING),external)
+EXPAT_INCLUDE := @EXPAT_INCLUDE@
+EXPAT_LINKLIB := @EXPAT_LIB@
+endif
+
+ifeq ($(EXPAT_SETTING),disabled)
+EXPAT_INCLUDE := -DEXPAT_DISABLED
+EXPAT_LINKLIB := 
+endif
+
+

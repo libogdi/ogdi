@@ -80,6 +80,7 @@ PROJ_INCLUDE	= $(INCL_SW)$(TOPDIR)/proj
 VPF_INCLUDE	= $(INCL_SW)$(TOPDIR)/vpflib/include $(INCL_SW)$(TOPDIR)/vpflib
 ZLIB_INCLUDE	= $(INCL_SW)$(TOPDIR)/external/zlib
 GLUTIL_INCLUDE	= $(INCL_SW)$(TOPDIR)/ogdi/glutil
+EXPAT_INCLUDE   = $(INCL_SW)$(TOPDIR)/external/expat
 
 #
 # Dynamic libraries (shared objects)
@@ -88,6 +89,7 @@ GLUTIL_INCLUDE	= $(INCL_SW)$(TOPDIR)/ogdi/glutil
 ODBCEXT_LINKLIB	= $(LINK_SW)$(LINKDIR)$(LIB_SW)odbcext$(LIB_SUFFIX)
 OGDI_LINKLIB	= $(LINK_SW)$(LINKDIR)$(LIB_SW)ogdi$(OGDI_VERSION)$(LIB_SUFFIX)
 ZLIB_LINKLIB	= $(LINK_SW)$(LINKDIR)$(LIB_SW)zlib_ogdi$(OGDI_VERSION)$(LIB_SUFFIX)
+EXPAT_LINKLIB	= $(LINK_SW)$(LINKDIR)$(LIB_SW)expat_ogdi$(OGDI_VERSION)$(LIB_SUFFIX)
 
 #
 # Static libraries (archives)

@@ -136,6 +136,94 @@ AC_SUBST(PROJ_SETTING,$PROJ_SETTING)
 AC_SUBST(PROJ_INCLUDE,$PROJ_INCLUDE)
 AC_SUBST(PROJ_LIB,$PROJ_LIB)
 
+dnl ---------------------------------------------------------------------------
+dnl Check for expat override, or disabling.
+dnl ---------------------------------------------------------------------------
+
+EXPAT_SETTING=internal
+EXPAT_INCLUDE=
+EXPAT_LIB=
+export EXPAT_LIB EXPAT_INCLUDE EXPAT_SETTING
+
+AC_ARG_WITH(expat,[  --with-expat[=ARG]      Utilize external Expat library, or disable Expat.],,)
+
+if test "$with_expat" = "yes" ; then
+
+  AC_CHECK_LIB(expat,XML_ParserCreate,EXPAT_SETTING=external,EXPAT_SETTING=missing,)
+  AC_CHECK_HEADERS(expat.h)
+
+  if test $EXPAT_SETTING = missing ; then
+    AC_MSG_ERROR([Unable to find external Expat library, give path or use default internal library.])
+  fi
+  if test "$ac_cv_header_expat_h" = no ; then
+    AC_MSG_ERROR([Unable to find external expat.h file, give path or use default internal library.])
+  fi
+
+  EXPAT_SETTING=external
+  EXPAT_LIB=-lexpat
+
+elif test "$with_expat" = "no" ; then
+  echo "Disabled use of Expat library, and XML capabilities parsing."
+  EXPAT_SETTING=disabled
+
+elif test "$with_expat" != "" ; then
+  
+  if test -r $with_expat/include/expat.h ; then
+    echo "checking for $with_expat/include/expat.h ... found"
+    EXPAT_INCLUDE=-I$with_expat/include
+  elif test -r $with_expat/expat.h ; then
+    echo "checking for $with_expat/expat.h ... found"
+    EXPAT_INCLUDE=-I$with_expat
+  else
+    AC_MSG_ERROR([Unable to find $with_expat/include/expat.h])
+  fi
+
+  if test -r $with_expat/lib/libexpat.so ; then
+    EXPAT_LIB=$with_expat/lib/libexpat.so
+    echo "checking for $EXPAT_LIB ... found"
+
+  elif test -r $with_expat/lib/libexpat.a ; then
+    EXPAT_LIB=$with_expat/lib/libexpat.a
+    echo "checking for $EXPAT_LIB ... found"
+
+  elif test -r $with_expat/libexpat.so ; then
+    EXPAT_LIB=$with_expat/libexpat.so
+    echo "checking for $EXPAT_LIB ... found"
+
+  elif test -r $with_expat/libexpat.a ; then
+    EXPAT_LIB=$with_expat/libexpat.a
+    echo "checking for $EXPAT_LIB ... found"
+
+  else
+    AC_MSG_ERROR([Unable to find $with_expat/{lib/,}libexpat.{so,a}])
+  fi
+
+  EXPAT_SETTING=external
+fi
+
+AC_ARG_WITH(expatlib,[  --with-expatlib=path    Select Expat library],,)
+
+if test "$with_expatlib" != "" ; then
+  EXPAT_LIB=$with_expatlib
+  EXPAT_SETTING=external
+  echo "Using EXPAT_LIB=$EXPAT_LIB for Expat library."
+fi
+
+AC_ARG_WITH(expatinc,[  --with-expatinc=path    Select Expat include directory],,)
+
+if test "$with_expatinc" != "" ; then
+  EXPAT_INCLUDE=-I${with_expatinc}
+  EXPAT_SETTING=external
+  echo "Using EXPAT_INCLUDE=$EXPAT_INCLUDE for Expat includes."
+fi
+
+if test "$EXPAT_SETTING" = "internal" ; then
+  echo "Using internal Expat implementation." 
+fi
+
+AC_SUBST(EXPAT_SETTING,$EXPAT_SETTING)
+AC_SUBST(EXPAT_INCLUDE,$EXPAT_INCLUDE)
+AC_SUBST(EXPAT_LIB,$PROJ_LIB)
 
 AC_OUTPUT(config/generic.mak)
 mv config/generic.mak config/`uname`.mak
