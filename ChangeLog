@@ -1,5 +1,9 @@
 2001-04-09  Frank Warmerdam  <warmerdam@pobox.com>
 
+	* contrib/ogdi_info/ogdi_info.c: added -no-proj option.  Fixed up 
+	test suite to use this to avoid projection availability differences
+	on Unix and Windows. 
+
 	* ogdi/c-api: client.c, ecs_dyna.c, ecs_xdrz.c, ecsdist.c, ecsgeo.c,
 	  ecshash.c, ecsinfo.c, ecslist.c, ecsregex.c, ecssplit.c, ecstile.c, 
 	  gmath.c, gmath.h, opendir.c, opendir.h, server.c
