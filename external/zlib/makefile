@@ -16,7 +16,7 @@
 #
 # The names of the targets to build
 #
-TOBEGEN		= zlib
+TOBEGEN		= zlib_ogdi$(OGDI_VERSION)
 TARGETGEN	= $(ARCHGEN)
 
 #
