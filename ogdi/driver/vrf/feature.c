@@ -17,7 +17,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.10  2003-05-22 16:58:01  warmerda
+ * Revision 1.11  2003-05-22 17:04:05  warmerda
+ * Removed debug statement.
+ *
+ * Revision 1.10  2003/05/22 16:58:01  warmerda
  * Several fixes related to reading VITD area geometries properly even if
  * the datasets face information seems to be corrupt.  See bug:
  * http://sf.net/tracker/index.php?func=detail&aid=741854&group_id=11181&atid=111181
@@ -704,9 +707,6 @@ int vrf_get_area_feature (s, layer, prim_id)
   }
   
   area.rings[n]->id = n+1;
-
-  if( prim_id == 231 )
-      printf( "reading ring(s) for prim_id %d\n", prim_id );
 
   if (!vrf_get_ring_coords (s,area.rings[n], prim_id, ring_rec.edge, edgetable)) {
     xvt_free((char*)area.rings[0]);
