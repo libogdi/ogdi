@@ -1,29 +1,26 @@
-/*********************************************************************
-
-  CSOURCE_INFORMATION
-  
-  NAME
-     rpf.h
-
-  DESCRIPTION
-     Data structure and prototype definition for the RPF driver
-  END_DESCRIPTION
-
-  END_CSOURCE_INFORMATION
-
-  Copyright (C) 1995 Logiciels et Applications Scientifiques (L.A.S.) Inc
-  Permission to use, copy, modify and distribute this software and
-  its documentation for any purpose and without fee is hereby granted,
-  provided that the above copyright notice appear in all copies, that
-  both the copyright notice and this permission notice appear in
-  supporting documentation, and that the name of L.A.S. Inc not be used 
-  in advertising or publicity pertaining to distribution of the software 
-  without specific, written prior permission. L.A.S. Inc. makes no
-  representations about the suitability of this software for any purpose.
-  It is provided "as is" without express or implied warranty.
-  
-  ********************************************************************/
-
+/******************************************************************************
+ *
+ * Component: OGDI RPF Driver
+ * Purpose: Declarations of RPF driver structures and functions.
+ * 
+ ******************************************************************************
+ * Copyright (C) 1995 Logiciels et Applications Scientifiques (L.A.S.) Inc
+ * Permission to use, copy, modify and distribute this software and
+ * its documentation for any purpose and without fee is hereby granted,
+ * provided that the above copyright notice appear in all copies, that
+ * both the copyright notice and this permission notice appear in
+ * supporting documentation, and that the name of L.A.S. Inc not be used 
+ * in advertising or publicity pertaining to distribution of the software 
+ * without specific, written prior permission. L.A.S. Inc. makes no
+ * representations about the suitability of this software for any purpose.
+ * It is provided "as is" without express or implied warranty.
+ ******************************************************************************
+ *
+ * $Log$
+ * Revision 1.5  2001-04-12 19:22:46  warmerda
+ * applied DND support Image type support
+ *
+ */
 
 #ifndef RPF_H
 #define RPF_H 1
@@ -517,6 +514,8 @@ void dyn_getNextObjectRaster   _ANSI_ARGS_((ecs_Server *s,ecs_Layer *l));
 void dyn_rewindRasterLayer     _ANSI_ARGS_((ecs_Server *s,ecs_Layer *l));
 int dyn_PointCallBack          _ANSI_ARGS_((ecs_Server *s,ecs_TileStructure *t,int xtile,int ytile,
 					 int xpixel,int ypixel,int *cat));
+int dyn_ImagePointCallBack          _ANSI_ARGS_((ecs_Server *s,ecs_TileStructure *t,int xtile,int ytile,
+						 int xpixel,int ypixel,int *cat));
 int dyn_DimCallBack            _ANSI_ARGS_((ecs_Server *s,ecs_TileStructure *t,
 					 double x,double y,int *width,int *height));
 
@@ -528,6 +527,13 @@ void		dyn_getNextObjectRaster _ANSI_ARGS_((ecs_Server *s,ecs_Layer *layer));
 void		dyn_getObjectRaster _ANSI_ARGS_((ecs_Server *s,ecs_Layer *layer, char *objectId));
 void		dyn_getObjectIdRaster _ANSI_ARGS_((ecs_Server *s,ecs_Layer *layer, ecs_Coordinate *coord));
 int         _calcPosValue _ANSI_ARGS_((ecs_Server *s,ecs_Layer *l,int i,int j));
+void		dyn_openImageLayer _ANSI_ARGS_((ecs_Server *s,ecs_Layer *layer));
+void		dyn_closeImageLayer _ANSI_ARGS_((ecs_Server *s,ecs_Layer *layer));
+void		dyn_rewindImageLayer _ANSI_ARGS_((ecs_Server *s,ecs_Layer *layer));
+void		dyn_getNextObjectImage _ANSI_ARGS_((ecs_Server *s,ecs_Layer *layer));
+void		dyn_getObjectImage _ANSI_ARGS_((ecs_Server *s,ecs_Layer *layer, char *objectId));
+void		dyn_getObjectIdImage _ANSI_ARGS_((ecs_Server *s,ecs_Layer *layer, ecs_Coordinate *coord));
+int             _calcImagePosValue _ANSI_ARGS_((ecs_Server *s,ecs_Layer *l,int i,int j));
 
 /* layer oriented method are keeped into a single data structure to simplify the code */
 

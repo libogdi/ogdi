@@ -1,31 +1,31 @@
-/*********************************************************************
-
-  CSOURCE_INFORMATION
-  
-  NAME
-     rpf.c
-
-  DESCRIPTION
-     The implementation of the driver API to the OGDI.
-  END_DESCRIPTION
-
-  END_CSOURCE_INFORMATION
-
-  Copyright (C) 1995 Logiciels et Applications Scientifiques (L.A.S.) Inc
-  Permission to use, copy, modify and distribute this software and
-  its documentation for any purpose and without fee is hereby granted,
-  provided that the above copyright notice appear in all copies, that
-  both the copyright notice and this permission notice appear in
-  supporting documentation, and that the name of L.A.S. Inc not be used 
-  in advertising or publicity pertaining to distribution of the software 
-  without specific, written prior permission. L.A.S. Inc. makes no
-  representations about the suitability of this software for any purpose.
-  It is provided "as is" without express or implied warranty.
-  
-  ********************************************************************/
+/******************************************************************************
+ *
+ * Component: OGDI RPF Driver
+ * Purpose: Implementation of dyn_* api for RPF driver.
+ * 
+ ******************************************************************************
+ * Copyright (C) 1995 Logiciels et Applications Scientifiques (L.A.S.) Inc
+ * Permission to use, copy, modify and distribute this software and
+ * its documentation for any purpose and without fee is hereby granted,
+ * provided that the above copyright notice appear in all copies, that
+ * both the copyright notice and this permission notice appear in
+ * supporting documentation, and that the name of L.A.S. Inc not be used 
+ * in advertising or publicity pertaining to distribution of the software 
+ * without specific, written prior permission. L.A.S. Inc. makes no
+ * representations about the suitability of this software for any purpose.
+ * It is provided "as is" without express or implied warranty.
+ ******************************************************************************
+ *
+ * $Log$
+ * Revision 1.6  2001-04-12 19:22:46  warmerda
+ * applied DND support Image type support
+ *
+ */
 
 #include "rpf.h"
 #include "datadict.h"
+
+ECS_CVSID("$Id$");
 
 int colorintensity[6] = {0,63,105,147,189,255};
 
@@ -38,7 +38,7 @@ LayerMethod rpf_layerMethod[11] = {
   /* Line */	{ NULL, NULL, NULL, NULL, NULL, NULL },
   /* Point */	{ NULL, NULL, NULL, NULL, NULL, NULL },
   /* Matrix */	{ NULL, NULL, dyn_rewindRasterLayer, dyn_getNextObjectRaster, dyn_getObjectRaster, dyn_getObjectIdRaster },
-  /* Image */	{ NULL, NULL, NULL, NULL, NULL, NULL },
+  /* Image */	{ NULL, NULL, dyn_rewindImageLayer, dyn_getNextObjectImage, dyn_getObjectImage, dyn_getObjectIdImage },
   /* Text */	{ NULL, NULL, NULL, NULL, NULL, NULL },
   /* Edge */	{ NULL, NULL, NULL, NULL, NULL, NULL },
   /* Face */	{ NULL, NULL, NULL, NULL, NULL, NULL },
@@ -575,8 +575,9 @@ NAME
 
 DESCRIPTION
 
-     Return the raster information for the current layer and
-     set a category table for a 6x6x6 color cube.
+     Return the raster information for the current layer and set a
+     category table for a 6x6x6 color cube for matrix informations and
+     a default category table for images.
 
 END_DESCRIPTION
 
@@ -610,27 +611,43 @@ PSEUDOCODE
 
      Get the current private layer information
 
-     Call ecs_SetRasterInfo with the width and the height of the layer.
-     To calculate that, multiply the number of tiles horizontally and
-     vertically by 1536.
-
-     For each value i between 0 and 5
+     If the layer is matricial
      Begin
 
-          For each value j between 0 and 5
-          Begin
+        Call ecs_SetRasterInfo with the width and the height of the
+        layer.  To calculate that, multiply the number of tiles
+        horizontally and vertically by 1536.
+   
+        For each value i between 0 and 5
+        Begin
+   
+             For each value j between 0 and 5
+             Begin
+   
+                  For each value k between 0 and 5
+                  Begin
+   
+                       Add a category with ecs_AddRasterInfoCategory
+                       with a color r=i*43, g=j*43 and b=k*43. The
+                       buffer is a empty string.
+   
+                  End
+   
+             End
+   
+        End
+   
+     End
 
-               For each value k between 0 and 5
-               Begin
+     Else if the layer is an image
+     Begin
 
-                    Add a category with ecs_AddRasterInfoCategory
-                    with a color r=i*43, g=j*43 and b=k*43. The buffer
-                    is a empty string.
+        Call ecs_SetRasterInfo. Set the width with 1 (RGB image) and
+        height to 0.
 
-               End
-
-          End
-
+	Add a category with ecs_AddRasterInfoCategory with a white
+	color. The buffer is a string "No data".
+        
      End
 
      Return a success message
@@ -657,24 +674,29 @@ ecs_Result *dyn_GetRasterInfo(s)
   rows = (int) ((region.north-region.south)/region.ns_res);
   columns = (int) ((region.east-region.west)/region.ew_res);
 
-  ecs_SetRasterInfo(&(s->result),columns,rows);
-  count = 1;
-  if (lpriv->isColor == TRUE) {
-    for(i=0;i<6;i++) {
-      for(j=0;j<6;j++) {
-	for(k=0;k<6;k++) {
-	  ecs_AddRasterInfoCategory(&(s->result),count,
-				    colorintensity[i],
-				    colorintensity[j],
-				    colorintensity[k],buffer,0);
-	  count++;
-	}
+  if (s->layer[s->currentLayer].sel.F == Matrix) {
+    ecs_SetRasterInfo(&(s->result),columns,rows);
+    count = 1;
+    if (lpriv->isColor == TRUE) {
+      for(i=0;i<6;i++) {
+        for(j=0;j<6;j++) {
+	  for(k=0;k<6;k++) {
+	    ecs_AddRasterInfoCategory(&(s->result),count,
+                                      colorintensity[i],
+                                      colorintensity[j],
+                                      colorintensity[k],buffer,0);
+            count++;
+          }
+        }
       }
+    } else {
+        for(i=1;i<255;i++) {
+            ecs_AddRasterInfoCategory(&(s->result),i,i,i,i,buffer,0);
+        }
     }
   } else {
-    for(i=1;i<255;i++) {
-      ecs_AddRasterInfoCategory(&(s->result),i,i,i,i,buffer,0);
-    }
+    ecs_SetRasterInfo(&(s->result),1,0);
+    ecs_AddRasterInfoCategory(&(s->result),1, 255, 255, 255,"No data",0);
   }
 
   ecs_SetSuccess(&(s->result));

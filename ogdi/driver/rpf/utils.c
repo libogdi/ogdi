@@ -1,32 +1,30 @@
-/*********************************************************************
-
-  CSOURCE_INFORMATION
-  
-  NAME
-     utils.c
-
-  DESCRIPTION
-     The implementation of the functions of RPF
-  END_DESCRIPTION
-
-  END_CSOURCE_INFORMATION
-
-  Copyright (C) 1995 Logiciels et Applications Scientifiques (L.A.S.) Inc
-  Permission to use, copy, modify and distribute this software and
-  its documentation for any purpose and without fee is hereby granted,
-  provided that the above copyright notice appear in all copies, that
-  both the copyright notice and this permission notice appear in
-  supporting documentation, and that the name of L.A.S. Inc not be used 
-  in advertising or publicity pertaining to distribution of the software 
-  without specific, written prior permission. L.A.S. Inc. makes no
-  representations about the suitability of this software for any purpose.
-  It is provided "as is" without express or implied warranty.
-  
-  ********************************************************************/
-
-
+/******************************************************************************
+ *
+ * Component: OGDI RPF Driver
+ * Purpose: Implementation of various RPF support functions.
+ * 
+ ******************************************************************************
+ * Copyright (C) 1995 Logiciels et Applications Scientifiques (L.A.S.) Inc
+ * Permission to use, copy, modify and distribute this software and
+ * its documentation for any purpose and without fee is hereby granted,
+ * provided that the above copyright notice appear in all copies, that
+ * both the copyright notice and this permission notice appear in
+ * supporting documentation, and that the name of L.A.S. Inc not be used 
+ * in advertising or publicity pertaining to distribution of the software 
+ * without specific, written prior permission. L.A.S. Inc. makes no
+ * representations about the suitability of this software for any purpose.
+ * It is provided "as is" without express or implied warranty.
+ ******************************************************************************
+ *
+ * $Log$
+ * Revision 1.6  2001-04-12 19:22:46  warmerda
+ * applied DND support Image type support
+ *
+ */
 
 #include "rpf.h"
+
+ECS_CVSID("$Id$");
 
 void dyn_string_tolower(char *);
 
@@ -205,11 +203,20 @@ int dyn_prepare_rpflayer(s,l)
   region.ns_res = (region.north - region.south) / (1536*lpriv->entry->vert_frames);
   region.ew_res = (region.east - region.west) / (1536*lpriv->entry->horiz_frames);
 
-  if (!ecs_TileInitialize( s, &(lpriv->tilestruct), &(region), 
-			   lpriv->entry->horiz_frames, lpriv->entry->vert_frames, 
-			   1536, 1536, dyn_PointCallBack, NULL)) { 
-    ecs_SetError(&(s->result), 1, "Unable to retrieve tile structure.");
-    return FALSE;
+  if (l->sel.F == Matrix) {
+    if (!ecs_TileInitialize( s, &(lpriv->tilestruct), &(region), 
+			     lpriv->entry->horiz_frames, lpriv->entry->vert_frames, 
+			     1536, 1536, dyn_PointCallBack, NULL)) { 
+      ecs_SetError(&(s->result), 1, "Unable to retrieve tile structure.");
+      return FALSE;
+    }
+  } else {
+    if (!ecs_TileInitialize( s, &(lpriv->tilestruct), &(region), 
+			     lpriv->entry->horiz_frames, lpriv->entry->vert_frames, 
+			     1536, 1536, dyn_ImagePointCallBack, NULL)) { 
+      ecs_SetError(&(s->result), 1, "Unable to retrieve tile structure.");
+      return FALSE;
+    }
   }
 
   /* Check if it's a black and white image */
@@ -1010,6 +1017,16 @@ Toc_entry *parse_toc(ecs_Server *s, char *dir, Header *head, uint *num_boundarie
 #ifndef _WINDOWS
     dyn_string_tolower((char *) frame->filename);
 #endif
+
+    /* Check if the filename is an overview */
+
+    for (j=0;j<12;j++) {
+      if (strcmp(&(frame->filename[j]),".OVR") == 0 ||
+	  strcmp(&(frame->filename[j]),".ovr") == 0) {
+	entry->invalid_geographics = 1L;
+	break;
+      }
+    }
 
    /* Get file geo reference */
 
