@@ -44,10 +44,10 @@
 
 #if XVT_CC_PROTO
 FILE           *
-file_open(char *path, char *mode)
+muse_file_open(char *path, char *mode)
 #else
 FILE           *
-file_open(path, mode)
+muse_file_open(path, mode)
     char           *path;
     char           *mode;
 #endif
@@ -410,7 +410,7 @@ muse_filelength(path)
     int32            length;
 
     length = 0;
-    file = file_open(path, "rb");
+    file = muse_file_open(path, "rb");
     if (file != NULL) {
 #ifdef _WINDOWS
       length = _filelength(fileno(file));

@@ -53,7 +53,7 @@ ERRSTATUS dir_restore (char *);
 ERRSTATUS dir_save(char *);
 ERRSTATUS dir_current(char *);
 /* ERRSTATUS file_spec_to_string (FILE_SPEC *, char *);*/
-FILE *file_open (char*, char*);
+FILE *muse_file_open (char*, char*);
 int muse_access (char *, int);
 int32 muse_filelength (char *);
 void muse_check_path (char*);
@@ -65,7 +65,7 @@ ERRSTATUS dir_restore ();
 ERRSTATUS dir_save();
 ERRSTATUS dir_current();
 ERRSTATUS file_spec_to_string ();
-FILE *file_open ();
+FILE *muse_file_open ();
 int muse_access ();
 #ifdef _ALPHA
 int muse_filelength ();

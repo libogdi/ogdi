@@ -342,7 +342,7 @@ float y2;
    int32 i;
    int32 machine_byte_order = MACHINE_BYTE_ORDER;
 
-   spx.fp = file_open (fname, "rb");
+   spx.fp = muse_file_open (fname, "rb");
    if (!spx.fp)
       {
       set.size = 0;

@@ -1,5 +1,9 @@
 2001-06-26  Frank Warmerdam  <warmerdam@pobox.com>
 
+	* vpflib: musedir.h, musedir.c, vpfbrows.c, vpfspx.c, vpftable.c,
+	vpftidx.c - renamed file_open() to muse_file_open() to avoid conflicts
+	with FITS library.
+
 	* ogdi/driver/rpf/utils.c: implemented vrf_fopen_ci() for case 
 	insensitive access to files.
 

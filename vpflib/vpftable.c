@@ -758,8 +758,8 @@ FILE *vpfopencheck (char *filename, char *mode)
 
   while (fp == NULL)
     {
-      fp = file_open(filename,mode);
-      if ((fp == NULL) && ((fp = file_open(copy,mode)) == NULL))
+      fp = muse_file_open(filename,mode);
+      if ((fp == NULL) && ((fp = muse_file_open(copy,mode)) == NULL))
         {
 	  retry = FALSE;
 	  if (!retry) break;
@@ -835,7 +835,7 @@ vpf_table_type vpf_open_table (char *tablename, storage_type storage,
   else
     table.mode = Write;
 
-  table.fp = file_open (tablepath, mode);
+  table.fp = muse_file_open (tablepath, mode);
   table.storage = storage;
 
   if (table.fp == NULL)
@@ -905,7 +905,7 @@ vpf_table_type vpf_open_table (char *tablename, storage_type storage,
       else
         idxname[strlen(tablepath)-1] = idxext;
 
-      table.xfp = file_open(idxname, mode);
+      table.xfp = muse_file_open(idxname, mode);
       if (table.xfp == NULL) {
 	/* Test for UNIX CD-ROM filename terminator "." */
 	if (idxname[strlen(tablepath)-1] == '.')
@@ -913,7 +913,7 @@ vpf_table_type vpf_open_table (char *tablename, storage_type storage,
 	else
 	  idxname[strlen(tablepath)-1] = idxmaj;
 	
-	table.xfp = file_open(idxname, mode);
+	table.xfp = muse_file_open(idxname, mode);
       }
 
       /* The FCX CASE */
@@ -928,7 +928,7 @@ vpf_table_type vpf_open_table (char *tablename, storage_type storage,
 	else
 	  idxname[strlen(tablepath)-1] = idxext;
 	
-	table.xfp = file_open(idxname, mode);
+	table.xfp = muse_file_open(idxname, mode);
 	if (table.xfp == NULL) {
 	  /* Test for UNIX CD-ROM filename terminator "." */
 	  if (idxname[strlen(tablepath)-1] == '.')
@@ -936,7 +936,7 @@ vpf_table_type vpf_open_table (char *tablename, storage_type storage,
 	  else
 	    idxname[strlen(tablepath)-1] = idxmaj;
 	  
-	  table.xfp = file_open(idxname, mode);
+	  table.xfp = muse_file_open(idxname, mode);
 	}	
       }
 
@@ -1217,7 +1217,7 @@ int32 is_vpf_table( char *fname )
   FILE *fp;
   int32 n, ok;
 
-  fp = file_open( fname, "rb" );
+  fp = muse_file_open( fname, "rb" );
   if (!fp) {
     return FALSE;
   }

@@ -534,7 +534,7 @@ static int32 maxlength;
    /* Initialize string count to 0 */
    str2list (NULL, NULL);
 
-   file = file_open (browse->path, "rb");
+   file = muse_file_open (browse->path, "rb");
    string = xvt_zmalloc(sizeof (char) * maxlength);
 
    VpfRead (&entries, VpfInteger, 1, file);
@@ -608,7 +608,7 @@ static int32 maxlength;
    /* Initialize string count to 0 */
    str2list (NULL, NULL);
 
-   file = file_open (browse->path, "rb");
+   file = muse_file_open (browse->path, "rb");
    string = xvt_zmalloc(sizeof (char) * maxlength);
 
    /* Header Info */
@@ -743,7 +743,7 @@ static int32 maxlength;
    /* Initialize string count to 0 */
    str2list (NULL, NULL);
 
-   file = file_open (browse->path, "rb");
+   file = muse_file_open (browse->path, "rb");
    string = (char*)xvt_zmalloc (sizeof (char) * maxlength);
    temp = (char*)xvt_zmalloc (sizeof (char) * maxlength);
    memset (name, '\0', sizeof(name));

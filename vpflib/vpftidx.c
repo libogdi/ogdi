@@ -548,7 +548,7 @@ char *idx_set;
 
   /* open output index file */
 
-  if (( ifp = file_open ( idxname, "w+b" )) == NULL ) {
+  if (( ifp = muse_file_open ( idxname, "w+b" )) == NULL ) {
     vpf_close_table(&table);
     Whimper ( idxname ) ;
   }
@@ -1236,7 +1236,7 @@ char *value;
 
   /* open output index file */
 
-  if (( ifp = file_open ( idxname, "rb" )) == NULL ) {
+  if (( ifp = muse_file_open ( idxname, "rb" )) == NULL ) {
     sprintf ( hack, "No such index < %s >", idxname ) ;
     SWhimper ( hack ) ;
   }
@@ -1359,7 +1359,7 @@ int32 storage;
 
   /* open output index file */
 
-  if (( idx.fp = file_open ( idxname, "rb" )) == NULL ) {
+  if (( idx.fp = muse_file_open ( idxname, "rb" )) == NULL ) {
     sprintf ( hack, "No such index < %s >", idxname ) ;
     OWhimper ( hack ) ;
   }
@@ -1838,7 +1838,7 @@ char *idx_set;
     return -4;
   }
 
-  idx_fp = file_open(idx_fname, "wb");
+  idx_fp = muse_file_open(idx_fname, "wb");
 
   if (idx_fp == NULL) {
     vpf_close_table(&t);
@@ -2060,7 +2060,7 @@ char *query_str;
   if (!idx_fname) return query_set;
   if (!query_str) return query_set;
 
-  idx_fp = file_open(idx_fname, "rb");
+  idx_fp = muse_file_open(idx_fname, "rb");
 
   if (idx_fp == NULL)
     return query_set;
