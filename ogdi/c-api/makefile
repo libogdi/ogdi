@@ -33,8 +33,14 @@ all: MKOBJECTDIR ecs_xdr.c
 	$(MAKE) --directory $(OBJDIR) -f ../makefile PASS='depend' $(TARGETGEN)
 	$(COPY_LOCAL)
 
-ecs_xdr.c: ../include/ecs.x
-ifneq ($(TARGET),win32)
+#
+#	Because the RPCGEN process doesn't work too well on many
+#	platforms we disable it by default, and make people do a "make rpcgen"
+#	to regenerate ecs_xdr.c explicitly.
+#
+#ecs_xdr.c: ../include/ecs.x
+
+rpcgen:
 	-$(RM) -f ecs.x
 	-$(RM) -f $@.raw
 	-$(RM) -f $@
@@ -42,5 +48,4 @@ ifneq ($(TARGET),win32)
 	rpcgen -C -c -o $@.raw ecs.x
 	perl ../scripts/xdr_clean.pl -o $@ $@.raw
 	$(RM) -f ecs.x
-endif
 

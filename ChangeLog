@@ -1,3 +1,8 @@
+2001-02-17  Frank Warmerdam  <warmerdam@pobox.com>
+
+	* ogdi/c-api/makefile, ogdi/gltpd/makefile:
+	Disable running rpcgen unless explicitly requested due to problems.
+
 2001-02-07  Frank Warmerdam  <warmerdam@pobox.com>
 
 	* ogdi/driver/vrf: vrf.c, utils.c

@@ -32,8 +32,15 @@ include $(TOPDIR)/config/common.mak
 all: MKOBJECTDIR ecs_svc.c
 	$(MAKE) --directory $(OBJDIR) -f ../makefile PASS='depend' $(TARGETGEN)
 
-ecs_svc.c: ../include/ecs.x
-ifneq ($(TARGET),win32)
+#
+#	Because the RPCGEN process doesn't work too well on many
+#	platforms we disable it by default, and make people do a "make rpcgen"
+#	to regenerate ecs_xdr.c explicitly.
+#
+
+#ecs_svc.c: ../include/ecs.x
+
+rpcgen:
 	-$(RM) -f ecs.x
 	$(FILECOPY) ../include/ecs.x ecs.x
 	$(RM) -f $(OBJDIR)/ecs_svc.c.raw
@@ -41,5 +48,3 @@ ifneq ($(TARGET),win32)
 	perl ../scripts/svc_clean.pl \
 		-o ecs_svc.c $(OBJDIR)/ecs_svc.c.raw
 	$(RM) -f ecs.x
-endif
-
