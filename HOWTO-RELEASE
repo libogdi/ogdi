@@ -30,15 +30,10 @@
    cd devdir
    mkogdidist.sh 3.1beta2
 
-8) Publish the resulting files.  For private releases (ie. pre final
-   releases) they should be put somewhere out of the way, and announced 
-   only to the 3i membership.  For public (ie. final) releases they should
+8) Publish the resulting files.  For public (ie. final) releases they should
    be put up on the SourceForge file download manager area.  
 
    <fill in details>
 
-9) Announce release.  For public releases announce to ogdidev mailing list.
-
-
-
- 
+9) Announce release.  For public releases announce to ogdidev mailing list,
+   and on Freshmeat.net.
