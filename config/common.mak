@@ -10,6 +10,7 @@
 # representations about the suitability of this software for any purpose.
 # It is provided "as is" without express or implied warranty.
 
+OGDI_VERSION      = 31
 
 # Common macros and symbols used by all platforms
 #
@@ -85,8 +86,8 @@ GLUTIL_INCLUDE	= $(INCL_SW)$(TOPDIR)/ogdi/glutil
 #
 
 ODBCEXT_LINKLIB	= $(LINK_SW)$(LINKDIR)$(LIB_SW)odbcext$(LIB_SUFFIX)
-OGDI_LINKLIB	= $(LINK_SW)$(LINKDIR)$(LIB_SW)ogdi$(LIB_SUFFIX)
-ZLIB_LINKLIB	= $(LINK_SW)$(LINKDIR)$(LIB_SW)zlib$(LIB_SUFFIX)
+OGDI_LINKLIB	= $(LINK_SW)$(LINKDIR)$(LIB_SW)ogdi$(OGDI_VERSION)$(LIB_SUFFIX)
+ZLIB_LINKLIB	= $(LINK_SW)$(LINKDIR)$(LIB_SW)zlib_ogdi$(OGDI_VERSION)$(LIB_SUFFIX)
 
 #
 # Static libraries (archives)
