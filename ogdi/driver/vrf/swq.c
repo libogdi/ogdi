@@ -18,7 +18,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.2  2001-06-21 20:30:15  warmerda
+ * Revision 1.3  2001-06-26 00:57:34  warmerda
+ * fixed strcasecmp on WIN32
+ *
+ * Revision 1.2  2001/06/21 20:30:15  warmerda
  * added ECS_CVSID
  *
  * Revision 1.1  2001/06/20 21:49:16  warmerda
@@ -46,6 +49,10 @@ ECS_CVSID("$Id$");
 
 #ifndef FALSE
 #  define FALSE 0
+#endif
+
+#ifdef WIN32
+#  define strcasecmp stricmp
 #endif
 
 char	swq_error[1024];

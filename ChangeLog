@@ -1,5 +1,9 @@
 2001-06-25  Frank Warmerdam  <warmerdam@pobox.com>
 
+	* ogdi/driver/vrf: swq.c, vrfswq.c
+
+	Added WIN32 redifinition of strcasecmp() to stricmp().
+
 	* ogdi/driver/adrg/adrg.c:Made cleanup safer if verifyLocation() fails.
 
 2001-06-23  Frank Warmerdam  <warmerdam@pobox.com>
