@@ -61,7 +61,7 @@ INST_BIN	= @bindir@
 #
 #RPC_LINKLIB	= -lrpcsvc -lnsl -lsocket
 #RPC_LINKLIB	=	-ldl -ldbmalloc
-RPC_LINKLIB	=	-ldl
+RPC_LINKLIB	=	@LIBS@
 
 #
 # Endian definition, could be little or big
