@@ -63,6 +63,7 @@ _openAreaLayer(s,l)
      ecs_Server *s;
      ecs_Layer *l;
 {
+  (void) s;
   l->index = 0;
   l->nbfeature = dbareaqty;
   return TRUE;
@@ -96,6 +97,8 @@ _closeAreaLayer(s,l)
      ecs_Server *s;
      ecs_Layer *l;
 {
+    (void) s;
+    (void) l;
 }
 
 /*
@@ -126,6 +129,7 @@ _rewindAreaLayer(s,l)
      ecs_Server *s;
      ecs_Layer *l;
 {
+  (void) s;
   l->index = 0;
 }
 
@@ -161,6 +165,7 @@ _openLineLayer(s,l)
      ecs_Server *s;
      ecs_Layer *l;
 {
+  (void) s;
   l->index = 0;
   l->nbfeature = dblineqty;
   return TRUE;
@@ -194,6 +199,8 @@ _closeLineLayer(s,l)
      ecs_Server *s;
      ecs_Layer *l;
 {
+  (void) s;
+  (void) l;
 }
 
 /*
@@ -224,6 +231,7 @@ _rewindLineLayer(s,l)
      ecs_Server *s;
      ecs_Layer *l;
 {
+  (void) s;
   l->index = 0;
 }
 
@@ -259,6 +267,7 @@ _openPointLayer(s,l)
      ecs_Server *s;
      ecs_Layer *l;
 {
+  (void) s;
   l->index = 0;
   l->nbfeature = dbpointqty;
   return TRUE;
@@ -292,6 +301,8 @@ _closePointLayer(s,l)
      ecs_Server *s;
      ecs_Layer *l;
 {
+  (void) s;
+  (void) l;
 }
 
 /*
@@ -322,6 +333,7 @@ _rewindPointLayer(s,l)
      ecs_Server *s;
      ecs_Layer *l;
 {
+  (void) s;
   l->index = 0;
 }
 
@@ -357,6 +369,7 @@ _openTextLayer(s,l)
      ecs_Server *s;
      ecs_Layer *l;
 {
+  (void) s;
   l->index = 0;
   l->nbfeature = dbtextqty;
   return TRUE;
@@ -390,6 +403,8 @@ _closeTextLayer(s,l)
      ecs_Server *s;
      ecs_Layer *l;
 {
+  (void) s;
+  (void) l;
 }
 
 /*
@@ -420,6 +435,7 @@ _rewindTextLayer(s,l)
      ecs_Server *s;
      ecs_Layer *l;
 {
+  (void) s;
   l->index = 0;
 }
 
@@ -457,6 +473,8 @@ _openMatrixLayer(s,l)
      ecs_Layer *l;
 {
   register LayerPrivateData *lpriv = (LayerPrivateData *) l->priv;
+
+  (void) s;
 
   l->index = 0;
   lpriv->matrixregion.north = 4925000.0;
@@ -503,6 +521,8 @@ _closeMatrixLayer(s,l)
      ecs_Server *s;
      ecs_Layer *l;
 {
+  (void) s;
+  (void) l;
 }
 
 /*
@@ -533,6 +553,7 @@ _rewindMatrixLayer(s,l)
      ecs_Server *s;
      ecs_Layer *l;
 {
+  (void) s;
   l->index = 0;
 }
 

@@ -115,6 +115,8 @@
   example of this in the skeleton.h (LayerPrivateData).
   */
 
+static void _releaseAllLayers _ANSI_ARGS_((ecs_Server *s));
+
 /* 
    Layer oriented functions are kept in data structure to simplify the code 
    */
@@ -173,6 +175,8 @@ ecs_Result *dyn_CreateServer(s,Request)
      char *Request;
 {
   register ServerPrivateData *spriv;
+
+  (void) Request;
 
   /* 
      This code creates the driver private structure. The main purpose
@@ -511,7 +515,6 @@ ecs_Result *dyn_ReleaseLayer(s,sel)
     return &(s->result);
   }
 
-/**MOD START**/  
   /* Close all related things to this layer and free, if any, all
      allocated memory that the lpriv structure could contains.
      All these operations are encapsulated in the "close"
@@ -529,9 +532,8 @@ ecs_Result *dyn_ReleaseLayer(s,sel)
   if (s->layer[layer].priv != NULL)
   {
      free( s->layer[layer].priv );
-     s->layer[layer].priv == NULL;
+     s->layer[layer].priv = NULL;
   }
-/**MOD END**/
 
   /* 
      Free the layer.
@@ -703,8 +705,6 @@ ecs_Result *dyn_GetDictionary(s)
 ecs_Result *dyn_GetAttributesFormat(s)
      ecs_Server *s;
 {
-  register LayerPrivateData *lpriv = (LayerPrivateData *) s->layer[s->currentLayer].priv;
-
   if (s->layer[s->currentLayer].sel.F == Matrix) {
     if (!ecs_SetObjAttributeFormat(&(s->result)))
       return &(s->result);
@@ -915,8 +915,8 @@ ecs_Result *dyn_UpdateDictionary(s,arg)
      ecs_Server *s;
      char *arg;
 {
-  register ServerPrivateData *spriv = s->priv;
-
+  (void) arg;
+    
   /* Make sure an empty list is returned in all cases */ 
 
   ecs_SetText(&(s->result),""); 
@@ -998,8 +998,6 @@ ecs_Result *dyn_UpdateDictionary(s,arg)
 ecs_Result *dyn_GetServerProjection(s)
      ecs_Server *s;
 {
-  ServerPrivateData *spriv=s->priv;
-
   ecs_SetText(&(s->result), "+proj=utm +ellps=clrk66 +zone=13");
   
   ecs_SetSuccess(&(s->result));
@@ -1071,6 +1069,8 @@ ecs_Result *dyn_SetServerLanguage(s,language)
      ecs_Server *s;
      u_int language;
 {
+  (void) language;
+
   ecs_SetSuccess(&(s->result));
   return &(s->result);
 }
@@ -1087,6 +1087,7 @@ ecs_Result *dyn_SetCompression(s,compression)
      ecs_Server *s;
      ecs_Compression *compression;
 {
+  (void) compression;
   ecs_SetSuccess(&(s->result));
   return &(s->result);
 }

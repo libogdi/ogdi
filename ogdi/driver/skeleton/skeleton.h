@@ -139,8 +139,6 @@ typedef struct {
   int globaldummy;
 } ServerPrivateData;
 
-static void _releaseAllLayers _ANSI_ARGS_((ecs_Server *s));
-
 /* open.c prototypes */
 
 int _openAreaLayer _ANSI_ARGS_((ecs_Server *s, ecs_Layer *l));
