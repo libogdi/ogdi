@@ -39,6 +39,10 @@ INCLUDES = $(CURRENT_INCLUDE)
 CFLAGS 	= $(INCLUDES) $(COMMON_CFLAGS) \
 	-DVERSION=\"expat_1.95.1\" -DPACKAGE="expat"
 
+ifeq ($(BIG_ENDIAN),1)
+CFLAGS 	:=    $(CFLAGS) /DWORDS_BIGENDIAN
+endif
+
 #
 # Primary target
 #
