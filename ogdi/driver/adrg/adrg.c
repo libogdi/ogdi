@@ -17,7 +17,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.6  2001-06-23 14:06:31  warmerda
+ * Revision 1.7  2001-06-25 19:46:10  warmerda
+ * Made cleanup safer if verifyLocation() fails.
+ *
+ * Revision 1.6  2001/06/23 14:06:31  warmerda
  * added capabilities support, cache layer list when opening datastore
  *
  * Revision 1.5  2001/06/22 16:37:50  warmerda
@@ -27,6 +30,7 @@
 
 #include "adrg.h"
 #include "datadict.h"
+#include <assert.h>
 
 ECS_CVSID("$Id$");
 
@@ -61,7 +65,8 @@ ecs_Result *dyn_CreateServer(s,Request)
      ecs_Server *s;
      char *Request;
 {
-  register ServerPrivateData *spriv = s->priv = (void *) malloc(sizeof(ServerPrivateData));
+  register ServerPrivateData *spriv = s->priv = 
+      (void *) calloc(sizeof(ServerPrivateData),1);
   struct dirent *structure;
   DIR *dirlist;
   char *c;
@@ -147,8 +152,10 @@ ecs_Result *dyn_CreateServer(s,Request)
   /* check the .GEN file and see if the location is valid */
 
   if (!_verifyLocation(s)) {
-    free(spriv->imgdir);
-    free(spriv->genfilename);
+    if( spriv->imgdir )
+        free(spriv->imgdir);
+    if( spriv->genfilename )
+        free(spriv->genfilename);
     free(s->priv);
     return &(s->result);		
   }
