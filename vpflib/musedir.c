@@ -17,6 +17,7 @@
 /* #include "direct.h" */
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <unistd.h>
 #endif
 
 #include "machine.h"
@@ -34,6 +35,8 @@
 #include <stdio.h>
 #include <io.h>
 #endif
+
+#include <ctype.h>
 
 
 /**************************************************************************/
