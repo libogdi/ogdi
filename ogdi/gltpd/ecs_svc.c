@@ -31,6 +31,10 @@ extern unsigned long newprogramno;
 #define main dummy
 #define RPC_SVC_FG
 
+#ifdef svc_fdset
+#undef svc_fdset
+#endif
+
 extern ecs_Server *svr_handle;
 
 static void closedown(int sig);

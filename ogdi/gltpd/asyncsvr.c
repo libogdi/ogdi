@@ -17,7 +17,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.3  2001-04-09 15:04:35  warmerda
+ * Revision 1.4  2002-02-21 16:38:19  warmerda
+ * undefine svc_fdset if defined - helps avoid odd library requirements on linux
+ *
+ * Revision 1.3  2001/04/09 15:04:35  warmerda
  * applied new source headers
  *
  */
@@ -43,6 +46,10 @@ ECS_CVSID("$Id$");
 
 #ifdef HAVE_STD_RPC_INCLUDES
 #  include <rpc/pmap_clnt.h>
+#endif
+
+#ifdef svc_fdset
+#undef svc_fdset
 #endif
 
 #define COMTIMEOUT 900
