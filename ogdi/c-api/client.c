@@ -1,13 +1,10 @@
-/*
- * client.c --
+/******************************************************************************
  *
- * Control dispatch of locals client. Also control cache management and
- * projection changes.
- *
- * MOD: Bruno Savard, INFOMAR INC., bsavard@infomar.com, 1998/09/21
- * Procedures changed: cln_SetClientProjection()
- *                     cln_FreeClient()
- *
+ * Component: OGDI Core C API
+ * Purpose: Control dispatch of locals client. Also control cache management 
+ *          and projection changes.
+ * 
+ ******************************************************************************
  * Copyright (C) 1995 Logiciels et Applications Scientifiques (L.A.S.) Inc
  * Permission to use, copy, modify and distribute this software and
  * its documentation for any purpose and without fee is hereby granted,
@@ -18,11 +15,18 @@
  * without specific, written prior permission. L.A.S. Inc. makes no
  * representations about the suitability of this software for any purpose.
  * It is provided "as is" without express or implied warranty.
+ ******************************************************************************
+ *
+ * $Log$
+ * Revision 1.6  2001-04-09 15:04:34  warmerda
+ * applied new source headers
+ *
  */
-
 
 #include "ecs.h"
 #include "gmath.h"
+
+ECS_CVSID("$Id$");
 
 /* 
    Definitions specific to c_interface 

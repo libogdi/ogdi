@@ -1,20 +1,31 @@
-/* 
+/******************************************************************************
+ *
+ * Component: OGDI Core C API
+ * Purpose: Implementation of BSD directory routines for MS-DOS.
+ * 
+ ******************************************************************************
  * @(#) dirent.h 2.0 17 Jun 91   Public Domain. 
  * 
- *  A public domain implementation of BSD directory routines for 
- *  MS-DOS.  Written by Michael Rendell ({uunet,utai}michael@garfield), 
- *  August 1987 
+ * A public domain implementation of BSD directory routines for 
+ * MS-DOS.  Written by Michael Rendell ({uunet,utai}michael@garfield), 
+ * August 1987 
  * 
- *  Enhanced and ported to OS/2 by Kai Uwe Rommel; added scandir() prototype 
- *  December 1989, February 1990 
- *  Change of MAXPATHLEN for HPFS, October 1990 
+ * Enhanced and ported to OS/2 by Kai Uwe Rommel; added scandir() prototype 
+ * December 1989, February 1990 
+ * Change of MAXPATHLEN for HPFS, October 1990 
  *   
- *  Unenhanced and ported to Windows NT by Bill Gallagher 
- *  17 Jun 91 
- *  changed d_name to char * instead of array, removed non-std extensions 
+ * Unenhanced and ported to Windows NT by Bill Gallagher 
+ * 17 Jun 91 
+ * changed d_name to char * instead of array, removed non-std extensions 
  *  
- *  Cleanup, other hackery, Summer '92, Brian Moran , brianmo@microsoft.com 
- */ 
+ * Cleanup, other hackery, Summer '92, Brian Moran , brianmo@microsoft.com 
+ ******************************************************************************
+ *
+ * $Log$
+ * Revision 1.2  2001-04-09 15:04:34  warmerda
+ * applied new source headers
+ *
+ */
 
 #ifndef _DIRENT
 #define _DIRENT

@@ -1,4 +1,30 @@
+/******************************************************************************
+ *
+ * Component: OGDI Core C API
+ * Purpose: Computing distances and areas related to feature objects.
+ * 
+ ******************************************************************************
+ * Copyright (C) 1995 Logiciels et Applications Scientifiques (L.A.S.) Inc
+ * Permission to use, copy, modify and distribute this software and
+ * its documentation for any purpose and without fee is hereby granted,
+ * provided that the above copyright notice appear in all copies, that
+ * both the copyright notice and this permission notice appear in
+ * supporting documentation, and that the name of L.A.S. Inc not be used 
+ * in advertising or publicity pertaining to distribution of the software 
+ * without specific, written prior permission. L.A.S. Inc. makes no
+ * representations about the suitability of this software for any purpose.
+ * It is provided "as is" without express or implied warranty.
+ ******************************************************************************
+ *
+ * $Log$
+ * Revision 1.3  2001-04-09 15:04:34  warmerda
+ * applied new source headers
+ *
+ */
+
 #include "ecs.h"
+
+ECS_CVSID("$Id$");
 
 static double ecs_QA, ecs_QB, ecs_QC;
 static double ecs_QbarA, ecs_QbarB, ecs_QbarC, ecs_QbarD;

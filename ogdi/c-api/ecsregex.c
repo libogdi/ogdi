@@ -1,12 +1,15 @@
-/*
- * EcsRegComp and EcsRegExec -- EcsRegSub is elsewhere
+/******************************************************************************
  *
- *	Copyright (c) 1986 by University of Toronto.
- *	Written by Henry Spencer.  Not derived from licensed software.
+ * Component: OGDI Core C API
+ * Purpose: Regular expression handling.
+ * 
+ ******************************************************************************
+ * Copyright (c) 1986 by University of Toronto.
+ * Written by Henry Spencer.  Not derived from licensed software.
  *
- *	Permission is granted to anyone to use this software for any
- *	purpose on any computer system, and to redistribute it freely,
- *	subject to the following restrictions:
+ * Permission is granted to anyone to use this software for any
+ * purpose on any computer system, and to redistribute it freely,
+ * subject to the following restrictions:
  *
  *	1. The author is not responsible for the consequences of use of
  *		this software, no matter how awful, even if they arise
@@ -17,6 +20,17 @@
  *
  *	3. Altered versions must be plainly marked as such, and must not
  *		be misrepresented as being the original software.
+ *
+ ******************************************************************************
+ *
+ * $Log$
+ * Revision 1.2  2001-04-09 15:04:34  warmerda
+ * applied new source headers
+ *
+ */
+
+/*
+ * EcsRegComp and EcsRegExec -- EcsRegSub is elsewhere
  *
  * Beware that some of this code is subtly aware of the way operator
  * precedence is structured in regular expressions.  Serious changes in
@@ -43,6 +57,8 @@
  */
 
 #include "ecs.h"
+
+ECS_CVSID("$Id$");
 
 /*
  * The variable below is set to NULL before invoking regexp functions

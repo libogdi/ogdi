@@ -1,13 +1,9 @@
-#include <stdio.h>
-#include <math.h>
-#include "ecs.h"
-
-
-/*
- * ecsdist.c
+/******************************************************************************
  *
- * General library of functions to calculate distances between objects
- *
+ * Component: OGDI Core C API
+ * Purpose: Functions for computing distances, centroids, and point-in-polygon.
+ * 
+ ******************************************************************************
  * Copyright (C) 1995 Logiciels et Applications Scientifiques (L.A.S.) Inc
  * Permission to use, copy, modify and distribute this software and
  * its documentation for any purpose and without fee is hereby granted,
@@ -18,9 +14,19 @@
  * without specific, written prior permission. L.A.S. Inc. makes no
  * representations about the suitability of this software for any purpose.
  * It is provided "as is" without express or implied warranty.
+ ******************************************************************************
+ *
+ * $Log$
+ * Revision 1.4  2001-04-09 15:04:34  warmerda
+ * applied new source headers
+ *
  */
 
+#include <stdio.h>
+#include <math.h>
 #include "ecs.h"
+
+ECS_CVSID("$Id$");
 
 double currenttolerance = 0.0;
 

@@ -1,31 +1,28 @@
-/*********************************************************************
-
-  CSOURCE_INFORMATION
-  
-  NAME
-     ecs_util.h
-
-  DESCRIPTION
-     Include file for all the OGDI (included by ecs.h)
-  END_DESCRIPTION
-
-  MOD: Bruno Savard, INFOMAR INC., bsavard@infomar.com, 1998/09/21
-  Description: Addition of cln_ConvMBR() declaration to avoid some warnings.
-
-  END_CSOURCE_INFORMATION
-
-  Copyright (C) 1997 Logiciels et Applications Scientifiques (L.A.S.) Inc
-  Permission to use, copy, modify and distribute this software and
-  its documentation for any purpose and without fee is hereby granted,
-  provided that the above copyright notice appear in all copies, that
-  both the copyright notice and this permission notice appear in
-  supporting documentation, and that the name of L.A.S. Inc not be used 
-  in advertising or publicity pertaining to distribution of the software 
-  without specific, written prior permission. L.A.S. Inc. makes no
-  representations about the suitability of this software for any purpose.
-  It is provided "as is" without express or implied warranty.
-  
-  ********************************************************************/
+/******************************************************************************
+ *
+ * Component: OGDI Core C API
+ * Purpose: Include file for all the OGDI (included by ecs.h).
+ *          Contains most macros, and function prototypes, and structures
+ *          that aren't transmitted over RPC (the rest are in ecs.h).
+ * 
+ ******************************************************************************
+ * Copyright (C) 1995 Logiciels et Applications Scientifiques (L.A.S.) Inc
+ * Permission to use, copy, modify and distribute this software and
+ * its documentation for any purpose and without fee is hereby granted,
+ * provided that the above copyright notice appear in all copies, that
+ * both the copyright notice and this permission notice appear in
+ * supporting documentation, and that the name of L.A.S. Inc not be used 
+ * in advertising or publicity pertaining to distribution of the software 
+ * without specific, written prior permission. L.A.S. Inc. makes no
+ * representations about the suitability of this software for any purpose.
+ * It is provided "as is" without express or implied warranty.
+ ******************************************************************************
+ *
+ * $Log$
+ * Revision 1.6  2001-04-09 15:04:35  warmerda
+ * applied new source headers
+ *
+ */
 
 #ifndef ECS_UTIL
 #define ECS_UTIL 1
@@ -139,6 +136,20 @@ typedef unsigned long uint32;
 #define PI 3.14159265359
 #endif
 
+/***********************************************************************
+ * Define ECS_CVSID() macro.  It can be disabled during a build by
+ * defining DISABLE_CVSID in the compiler options.
+ *
+ * The cvsid_aw() function is just there to prevent reports of ecs_cvsid()
+ * being unused.
+ */
+
+#ifndef DISABLE_CVSID
+#  define ECS_CVSID(string)	static char ecs_cvsid[] = string; \
+static char *cvsid_aw() { return( cvsid_aw() ? ((char *) NULL) : ecs_cvsid ); }
+#else
+#  define RCSID(string)
+#endif
 
 /***********************************************************************/
 

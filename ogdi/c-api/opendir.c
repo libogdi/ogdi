@@ -1,9 +1,9 @@
-/* 
-   dir.c for MS-DOS by Samuel Lam <skl@van-bc.UUCP>, June/87 
-*/ 
- 
-/* #ifdef WIN32 */
-/* 
+/******************************************************************************
+ *
+ * Component: OGDI Core C API
+ * Purpose: Implementation of BSD directory routines for MS-DOS.
+ * 
+ ******************************************************************************
  * @(#)dir.c 1.4 87/11/06 Public Domain. 
  * 
  *  A public domain implementation of BSD directory routines for 
@@ -16,7 +16,19 @@
  *  opendirx() was horribly written, very inefficient, and did not take care
  *    of all cases.  It is still not too clean, but it is far more efficient.
  *    Changes made by Gordon Chaffee (chaffee@bugs-bunny.cs.berkeley.edu)
- */ 
+ ******************************************************************************
+ *
+ * $Log$
+ * Revision 1.2  2001-04-09 15:04:34  warmerda
+ * applied new source headers
+ *
+ */
+
+/* 
+   dir.c for MS-DOS by Samuel Lam <skl@van-bc.UUCP>, June/87 
+*/ 
+ 
+/* #ifdef WIN32 */
  
  
 #ifdef _WINDOWS

@@ -1,17 +1,26 @@
-/* 
- * ecsHash.c --
+/******************************************************************************
  *
- *	Implementation of in-memory hash tables for ecs and ecs-based
- *	applications.
- *
+ * Component: OGDI Core C API
+ * Purpose: Implementation of in-memory hash tables for ecs and ecs-based
+ *	    applications.
+ * 
+ ******************************************************************************
  * Copyright (c) 1991-1993 The Regents of the University of California.
  * Copyright (c) 1994 Sun Microsystems, Inc.
  *
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+ ******************************************************************************
+ *
+ * $Log$
+ * Revision 1.3  2001-04-09 15:04:34  warmerda
+ * applied new source headers
+ *
  */
 
 #include "ecs.h"
+
+ECS_CVSID("$Id$");
 
 /*
  * When there are this many entries per bucket, on average, rebuild
