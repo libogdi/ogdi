@@ -1,3 +1,8 @@
+2001-12-11  Frank Warmerdam  <warmerdam@pobox.com>
+
+	* contrib/ogdi_import/ogdi_import.c: fixed region handling if 
+	GetLayerRegion() fails - default to global bounds.
+
 2001-11-13  Frank Warmerdam  <warmerdam@pobox.com>
 
 	* contrib/ogdi_import/ogdi_import.c: added -no-dict option.
