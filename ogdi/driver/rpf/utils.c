@@ -17,7 +17,11 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.7  2001-06-26 18:14:55  warmerda
+ * Revision 1.8  2004-03-29 05:18:05  warmerda
+ * Added check for FSDEVG field when reading TOC file (in parse_toc).
+ * Apparently needed for CIB1 data, as per bug 917678.
+ *
+ * Revision 1.7  2001/06/26 18:14:55  warmerda
  * implement rpf_fopen_ci() to case insenstive file access
  *
  * Revision 1.6  2001/04/12 19:22:46  warmerda
@@ -795,7 +799,18 @@ Toc_entry *parse_toc(ecs_Server *s, char *dir, Header *head, uint *num_boundarie
   NITF[4] = '\0';
   if (strcmp(NITF, "NITF") == 0) /* Match: skip NITF hdr */
   {
-    head->NITF_hdr_len = 410L;
+      char FSDWNG[6];
+
+      head->NITF_hdr_len = 410L;
+
+      /* Determine if conditional FSDEVG field exists */
+      /* by examining FSDWNG field */
+      /* Adjust hdr length by 40 characters if needed */
+      /* note: rpf/cib1 products need this */
+      fseek(toc, 280, SEEK_SET);
+      fread(FSDWNG, 6L, 1, toc);
+      if( memcmp(FSDWNG, "999998", 6) == 0 )
+          head->NITF_hdr_len += 40L;
   }
   else /* not in NITF format */
   {
