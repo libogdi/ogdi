@@ -17,7 +17,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.15  2004-02-19 06:56:43  warmerda
+ * Revision 1.16  2006-05-05 19:10:54  warmerda
+ * VRF fix when doing feature merging with index sizing (ie. with DNC 13 dataset)
+ *
+ * Revision 1.15  2004/02/19 06:56:43  warmerda
  * fixed serious bug in releaseAllLayers() with multiple layers
  *
  * Revision 1.14  2004/02/19 05:59:22  warmerda
@@ -91,6 +94,8 @@ ecs_Result *dyn_CreateServer(s,Request)
   printf("dyn_CreateServer\n");
 #endif
 
+  sleep(0);
+  
   spriv = s->priv = (void *) calloc(1,sizeof(ServerPrivateData));
   if (s->priv == NULL) {
     ecs_SetError(&(s->result), 1, "Could not create VRF server, not enough memory");
@@ -144,6 +149,9 @@ ecs_Result *dyn_CreateServer(s,Request)
   /* open schema files */
 
   sprintf(buffer,"%s/lat",spriv->database);
+  if (muse_access(buffer,0) != 0) {
+    sprintf(buffer,"%s/LAT",spriv->database);
+  }
 #ifdef TESTOPENTABLE
   printf("open spriv->latTable:%s\n",buffer);
 #endif
@@ -306,7 +314,7 @@ ecs_Result *dyn_SelectLayer(s,sel)
      ecs_LayerSelection *sel;
 {
   char buffer[256];
-  int layer,i;
+  int layer,i, index_size;
   register ServerPrivateData *spriv = s->priv;
   register LayerPrivateData *lpriv;
 
@@ -496,11 +504,17 @@ ecs_Result *dyn_SelectLayer(s,sel)
     s->layer[layer].nbfeature = lpriv->joinTable.nrows;
   else
     s->layer[layer].nbfeature = lpriv->featureTable.nrows;
+
   lpriv->current_tileid = -1;
 
-  lpriv->index = (VRFIndex *) malloc(sizeof(VRFIndex) * (s->layer[layer].nbfeature+1));
+  if( lpriv->joinTableName != NULL )
+      index_size = lpriv->joinTable.nrows + 1;
+  else
+      index_size = lpriv->featureTable.nrows + 1;
 
-  for (i=0; i < s->layer[layer].nbfeature+1; ++i) {
+  lpriv->index = (VRFIndex *) malloc(sizeof(VRFIndex) * index_size);
+
+  for (i=0; i < index_size; ++i) {
     lpriv->index[i].prim_id = -1;
   }
 
