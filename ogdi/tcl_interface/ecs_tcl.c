@@ -17,7 +17,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.5  2001-04-09 15:04:35  warmerda
+ * Revision 1.6  2007-02-12 16:04:21  cbalint
+ *    More warrning fixes in tcl and odbc plugins.
+ *
+ * Revision 1.5  2001/04/09 15:04:35  warmerda
  * applied new source headers
  *
  */
@@ -63,31 +66,31 @@ typedef struct ecs_UserData ecs_UserData;
 
 int ecs_SetClientProjectionList        _ANSI_ARGS_((Tcl_Interp *interp,int ClientID, char *list));
 int ecs_SetGeoRegionList               _ANSI_ARGS_((Tcl_Interp *interp,ecs_Region *gr,char *list));
-int ecs_CreateClientCmd                _ANSI_ARGS_((ClientData clientData, Tcl_Interp *interp,int argc, char **argv));
-int ecs_DestroyClientCmd               _ANSI_ARGS_((ClientData clientData, Tcl_Interp *interp, int argc, char **argv));
-int ecs_SelectLayerCmd                 _ANSI_ARGS_((ClientData clientData, Tcl_Interp *interp, int argc, char **argv));
-int ecs_ReleaseLayerCmd                _ANSI_ARGS_((ClientData clientData, Tcl_Interp *interp, int argc, char **argv));
-int ecs_SelectRegionCmd                _ANSI_ARGS_((ClientData clientData, Tcl_Interp *interp, int argc, char **argv));
-int ecs_SelectMaskCmd                  _ANSI_ARGS_((ClientData clientData, Tcl_Interp *interp, int argc, char **argv));
-int ecs_UnSelectMaskCmd                _ANSI_ARGS_((ClientData clientData, Tcl_Interp *interp, int argc, char **argv));
-int ecs_GetDictionaryCmd               _ANSI_ARGS_((ClientData clientData, Tcl_Interp *interp, int argc, char **argv));
-int ecs_GetAttributesFormatCmd         _ANSI_ARGS_((ClientData clientData, Tcl_Interp *interp, int argc, char **argv));
-int ecs_GetNextObjectCmd               _ANSI_ARGS_((ClientData clientData, Tcl_Interp *interp, int argc, char **argv));
-int ecs_GetRasterInfoCmd               _ANSI_ARGS_((ClientData clientData, Tcl_Interp *interp, int argc, char **argv));
-int ecs_GetObjectCmd                   _ANSI_ARGS_((ClientData clientData, Tcl_Interp *interp, int argc, char **argv));
-int ecs_GetObjectIdFromCoordCmd        _ANSI_ARGS_((ClientData clientData, Tcl_Interp *interp, int argc, char **argv));
-int ecs_UpdateDictionaryCmd            _ANSI_ARGS_((ClientData clientData, Tcl_Interp *interp, int argc, char **argv));
-int ecs_GetServerProjectionCmd         _ANSI_ARGS_((ClientData clientData, Tcl_Interp *interp, int argc, char **argv));
-int ecs_GetGlobalBoundCmd              _ANSI_ARGS_((ClientData clientData, Tcl_Interp *interp, int argc, char **argv));
-int ecs_SetClientProjectionCmd         _ANSI_ARGS_((ClientData clientData, Tcl_Interp *interp, int argc, char **argv));
-int ecs_SetServerProjectionCmd         _ANSI_ARGS_((ClientData clientData, Tcl_Interp *interp, int argc, char **argv));
-int ecs_GetURLListCmd                  _ANSI_ARGS_((ClientData clientData, Tcl_Interp *interp, int argc, char **argv));
-int ecs_AssignTclFunctionCmd           _ANSI_ARGS_((ClientData clientData, Tcl_Interp *interp, int argc, char **argv));
-int ecs_SetCacheCmd                    _ANSI_ARGS_((ClientData clientData, Tcl_Interp *interp, int argc, char **argv));
-int ecs_LoadCacheCmd                   _ANSI_ARGS_((ClientData clientData, Tcl_Interp *interp, int argc, char **argv));
-int ecs_ReleaseCacheCmd                _ANSI_ARGS_((ClientData clientData, Tcl_Interp *interp, int argc, char **argv));
-int ecs_SetServerLanguageCmd           _ANSI_ARGS_((ClientData clientData, Tcl_Interp *interp, int argc, char **argv));
-int ecs_SetCompressionCmd              _ANSI_ARGS_((ClientData clientData, Tcl_Interp *interp, int argc, char **argv));
+int ecs_CreateClientCmd                _ANSI_ARGS_((ClientData clientData, Tcl_Interp *interp,int argc, const char **argv));
+int ecs_DestroyClientCmd               _ANSI_ARGS_((ClientData clientData, Tcl_Interp *interp, int argc, const char **argv));
+int ecs_SelectLayerCmd                 _ANSI_ARGS_((ClientData clientData, Tcl_Interp *interp, int argc, const char **argv));
+int ecs_ReleaseLayerCmd                _ANSI_ARGS_((ClientData clientData, Tcl_Interp *interp, int argc, const char **argv));
+int ecs_SelectRegionCmd                _ANSI_ARGS_((ClientData clientData, Tcl_Interp *interp, int argc, const char **argv));
+int ecs_SelectMaskCmd                  _ANSI_ARGS_((ClientData clientData, Tcl_Interp *interp, int argc, const char **argv));
+int ecs_UnSelectMaskCmd                _ANSI_ARGS_((ClientData clientData, Tcl_Interp *interp, int argc, const char **argv));
+int ecs_GetDictionaryCmd               _ANSI_ARGS_((ClientData clientData, Tcl_Interp *interp, int argc, const char **argv));
+int ecs_GetAttributesFormatCmd         _ANSI_ARGS_((ClientData clientData, Tcl_Interp *interp, int argc, const char **argv));
+int ecs_GetNextObjectCmd               _ANSI_ARGS_((ClientData clientData, Tcl_Interp *interp, int argc, const char **argv));
+int ecs_GetRasterInfoCmd               _ANSI_ARGS_((ClientData clientData, Tcl_Interp *interp, int argc, const char **argv));
+int ecs_GetObjectCmd                   _ANSI_ARGS_((ClientData clientData, Tcl_Interp *interp, int argc, const char **argv));
+int ecs_GetObjectIdFromCoordCmd        _ANSI_ARGS_((ClientData clientData, Tcl_Interp *interp, int argc, const char **argv));
+int ecs_UpdateDictionaryCmd            _ANSI_ARGS_((ClientData clientData, Tcl_Interp *interp, int argc, const char **argv));
+int ecs_GetServerProjectionCmd         _ANSI_ARGS_((ClientData clientData, Tcl_Interp *interp, int argc, const char **argv));
+int ecs_GetGlobalBoundCmd              _ANSI_ARGS_((ClientData clientData, Tcl_Interp *interp, int argc, const char **argv));
+int ecs_SetClientProjectionCmd         _ANSI_ARGS_((ClientData clientData, Tcl_Interp *interp, int argc, const char **argv));
+int ecs_SetServerProjectionCmd         _ANSI_ARGS_((ClientData clientData, Tcl_Interp *interp, int argc, const char **argv));
+int ecs_GetURLListCmd                  _ANSI_ARGS_((ClientData clientData, Tcl_Interp *interp, int argc, const char **argv));
+int ecs_AssignTclFunctionCmd           _ANSI_ARGS_((ClientData clientData, Tcl_Interp *interp, int argc, const char **argv));
+int ecs_SetCacheCmd                    _ANSI_ARGS_((ClientData clientData, Tcl_Interp *interp, int argc, const char **argv));
+int ecs_LoadCacheCmd                   _ANSI_ARGS_((ClientData clientData, Tcl_Interp *interp, int argc, const char **argv));
+int ecs_ReleaseCacheCmd                _ANSI_ARGS_((ClientData clientData, Tcl_Interp *interp, int argc, const char **argv));
+int ecs_SetServerLanguageCmd           _ANSI_ARGS_((ClientData clientData, Tcl_Interp *interp, int argc, const char **argv));
+int ecs_SetCompressionCmd              _ANSI_ARGS_((ClientData clientData, Tcl_Interp *interp, int argc, const char **argv));
 static int _interpEcsResult            _ANSI_ARGS_((Tcl_Interp *interp, ecs_Result *result, ecs_UserData  *userdata));
 static int _interpObject               _ANSI_ARGS_((Tcl_Interp *interp, ecs_Result *result, char *buffer, ecs_UserData *userdata));
 static int _interpArea                 _ANSI_ARGS_((Tcl_Interp *interp, ecs_Area *area, char *buffer));
@@ -101,7 +104,7 @@ static int _interpObjAttribute         _ANSI_ARGS_((Tcl_Interp *interp, ecs_ObjA
 static int _interpObjAttributeFormat   _ANSI_ARGS_((Tcl_Interp *interp, ecs_ObjAttributeFormat *oaf, char *buffer, ecs_UserData *userdata));
 static int _GetLayer                   _ANSI_ARGS_((Tcl_Interp *interp, char *family, char *request, ecs_LayerSelection *layer));
 static int _getObjectFromTclProc       _ANSI_ARGS_((Tcl_Interp *interp, char *proc, char *ObjID, char *tclvar, int ClientID));
-static int _getAttributesFromTCLProc   _ANSI_ARGS_((Tcl_Interp *interp, char *proc, char *tclvar, int ClientID));
+int _getAttributesFromTCLProc   _ANSI_ARGS_((Tcl_Interp *interp, char *proc, char *tclvar, int ClientID));
 
 int 
 Ecs_Init(interp)
@@ -206,7 +209,7 @@ int ecs_CreateClientCmd(clientData,interp,argc,argv)
 ClientData clientData;
 Tcl_Interp *interp;
 int argc;
-char **argv;
+const char **argv;
 {
   int ClientID;
   ecs_Result *result;
@@ -219,7 +222,7 @@ char **argv;
 
   /* Creation du client */
 
-  result = cln_CreateClient(&ClientID,argv[1]);
+  result = cln_CreateClient(&ClientID,(char *)argv[1]);
   if (result->error > 0) {
     _interpEcsResult(interp,result,NULL);
     return TCL_ERROR;
@@ -243,7 +246,7 @@ int ecs_DestroyClientCmd(clientData,interp,argc,argv)
 ClientData clientData;
 Tcl_Interp *interp;
 int argc;
-char **argv;
+const char **argv;
 {
   int ClientID;
 
@@ -253,7 +256,7 @@ char **argv;
     return(TCL_ERROR);
   }
   
-  if ((ClientID = cln_GetClientIdFromURL(argv[1])) < 0) {
+  if ((ClientID = cln_GetClientIdFromURL((char *)argv[1])) < 0) {
     /* url unknown */
     Tcl_AppendResult(interp,ecstcl_message[2], " ", argv[1], (char *) NULL);
     return TCL_ERROR;
@@ -354,7 +357,7 @@ int ecs_SelectLayerCmd(clientData,interp,argc,argv)
 ClientData clientData;
 Tcl_Interp *interp;
 int argc;
-char **argv;
+const char **argv;
 {
   ecs_LayerSelection layer;
   int ClientID;
@@ -368,14 +371,14 @@ char **argv;
     return(TCL_ERROR);
   }
 
-  ClientID = cln_GetClientIdFromURL(argv[1]);
+  ClientID = cln_GetClientIdFromURL((char *)argv[1]);
   if (ClientID < 0) {
     /* url unknown */
     Tcl_AppendResult(interp,ecstcl_message[2], " ", argv[1], (char *) NULL);
     return TCL_ERROR;
   }
 
-  if ((_GetLayer(interp, argv[2],argv[3],&layer)) != TCL_OK) {
+  if ((_GetLayer(interp, (char *)argv[2],(char *)argv[3],&layer)) != TCL_OK) {
     /* GetLayer appends its own error message */
     return TCL_ERROR;
   }
@@ -399,7 +402,7 @@ int ecs_ReleaseLayerCmd(clientData,interp,argc,argv)
      ClientData clientData;
      Tcl_Interp *interp;
      int argc;
-     char **argv;
+     const char **argv;
 {
   int ClientID;
   ecs_LayerSelection layer;
@@ -413,13 +416,13 @@ int ecs_ReleaseLayerCmd(clientData,interp,argc,argv)
     return(TCL_ERROR);
   }
 
-  if ((ClientID = cln_GetClientIdFromURL(argv[1])) < 0) {
+  if ((ClientID = cln_GetClientIdFromURL((char *)argv[1])) < 0) {
     /* url unknown */
     Tcl_AppendResult(interp,ecstcl_message[2], " ", argv[1], (char *) NULL);
     return TCL_ERROR;
   }
 
-  if ((_GetLayer(interp, argv[2],argv[3], &layer)) != TCL_OK) {
+  if ((_GetLayer(interp, (char *)argv[2],(char *)argv[3], &layer)) != TCL_OK) {
     /* GetLayer returns its own error msg to the interp */
     return TCL_ERROR;
   }
@@ -443,7 +446,7 @@ int ecs_SelectRegionCmd(clientData,interp,argc,argv)
 ClientData clientData;
 Tcl_Interp *interp;
 int argc;
-char **argv;
+const char **argv;
 {
   int j;
   int ClientID;
@@ -458,13 +461,13 @@ char **argv;
     return(TCL_ERROR);
   }
 
-  if ((j=ecs_SetGeoRegionList(interp,&GR,argv[2])) == ECS_FAILURE) {
+  if ((j=ecs_SetGeoRegionList(interp,&GR,(char *)argv[2])) == ECS_FAILURE) {
     /* region is invalid */
     Tcl_AppendResult(interp,ecstcl_message[8], (char *) NULL);
     return TCL_ERROR;
   }
 
-  if ((ClientID = cln_GetClientIdFromURL(argv[1])) < 0) {
+  if ((ClientID = cln_GetClientIdFromURL((char *)argv[1])) < 0) {
     /* url unknown */
     Tcl_AppendResult(interp,ecstcl_message[2], " ", argv[1], (char *) NULL);
     return TCL_ERROR;
@@ -481,12 +484,12 @@ int ecs_SelectMaskCmd(clientData,interp,argc,argv)
      ClientData clientData;
      Tcl_Interp *interp;
      int argc;
-     char **argv;
+     const char **argv;
 {
   int largc;
-  char **largv;
+  const char **largv;
   int pargc;
-  char **pargv;
+  const char **pargv;
   ecs_FeatureRing poly;
   int i;
   int isInclusive;
@@ -499,7 +502,7 @@ int ecs_SelectMaskCmd(clientData,interp,argc,argv)
     return TCL_ERROR;
   }
 
-  if ((ClientID = cln_GetClientIdFromURL(argv[1])) < 0) {
+  if ((ClientID = cln_GetClientIdFromURL((char *)argv[1])) < 0) {
     /* url unknown */
     Tcl_AppendResult(interp,ecstcl_message[2], " ", argv[1], (char *) NULL);
     return TCL_ERROR;
@@ -522,7 +525,7 @@ int ecs_SelectMaskCmd(clientData,interp,argc,argv)
   poly.c.c_len = largc;
   poly.c.c_val = malloc(sizeof(ecs_Coordinate)*largc);
   if (poly.c.c_val == NULL) {
-    ckfree(largv);
+    ckfree((char *)largv);
     return TCL_ERROR;
   }
 
@@ -530,29 +533,29 @@ int ecs_SelectMaskCmd(clientData,interp,argc,argv)
     Tcl_ResetResult(interp);
     if ((Tcl_SplitList(interp,largv[i],&pargc,&pargv) != TCL_OK) ||
 	(pargc < 0)) {
-      ckfree(largv);
+      ckfree((char *)largv);
       free(poly.c.c_val);
       return TCL_ERROR;
     }
 
     if (Tcl_GetDouble(interp,pargv[0], &(poly.c.c_val[i].x)) != TCL_OK) {
-      ckfree(largv);
-      ckfree(pargv);
+      ckfree((char *)largv);
+      ckfree((char *)pargv);
       free(poly.c.c_val);
       return TCL_ERROR;
     }
 
     if (Tcl_GetDouble(interp,pargv[1], &(poly.c.c_val[i].y)) != TCL_OK) {
-      ckfree(largv);
-      ckfree(pargv);
+      ckfree((char *)largv);
+      ckfree((char *)pargv);
       free(poly.c.c_val);
       return TCL_ERROR;
     }
 
-    ckfree(pargv);
+    ckfree((char *)pargv);
   }
 
-  ckfree((char *) largv);
+  ckfree((char *)largv);
 
   return _interpEcsResult(interp,cln_SelectMask(ClientID,&poly,isInclusive), NULL);
 }
@@ -564,7 +567,7 @@ int ecs_UnSelectMaskCmd(clientData,interp,argc,argv)
      ClientData clientData;
      Tcl_Interp *interp;
      int argc;
-     char **argv;
+     const char **argv;
 {
   int ClientID;
 
@@ -575,7 +578,7 @@ int ecs_UnSelectMaskCmd(clientData,interp,argc,argv)
     return TCL_ERROR;
   }
 
-  if ((ClientID = cln_GetClientIdFromURL(argv[1])) < 0) {
+  if ((ClientID = cln_GetClientIdFromURL((char *)argv[1])) < 0) {
     /* url unknown */
     Tcl_AppendResult(interp,ecstcl_message[2], " ", argv[1], (char *) NULL);
     return TCL_ERROR;
@@ -600,7 +603,7 @@ int ecs_GetDictionaryCmd(clientData,interp,argc,argv)
 ClientData clientData;
 Tcl_Interp *interp;
 int argc;
-char **argv;
+const char **argv;
 {
   ecs_Result *result;
   int ClientID;
@@ -608,8 +611,7 @@ char **argv;
   char class[129];
   int class_len;
   Tcl_RegExp itclclass;
-  static int compiled = 0;
-  char *startp, *endp;
+  const char *startp, *endp;
 
   /*  if (!compiled) {
     itclclass = TclRegComp("itcl_class ([A-Za-z_]+)"); */
@@ -626,7 +628,7 @@ char **argv;
     return(TCL_ERROR);
   }
 
-  if ((ClientID = cln_GetClientIdFromURL(argv[1])) < 0) {
+  if ((ClientID = cln_GetClientIdFromURL((char *)argv[1])) < 0) {
     /* url unknown */
     Tcl_AppendResult(interp,ecstcl_message[2], " ", argv[1], (char *) NULL);
     return TCL_ERROR;
@@ -672,7 +674,7 @@ int ecs_GetAttributesFormatCmd(clientData,interp,argc,argv)
 ClientData clientData;
 Tcl_Interp *interp;
 int argc;
-char **argv;
+const char **argv;
 {
   ecs_Result *result;
   ecs_UserData userdata;
@@ -687,7 +689,7 @@ char **argv;
     return(TCL_ERROR);
   }
 
-  if ((ClientID = cln_GetClientIdFromURL(argv[1])) < 0) {
+  if ((ClientID = cln_GetClientIdFromURL((char *)argv[1])) < 0) {
     /* url unknown */
     Tcl_AppendResult(interp,ecstcl_message[2], " ", argv[1], (char *) NULL);
     return TCL_ERROR;
@@ -715,7 +717,7 @@ int ecs_GetNextObjectCmd(clientData,interp,argc,argv)
 ClientData clientData;
 Tcl_Interp *interp;
 int argc;
-char **argv;
+const char **argv;
 {
   int ClientID;
   ecs_Result *result;
@@ -731,13 +733,13 @@ char **argv;
     return(TCL_ERROR);
   }
 
-  if ((ClientID = cln_GetClientIdFromURL(argv[1])) < 0) {
+  if ((ClientID = cln_GetClientIdFromURL((char *)argv[1])) < 0) {
     /* url unknown */
     Tcl_AppendResult(interp,ecstcl_message[2], " ", argv[1], (char *) NULL);
     return TCL_ERROR;
   }
   userdata.ClientID=ClientID;
-  userdata.tclvar=argv[2];
+  userdata.tclvar=(char *)argv[2];
   result = cln_GetNextObject(ClientID);    
   return (_interpEcsResult(interp, result, &userdata));
 
@@ -754,7 +756,7 @@ int ecs_GetRasterInfoCmd(clientData,interp,argc,argv)
 ClientData clientData;
 Tcl_Interp *interp;
 int argc;
-char **argv;
+const char **argv;
 {
   int ClientID;
   ecs_Result *result;
@@ -768,7 +770,7 @@ char **argv;
     return(TCL_ERROR);
   }
 
-  if ((ClientID = cln_GetClientIdFromURL(argv[1])) < 0) {
+  if ((ClientID = cln_GetClientIdFromURL((char *)argv[1])) < 0) {
     /* url unknown */
     Tcl_AppendResult(interp,ecstcl_message[2], " ", argv[1], (char *) NULL);
     return TCL_ERROR;
@@ -803,7 +805,7 @@ static int _getAttributesFromTclProc(interp, proc, tclvar, ClientID)
      int ClientID;
 {
   char buffer[256];
-  sprintf(buffer,"%s %d {} {}", proc, ClientID, tclvar);
+  sprintf(buffer,"%s %d %s{} {}", proc, ClientID, tclvar);
   return (Tcl_Eval(interp, buffer));
 }
 
@@ -820,7 +822,7 @@ int ecs_GetObjectCmd(clientData,interp,argc,argv)
 ClientData clientData;
 Tcl_Interp *interp;
 int argc;
-char **argv;
+const char **argv;
 {
   int ClientID;
   ecs_Result *result;
@@ -835,18 +837,18 @@ char **argv;
     return(TCL_ERROR);
   }
 
-  if ((ClientID = cln_GetClientIdFromURL(argv[1])) < 0) {
+  if ((ClientID = cln_GetClientIdFromURL((char *)argv[1])) < 0) {
     /* url unknown */
     Tcl_AppendResult(interp,ecstcl_message[2], " ", argv[1], (char *) NULL);
     return TCL_ERROR;
   }
 
-  result = cln_GetObject(ClientID, argv[2]);
+  result = cln_GetObject(ClientID,(char *)argv[2]);
   /* if there is an error in GetObject, return */
 
-  userdata.tclvar=argv[3];
+  userdata.tclvar=(char *)argv[3];
   userdata.ClientID=ClientID;
-  userdata.ObjID=argv[2];
+  userdata.ObjID=(char *)argv[2];
 
   return (_interpEcsResult(interp, result, &userdata));
     
@@ -870,7 +872,7 @@ int ecs_GetObjectIdFromCoordCmd(clientData,interp,argc,argv)
 ClientData clientData;
 Tcl_Interp *interp;
 int argc;
-char **argv;
+const char **argv;
 {
   int ClientID;
   ecs_Coordinate coordinate;
@@ -884,7 +886,7 @@ char **argv;
     return(TCL_ERROR);
   }
 
-  if ((ClientID = cln_GetClientIdFromURL(argv[1])) < 0) {
+  if ((ClientID = cln_GetClientIdFromURL((char *)argv[1])) < 0) {
     /* url unknown */
     Tcl_AppendResult(interp,ecstcl_message[2], " ", argv[1], (char *) NULL);
     return TCL_ERROR;
@@ -913,7 +915,7 @@ int ecs_UpdateDictionaryCmd(clientData,interp,argc,argv)
 ClientData clientData;
 Tcl_Interp *interp;
 int argc;
-char **argv;
+const char **argv;
 {
   int ClientID;
 
@@ -927,7 +929,7 @@ char **argv;
     return(TCL_ERROR);
   }
 
-  if ((ClientID = cln_GetClientIdFromURL(argv[1])) < 0) {
+  if ((ClientID = cln_GetClientIdFromURL((char *)argv[1])) < 0) {
     /* url unknown */
     Tcl_AppendResult(interp,ecstcl_message[2], " ", argv[1], (char *) NULL);
     return TCL_ERROR;
@@ -935,7 +937,7 @@ char **argv;
   if (argc == 2) {
     return _interpEcsResult(interp,cln_UpdateDictionary(ClientID,NULL),NULL);    
   } else {
-    return _interpEcsResult(interp,cln_UpdateDictionary(ClientID,argv[2]),NULL);    
+    return _interpEcsResult(interp,cln_UpdateDictionary(ClientID,(char *)argv[2]),NULL);    
   }
 }
 
@@ -953,7 +955,7 @@ int ecs_GetServerProjectionCmd(clientData,interp,argc,argv)
 ClientData clientData;
 Tcl_Interp *interp;
 int argc;
-char **argv;
+const char **argv;
 {
   int ClientID;
 
@@ -965,7 +967,7 @@ char **argv;
                      argv[0], " URLdescriptor\"", 0); */
     return(TCL_ERROR);
   }
-  if ((ClientID = cln_GetClientIdFromURL(argv[1])) < 0) {
+  if ((ClientID = cln_GetClientIdFromURL((char *)argv[1])) < 0) {
     /* url unknown */
     Tcl_AppendResult(interp,ecstcl_message[2], " ", argv[1], (char *) NULL);
     return TCL_ERROR;
@@ -989,7 +991,7 @@ int ecs_GetGlobalBoundCmd(clientData,interp,argc,argv)
 ClientData clientData;
 Tcl_Interp *interp;
 int argc;
-char **argv;
+const char **argv;
 {
   int ClientID;
 
@@ -1001,7 +1003,7 @@ char **argv;
     return(TCL_ERROR);
   }
 
-  if ((ClientID = cln_GetClientIdFromURL(argv[1])) < 0) {
+  if ((ClientID = cln_GetClientIdFromURL((char *)argv[1])) < 0) {
     /* url unknown */
     Tcl_AppendResult(interp,ecstcl_message[2], " ", argv[1], (char *) NULL);
     return TCL_ERROR;
@@ -1025,7 +1027,7 @@ int ecs_SetClientProjectionCmd(clientData,interp,argc,argv)
 ClientData clientData;
 Tcl_Interp *interp;
 int argc;
-char **argv;
+const char **argv;
 {
   int ClientID;
   ecs_Result *result;
@@ -1039,13 +1041,13 @@ char **argv;
     return(TCL_ERROR);
   }
 
-  if ((ClientID = cln_GetClientIdFromURL(argv[1])) < 0) {
+  if ((ClientID = cln_GetClientIdFromURL((char *)argv[1])) < 0) {
     /* url unknown */
     Tcl_AppendResult(interp,ecstcl_message[2], " ", argv[1], (char *) NULL);
     return TCL_ERROR;
   }
 
-  result = cln_SetClientProjection(ClientID,argv[2]);
+  result = cln_SetClientProjection(ClientID,(char *)argv[2]);
   _interpEcsResult(interp,result,NULL);    
   if(result->error > 0) {
     return TCL_ERROR;
@@ -1069,7 +1071,7 @@ int ecs_SetServerProjectionCmd(clientData,interp,argc,argv)
 ClientData clientData;
 Tcl_Interp *interp;
 int argc;
-char **argv;
+const char **argv;
 {
   int ClientID;
 
@@ -1082,13 +1084,13 @@ char **argv;
     return(TCL_ERROR);
   }
 
-  if ((ClientID = cln_GetClientIdFromURL(argv[1])) < 0) {
+  if ((ClientID = cln_GetClientIdFromURL((char *)argv[1])) < 0) {
     /* url unknown */
     Tcl_AppendResult(interp,ecstcl_message[2], " ", argv[1], (char *) NULL);
     return TCL_ERROR;
   }
 
-  return _interpEcsResult(interp, cln_SetServerProjection(ClientID, argv[2]),NULL);
+  return _interpEcsResult(interp, cln_SetServerProjection(ClientID,(char *)argv[2]),NULL);
 
   /*
   Tcl_AppendResult(interp, "projection ",argv[2]," is selected for ", argv[1], (
@@ -1109,7 +1111,7 @@ int ecs_GetURLListCmd(clientData,interp,argc,argv)
 ClientData clientData;
 Tcl_Interp *interp;
 int argc;
-char **argv;
+const char **argv;
 {
   int j;
   char *Liste;
@@ -1141,7 +1143,7 @@ int ecs_AssignTclFunctionCmd(clientData,interp,argc,argv)
 ClientData clientData;
 Tcl_Interp *interp;
 int argc;
-char **argv;
+const char **argv;
 { 
   int ClientID;
 
@@ -1156,7 +1158,7 @@ char **argv;
     return(TCL_ERROR);
   }
 
-  if ((ClientID = cln_GetClientIdFromURL(argv[1])) < 0) {
+  if ((ClientID = cln_GetClientIdFromURL((char *)argv[1])) < 0) {
     /* url unknown */
     Tcl_AppendResult(interp,ecstcl_message[2], " ", argv[1], (char *) NULL);
     return TCL_ERROR;
@@ -1167,7 +1169,7 @@ char **argv;
     Tcl_AppendResult(interp,ecstcl_message[14], (char *) NULL);
     return TCL_OK;
   } else {
-    cln_SetTclProc(ClientID, argv[2]);
+    cln_SetTclProc(ClientID,(char *)argv[2]);
     Tcl_AppendResult(interp, argv[2], (char *) NULL);
     return TCL_OK;
   }
@@ -1189,7 +1191,7 @@ int ecs_SetCacheCmd(clientData,interp,argc,argv)
      ClientData clientData;
      Tcl_Interp *interp;
      int argc;
-     char **argv;
+     const char **argv;
 {
   int j;
   int ClientID;
@@ -1207,13 +1209,13 @@ int ecs_SetCacheCmd(clientData,interp,argc,argv)
     return(TCL_ERROR);
   }
 
-  if ((ClientID = cln_GetClientIdFromURL(argv[1])) < 0) {
+  if ((ClientID = cln_GetClientIdFromURL((char *)argv[1])) < 0) {
     /* url unknown */
     Tcl_AppendResult(interp,ecstcl_message[2], " ", argv[1], (char *) NULL);
     return TCL_ERROR;
   }
 
-  if ((j = ecs_SetGeoRegionList(interp,&GR,argv[2])) != ECS_SUCCESS) {
+  if ((j = ecs_SetGeoRegionList(interp,&GR,(char *)argv[2])) != ECS_SUCCESS) {
     Tcl_AppendResult(interp,ecstcl_message[8], (char *) NULL);
     return TCL_ERROR;
   }
@@ -1244,7 +1246,7 @@ int ecs_LoadCacheCmd(clientData,interp,argc,argv)
 ClientData clientData;
 Tcl_Interp *interp;
 int argc;
-char **argv;
+const char **argv;
 {
   int ClientID;
   int j;
@@ -1260,13 +1262,13 @@ char **argv;
     return(TCL_ERROR);
   }
 
-  if ((ClientID = cln_GetClientIdFromURL(argv[1])) < 0) {
+  if ((ClientID = cln_GetClientIdFromURL((char *)argv[1])) < 0) {
     /* url unknown */
     Tcl_AppendResult(interp,ecstcl_message[2], " ", argv[1], (char *) NULL);
     return TCL_ERROR;
   }
 
-  if ((_GetLayer(interp,argv[2],argv[3],&layer)) != TCL_OK) {
+  if ((_GetLayer(interp,(char *)argv[2],(char *)argv[3],&layer)) != TCL_OK) {
     return TCL_ERROR;
   }
 
@@ -1298,7 +1300,7 @@ int ecs_ReleaseCacheCmd(clientData,interp,argc,argv)
 ClientData clientData;
 Tcl_Interp *interp;
 int argc;
-char **argv;
+const char **argv;
 {
   int ClientID;
   int j;
@@ -1314,13 +1316,13 @@ char **argv;
     return(TCL_ERROR);
   }
 
-  if ((ClientID = cln_GetClientIdFromURL(argv[1])) < 0) {
+  if ((ClientID = cln_GetClientIdFromURL((char *)argv[1])) < 0) {
     /* url unknown */
     Tcl_AppendResult(interp,ecstcl_message[2], " ", argv[1], (char *) NULL);
     return TCL_ERROR;
   }
 
-  if ((_GetLayer(interp,argv[2],argv[3],&layer)) != TCL_OK) {
+  if ((_GetLayer(interp,(char *)argv[2],(char *)argv[3],&layer)) != TCL_OK) {
     return TCL_ERROR;
   }
 
@@ -1338,7 +1340,7 @@ int ecs_SetServerLanguageCmd(clientData,interp,argc,argv)
 ClientData clientData;
 Tcl_Interp *interp;
 int argc;
-char **argv;
+const char **argv;
 {
   int ClientID, num;
 
@@ -1356,7 +1358,7 @@ char **argv;
     return TCL_ERROR;
   }
 
-  if ((ClientID = cln_GetClientIdFromURL(argv[1])) < 0) {
+  if ((ClientID = cln_GetClientIdFromURL((char *)argv[1])) < 0) {
     /* url unknown */
     Tcl_AppendResult(interp,ecstcl_message[2], " ", argv[1], (char *) NULL);
     return TCL_ERROR;
@@ -1387,7 +1389,7 @@ int ecs_SetCompressionCmd(clientData,interp,argc,argv)
 ClientData clientData;
 Tcl_Interp *interp;
 int argc;
-char **argv;
+const char **argv;
 {
   int ClientID;
   ecs_Compression c;
@@ -1404,24 +1406,24 @@ char **argv;
     return(TCL_ERROR);
   }
 
-  if (Tcl_GetInt(interp, argv[2], &c.ctype) != TCL_OK) {
+  if (Tcl_GetInt(interp, argv[2],(int *) &c.ctype) != TCL_OK) {
     return TCL_ERROR;
   }
-  if (Tcl_GetInt(interp, argv[3], &c.cversion) != TCL_OK) {
+  if (Tcl_GetInt(interp, argv[3],(int *) &c.cversion) != TCL_OK) {
     return TCL_ERROR;
   }
-  if (Tcl_GetInt(interp, argv[4], &c.clevel) != TCL_OK) {
+  if (Tcl_GetInt(interp, argv[4],(int *) &c.clevel) != TCL_OK) {
     return TCL_ERROR;
   }
-  if (Tcl_GetInt(interp, argv[5], &c.cblksize) != TCL_OK) {
+  if (Tcl_GetInt(interp, argv[5],(int *) &c.cblksize) != TCL_OK) {
     return TCL_ERROR;
   }
-  if (Tcl_GetInt(interp, argv[6], &c.cachesize) != TCL_OK) {
+  if (Tcl_GetInt(interp, argv[6],(int *) &c.cachesize) != TCL_OK) {
     return TCL_ERROR;
   }
   c.cfullsize = 0;
 
-  if ((ClientID = cln_GetClientIdFromURL(argv[1])) < 0) {
+  if ((ClientID = cln_GetClientIdFromURL((char *)argv[1])) < 0) {
     /* url unknown */
     Tcl_AppendResult(interp,ecstcl_message[2], " ", argv[1], (char *) NULL);
     return TCL_ERROR;
@@ -1440,7 +1442,7 @@ int ecs_SetGeoRegionList(interp,gr,liste)
      char *liste;
 {
   int argc;
-  char **argv;
+  const char **argv;
   int code = ECS_FAILURE;
 
   if (Tcl_SplitList(interp,liste,&argc,&argv) != TCL_OK) {
