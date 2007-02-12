@@ -978,7 +978,7 @@ Set the case of the filename for the current operating system.
    extent_type libextent;
    /* for dec degrees */
    vpf_projection_type libproj;
-   void (*invproj)();
+   void (*invproj)()=NULL;
 
    libproj = library_projection(library_path);
    set_vpf_forward_projection(libproj);

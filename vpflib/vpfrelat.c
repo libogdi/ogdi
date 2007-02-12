@@ -561,7 +561,7 @@ int32 tile_id;
    row_type row;
    int32 KEY2_, TILE_;
    char cval, *tval, path[255], *keystring, dir_separator[2];
-   id_triplet_type idtrip;
+   id_triplet_type idtrip = {' ',0,0,0};
 
    dir_separator[0] = DIR_SEPARATOR;
    dir_separator[1] = '\0';

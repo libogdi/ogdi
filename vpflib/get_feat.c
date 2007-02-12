@@ -285,7 +285,7 @@ vpf_projection_type NOPROJ = {DDS, 0.0, 0.0, 0.0, 0.0, 0, 0.0, 0.0,
 
       if (next_edge == 0)
          {
-         xvt_note ("Next edge(%d) = 0\n",edge_rec.id);
+         xvt_note ("Next edge(%d) = 0\n",(int)edge_rec.id);
          done = TRUE;
          }
 
@@ -423,7 +423,7 @@ vpf_projection_type NOPROJ = {DDS, 0.0, 0.0, 0.0, 0.0, 0, 0.0, 0.0,
 
    {
    int32 i;
-   COORDINATE *coord;
+   COORDINATE *coord = NULL;
 
    switch (table.header[pos].type)
       {

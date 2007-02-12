@@ -3,13 +3,12 @@
 char url[] = "gltp:/grass/c:/demo/spearfish/PERMANENT";
 char layer[] = "roads@PERMANENT(*)";
 
-main()
+int main()
 {
   int ClientID;
   ecs_Result *result;
   ecs_Region selectionRegion;
   ecs_LayerSelection selectionLayer;
-  int i;
 
   /* Create a client with ClientID as a reference */
   

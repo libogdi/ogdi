@@ -1012,7 +1012,7 @@ vpf_table_type table;
    position_type pos;
    expr_type expr;
    register int32 i;
-   int32 boolval=FALSE, booltemp, join = OR;
+   int32 boolval=FALSE, booltemp=FALSE, join = OR;
    int32 lval, lval2, count;
    short sval,sval2;
    float fval, fval2;
@@ -1177,7 +1177,7 @@ vpf_table_type table;
 {
    position_type pos;
    expr_type expr;
-   int32 boolval=FALSE, booltemp, join = OR;
+   int32 boolval=FALSE, booltemp=FALSE, join = OR;
    int32  lval, lval2, count;
    short sval, sval2;
    float fval, fval2;

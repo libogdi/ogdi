@@ -20,7 +20,12 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.12  2002-02-21 15:54:17  warmerda
+ * Revision 1.13  2007-02-12 15:52:57  cbalint
+ *
+ *    Preliminary cleanup.
+ *    Get rif of unitialized variables, and unused ones.
+ *
+ * Revision 1.12  2002/02/21 15:54:17  warmerda
  * fixed bug with declaration of dst
  *
  * Revision 1.11  2002/02/08 21:22:58  warmerda
@@ -314,7 +319,7 @@ static void ImportVectors( ecs_Region *region, const char * layer,
     while (ECSSUCCESS(result))
     {
         char	*pszList;
-        int	iField, iShape;
+        int	iField, iShape=0;
         
 /* -------------------------------------------------------------------- */
 /*      Write shapefile geometry                                        */
@@ -763,7 +768,7 @@ static int RecomputeRegion( const char * output_projection,
     projPJ      src;
     projPJ      dst;
     projUV      corners[4];
-    ecs_Region  out_region;
+    ecs_Region  out_region = {0,0,0,0,0,0};
     int         iCorner, src_xsize, src_ysize, max_dim;
     
 /* -------------------------------------------------------------------- */

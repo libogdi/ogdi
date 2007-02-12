@@ -17,7 +17,12 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.14  2004-10-26 20:29:43  warmerda
+ * Revision 1.15  2007-02-12 15:52:57  cbalint
+ *
+ *    Preliminary cleanup.
+ *    Get rif of unitialized variables, and unused ones.
+ *
+ * Revision 1.14  2004/10/26 20:29:43  warmerda
  * Removed hack that was dropping some inner rings from polygons unnecessarily.
  * The hack appears to be to deal with some problem of inner rings duplicating
  * outer rings in browse products, but I don't know how to check the original
@@ -315,10 +320,10 @@ int vrf_get_line_feature (s, layer, prim_id, result)
   int32 pos, count;
   row_type row;
   int i;
-  coordinate_type *ptr1;
-  tri_coordinate_type *ptr2;
-  double_coordinate_type *ptr3;
-  double_tri_coordinate_type *ptr4;
+  coordinate_type *ptr1=NULL;
+  tri_coordinate_type *ptr2=NULL;
+  double_coordinate_type *ptr3=NULL;
+  double_tri_coordinate_type *ptr4=NULL;
   register LayerPrivateData *lpriv = (LayerPrivateData *) layer->priv;
 
   /* 
@@ -961,7 +966,7 @@ int vrf_get_ring_coords (s,ring, face_id, start_edge, edgetable)
 
       if (!done)
 	{
-	  edge_rec = read_edge( next_edge, edgetable, (int)proj.inverse_proj);
+	  edge_rec = read_edge( next_edge, edgetable, (long)proj.inverse_proj);
 	  if (edge_rec.npts == 0) {
 	    sprintf(buffer,"Unable to read the edge %d in the face %d",
 		    (int) next_edge, (int) face_id);

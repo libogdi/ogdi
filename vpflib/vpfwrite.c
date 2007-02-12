@@ -758,7 +758,8 @@ int32 count;
 FILE *to;
 #endif
 {
-  int32 retval , i ;
+  int32 retval = 0;
+  int32 i;
 
   switch ( type ) {
   case VpfChar:
@@ -894,7 +895,7 @@ FILE *to;
     /* Do Nothing */
     break ;
   default:
-    xvt_note ("VpfWrite: error on data type < %s >", type ) ;  /*DGM*/
+    xvt_note ("VpfWrite: error on data type < %s >",(char*) type ) ;  /*DGM*/
     break ;
   }
 

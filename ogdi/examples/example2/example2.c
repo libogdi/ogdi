@@ -10,7 +10,7 @@ int PrintResult();
    lines print on screen.
    */
 
-main()
+int main()
 {
   int ClientID;
   char url[100];
@@ -19,13 +19,21 @@ main()
   ecs_Region selectionRegion;
   ecs_LayerSelection selectionLayer;
   int code;
-
+  int errin;
   code = TRUE;
 
   printf("Enter the URL: ");
-  scanf("%s",url);
+  errin = scanf("%s",url);
+    if (errin == 0) {
+        printf("URL Input error.\n"); 
+        exit(1);
+        }
   printf("Enter the layer: ");
-  scanf("%s",layerSelection);
+  errin = scanf("%s",layerSelection);
+    if (errin == 0) {
+        printf("Layer Input error.\n"); 
+        exit (1); 
+	}
 
   PrintResult("cln_CreateClient", cln_CreateClient(&ClientID,url));
   PrintResult("cln_GetGlobalBound", (result=cln_GetGlobalBound(ClientID)));

@@ -17,7 +17,12 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.3  2001-04-09 15:04:34  warmerda
+ * Revision 1.4  2007-02-12 15:52:57  cbalint
+ *
+ *    Preliminary cleanup.
+ *    Get rif of unitialized variables, and unused ones.
+ *
+ * Revision 1.3  2001/04/09 15:04:34  warmerda
  * applied new source headers
  *
  */
@@ -59,7 +64,7 @@ xdr_ecs_Result_Decode(XDR *xdrs, ecs_Result *objp)
 	void *zbuf;
 	z_stream z;
 	int status;
-	int size;
+	unsigned int size;
 
 	if (!xdr_u_int(xdrs, &objp->compression.cfullsize)) {
 		return FALSE;
@@ -104,7 +109,7 @@ xdr_ecs_Result_Decode(XDR *xdrs, ecs_Result *objp)
 	z.avail_out = objp->compression.cfullsize;
 	do {
 		if (! xdr_bytes(xdrs, (char **) &zbuf, &size,
-				objp->compression.cblksize))
+				   objp->compression.cblksize))
 		{
 			xdr_destroy(&mem_xdrs);
 			return (FALSE);
@@ -149,7 +154,7 @@ xdr_ecs_Result_Encode(XDR *xdrs, ecs_Result *objp)
 	int attempts;
 	void *zbuf;
 	z_stream z;
-	int count;
+	unsigned int count;
 	int status;
 	
 	if (objp->compression.ctype == ECS_COMPRESS_NONE) {

@@ -351,7 +351,7 @@ void _getObjectIdArea(s,l,coord)
      ecs_Layer *l;
      ecs_Coordinate *coord;
 {
-  double distance,calcdistance,pointdistance;
+  double distance=0,calcdistance=0,pointdistance;
   int firstobj;
   int index,position;
   char buffer[60];
@@ -658,7 +658,7 @@ _getObjectIdLine(s,l,coord)
      ecs_Layer *l;
      ecs_Coordinate *coord;
 {
-  double distance,calcdistance,pointdistance;
+  double distance=0,calcdistance=0,pointdistance;
   int firstobj;
   int index,position;
   char buffer[60];

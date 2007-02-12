@@ -79,6 +79,13 @@
  *    Barry Michaels   May 1991                           DOS Turbo C
  *E
  *************************************************************************/
+
+#ifdef PROTO
+int32 query_table_row (char *expression, row_type row, vpf_table_type table);
+#else
+int32 query_table_row (char *expression, row_type row, vpf_table_type table);
+#endif
+
 #ifdef PROTO
    set_type get_fit_tile_primitives (char *covpath, int32 primclass, char *expression,
 				                      vpf_table_type feature_table, int32 tile, int32 fca_id,

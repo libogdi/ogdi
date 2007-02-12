@@ -17,7 +17,12 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.6  2001-04-10 14:29:43  warmerda
+ * Revision 1.7  2007-02-12 15:52:57  cbalint
+ *
+ *    Preliminary cleanup.
+ *    Get rif of unitialized variables, and unused ones.
+ *
+ * Revision 1.6  2001/04/10 14:29:43  warmerda
  * Upgraded with changes from DND (hand applied to avoid losing bug fixes).
  * Patch also includes change to exclude zero elevations when computing
  * mincat/maxcat.
@@ -95,7 +100,7 @@ int _parse_request(s,sel,isInRam)
    */
 
 int _read_dted(ecs_Server *s, int xtile, int ytile) {
-  unsigned char buffer[UHL_LENGTH], temp[3];
+  char buffer[UHL_LENGTH], temp[3];
   char *chtmp;
   double origin_lon, origin_lat;
   double interval_lon, interval_lat;
@@ -273,7 +278,7 @@ int _sample_tiles(ecs_Server *s, ecs_TileStructure *t) {
    ---------------------------------------------------------- 
    */
 int _sample_read_dted(ecs_Server *s, int xtile, int ytile, int32 *firstcoordfilepos, FILE *fileptr) {
-  unsigned char buffer[UHL_LENGTH], temp[3];
+  char buffer[UHL_LENGTH], temp[3];
   char *chtmp;
   double origin_lon, origin_lat;
   double interval_lon, interval_lat;
@@ -334,7 +339,7 @@ int _sample_read_dted(ecs_Server *s, int xtile, int ytile, int32 *firstcoordfile
 
 /* retrieve nothing but the level from a tile */
 int _get_level(ecs_Server *s, int xtile, int ytile, int *level) {
-  unsigned char buffer[UHL_LENGTH], temp[3], dtedfilename[256];
+  char buffer[UHL_LENGTH], temp[3], dtedfilename[256];
   char *chtmp;
   ServerPrivateData *spriv =s->priv;
   
@@ -486,7 +491,7 @@ int _initRegionWithDefault(s)
   struct dirent *structure1;
   DIR *dirlist1;
   struct dirent *structure2;
-  DIR *dirlist2;
+  DIR *dirlist2=NULL;
   static int compiled = 0;
   static ecs_regexp *reglet;
   static ecs_regexp *regnum;

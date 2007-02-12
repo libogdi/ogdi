@@ -160,7 +160,7 @@ int32 count;
 FILE *from;
 #endif
 {
-  int32 retval , i ;
+  int32 retval=0, i ;
 
   switch ( type ) {
   case VpfChar:
@@ -379,7 +379,7 @@ int32 row_number;
 vpf_table_type table;
 #endif
 {
-   int32   recsize,len;
+   int32   recsize,len=0;
    uint32 ulen;
    int32 pos;
 
@@ -419,7 +419,7 @@ vpf_table_type table;
         if ( table.mode == Write && table.nrows != row_number ) {
            /* Just an error check, should never get here in writing */
            xvt_note ("index_length: error trying to access row %d",
-                   row_number ) ;
+                   (int) row_number ) ;
            len = (int32)NULL;
         }
         break;
@@ -511,7 +511,7 @@ vpf_table_type table;
          if ( table.mode == Write && table.nrows != row_number ) {
            /* Just an error check, should never get here in writing */
            xvt_note ("index_length: error trying to access row %d",
-                   row_number ) ;
+                   (int) row_number ) ;
            pos = (int32)NULL;
          }
          break;
@@ -1374,7 +1374,7 @@ int32  *count;
    col = field_number;
    if ((col < 0) || (col >= table.nfields)) {
       xvt_note ("GET_TABLE_ELEMENT: Invalid field number %d\n",
-              field_number);
+              (int) field_number);
       return NULL;
    }
 

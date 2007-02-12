@@ -17,7 +17,12 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.4  2001-04-19 05:09:17  warmerda
+ * Revision 1.5  2007-02-12 15:52:57  cbalint
+ *
+ *    Preliminary cleanup.
+ *    Get rif of unitialized variables, and unused ones.
+ *
+ * Revision 1.4  2001/04/19 05:09:17  warmerda
  * fixed round off errors in calculation of t->linelength, and placed
  * coord.x/y at center of pixel instead of the corner.
  *
@@ -793,7 +798,7 @@ int ecs_TileFindBuffer(ecs_TileStructure *t, int bufptr, ecs_TileBufferLine **tb
 int ecs_TileAddLine(ecs_TileStructure *t, int length, int index, ecs_TileBufferLine **tbuf) {
   /* malloc buffer */
   register int i;
-  ecs_TileBufferLine *tmp, *last;
+  ecs_TileBufferLine *tmp, *last=NULL;
 
 #if 0
   printf("+++adding a line %d to buffer\n",index);

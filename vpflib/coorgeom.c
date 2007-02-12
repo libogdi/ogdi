@@ -447,10 +447,10 @@
 #endif
 
 {
-   double m1,m2,b1,b2;
+   double m1,m2,b1=0,b2=0;
    double tempy1,tempy2;
 
-   if ( (l1.x1==l1.x2) && (l2.y1==l2.y2) )
+   if ( (l1.x1==l1.x2) && (l2.y1==l2.y2) ) {
       /* l1 is vertical and l2 is horizontal */
 
       if ( ( ((l2.x1 <= l1.x1) && (l1.x1 <= l2.x2)) ||    /* X coordinate */
@@ -461,11 +461,11 @@
        *xint = l1.x1;
        *yint = l2.y1;
        return 1;
-      }
-      else
+       } 
+     } else
        return 0;
 
-   if ( (l2.x1==l2.x2) && (l1.y1==l1.y2) )
+   if ( (l2.x1==l2.x2) && (l1.y1==l1.y2) ) {
       /* l2 is vertical and l1 is horizontal */
 
       if ( ( ((l1.x1 <= l2.x1) && (l2.x1 <= l1.x2)) ||    /* X coordinate */
@@ -476,8 +476,8 @@
        *xint = l2.x1;
        *yint = l1.y1;
        return 1;
-      }
-      else
+       }
+     } else
        return 0;
 
    if ( (l1.x1==l2.x1) && (l1.y1==l2.y1) ) {
@@ -652,7 +652,7 @@
 #endif
 
 {
-   double m1,mp,b1,bp; /* m's are for slopes, b's are for y intersections */
+   double m1,mp,b1=0,bp; /* m's are for slopes, b's are for y intersections */
              /* for the old y=mx+b point slope formula.         */
 
    if (lseg.y1 == lseg.y2)

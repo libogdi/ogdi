@@ -502,7 +502,7 @@ static unsigned char setmask[] = {1,2,4,8,16,32,64,128};
 
 {
    register int32 nbyte, bit, element, nbytes;
-   unsigned char byte;
+   unsigned char byte = ' ';
 
    if (!set.size) return MAXLONG;
 
@@ -1058,7 +1058,7 @@ static unsigned char setmask[] = {1,2,4,8,16,32,64,128};
        xvt_free (set->buf);
 #endif
       {
-      gunlock (set->buf_handle);
+//      gunlock (set->buf_handle);
       gfree (set->buf_handle);
       }
    set->size = -1;

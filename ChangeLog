@@ -1,4 +1,8 @@
 =============================================================================
+2007-02-12  Balint Cristian  <cbalint@redhat.com>
+
+	* fix some gcc warnings, unititialized variables, and unused variables.
+
 
 2005-02-28  Frank Warmerdam  <warmerdam@pobox.com>
 

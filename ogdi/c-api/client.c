@@ -18,7 +18,12 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.13  2004-02-19 06:20:09  warmerda
+ * Revision 1.14  2007-02-12 15:52:57  cbalint
+ *
+ *    Preliminary cleanup.
+ *    Get rif of unitialized variables, and unused ones.
+ *
+ * Revision 1.13  2004/02/19 06:20:09  warmerda
  * ecs_CleanUp() cln_dummy_result in ecs_DestroyServer()
  *
  * Revision 1.12  2003/08/27 05:26:36  warmerda
@@ -1769,9 +1774,9 @@ ecs_Result *cln_SetClientProjection(ClientID,projection)
   int result;
   char olddatumtable[10],datumtable[10];
   char filename[15];
-  ecs_Datum oldtargetdatum;
-  ecs_Datum oldsourcedatum;
-  char *ptr,*ptr1;
+  ecs_Datum oldtargetdatum=0;
+  ecs_Datum oldsourcedatum=0;
+  char *ptr,*ptr1=NULL;
   char *temp;
   int tempint;
 

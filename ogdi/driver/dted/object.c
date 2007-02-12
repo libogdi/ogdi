@@ -17,7 +17,12 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.6  2001-04-19 05:04:59  warmerda
+ * Revision 1.7  2007-02-12 15:52:57  cbalint
+ *
+ *    Preliminary cleanup.
+ *    Get rif of unitialized variables, and unused ones.
+ *
+ * Revision 1.6  2001/04/19 05:04:59  warmerda
  * move pos_y to middle of row, add errors for unsupported funcs
  *
  * Revision 1.5  2001/04/10 14:29:43  warmerda
@@ -289,7 +294,7 @@ int _calcPosValue(ecs_Server *s, ecs_TileStructure *t, int xtile,
 
 int _getTileDim(ecs_Server *s, ecs_TileStructure *t, double x, double y, 
                 int *width, int  *height) {
-  int ns_int, ew_int;  /* interval value in seconds*/
+  int ns_int, ew_int=0;  /* interval value in seconds*/
   ServerPrivateData *spriv= s->priv;
 
   (void) t;

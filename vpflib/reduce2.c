@@ -11,8 +11,8 @@
 #include "reduce2.h"
 #endif
 
-#define  MAX(m,n) (((m) > (n)) ? (m) : (n))
-#define  MIN(m,n) (((m) < (n)) ? (m) : (n))
+//#define  MAX(m,n) (((m) > (n)) ? (m) : (n))
+//#define  MIN(m,n) (((m) < (n)) ? (m) : (n))
 #define  DOCNT(i,t,n)   (_d_l=n, (_d_m=(t-(i)+_d_l)/_d_l) > 0 ? _d_m : 0L )
 
 /*    General purpose tools for polyline reduction:
