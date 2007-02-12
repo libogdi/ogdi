@@ -222,11 +222,6 @@ default-clean:
 #	Default rule(s) to install stuff if appropriate.
 #
 
-#ifeq ($(TARGETGEN),$(SHRDGEN))
-#default-install:
-#	cp $(TARGETGEN) $(INST_LIB)/ogdi
-#endif
-
 ifeq ($(TARGETGEN),$(DYNAGEN))
 default-install:
 	mkdir -p $(INST_LIB)/ogdi
