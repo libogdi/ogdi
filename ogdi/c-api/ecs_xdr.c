@@ -4,9 +4,7 @@
  */
 
 #include "ecs.h"
-#ifdef __GNU_LIBRARY__
 #include <ogdi_macro.h>
-#endif
 
 bool_t
 xdr_ecs_Family(register XDR *xdrs, ecs_Family *objp)

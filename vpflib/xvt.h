@@ -4,7 +4,12 @@
 #include <limits.h>
 #include <ctype.h>
 #include <signal.h>
+
+#ifdef __GNU_LIBRARY__
 #include <wait.h>
+#endif
+
+#include <ogdi_macro.h>
 
 extern  void G_warning (char *msg);
 
@@ -42,6 +47,3 @@ extern  void G_warning (char *msg);
 #define BOOLEAN unsigned char
 /* typedef unsigned char BOOLEAN; */
 
-#ifdef __GNU_LIBRARY__
-#include <ogdi_macro.h>
-#endif

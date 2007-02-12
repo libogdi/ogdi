@@ -63,9 +63,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 
-#ifdef __GNU_LIBRARY__
 #include <ogdi_macro.h>
-#endif
 
 
 

@@ -12,7 +12,12 @@
 #
 
 TOBEGEN	= ogdi
+
+ifeq ($(TARGET),Linux)
 TARGETGEN=$(SHRDGEN)
+else
+TARGETGEN=$(DYNAGEN)
+endif
 
 SOURCES = ecs_dyna.c ecsregex.c ecssplit.c \
           ecsassoc.c ecshash.c ecstile.c server.c ecsdist.c \

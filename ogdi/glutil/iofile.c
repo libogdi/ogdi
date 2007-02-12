@@ -11,9 +11,7 @@
 #endif
 
 #include "glutil.h"
-#ifdef __GNU_LIBRARY__
 #include <ogdi_macro.h>
-#endif
 /*
  *----------------------------------------------------------------------
  * remove_dir 

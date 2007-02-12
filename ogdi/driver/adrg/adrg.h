@@ -17,7 +17,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.7  2007-02-12 16:09:06  cbalint
+ * Revision 1.8  2007-02-12 21:01:48  cbalint
+ *      Fix win32 target. It build and works now. (tested with VC6)
+ *
+ * Revision 1.7  2007/02/12 16:09:06  cbalint
  *   *  Add hook macros for all GNU systems, hook fread,fwrite,read,fgets.
  *   *  Handle errors in those macro, if there are any.
  *   *  Fix some includes for GNU systems.
@@ -56,9 +59,8 @@
 #endif
 #include <fcntl.h>
 
-#ifdef __GNU_LIBRARY__
 #include <ogdi_macro.h>
-#endif
+
 #define MAXADRGTILES 26
 
 #ifndef max
