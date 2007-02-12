@@ -4,12 +4,15 @@
  */
 
 #include "ecs.h"
+#ifdef __GNU_LIBRARY__
+#include <ogdi_macro.h>
+#endif
 
 bool_t
 xdr_ecs_Family(register XDR *xdrs, ecs_Family *objp)
 {
 
-	register long *buf;
+//	register long *buf;
 
 	if (!xdr_enum(xdrs, (enum_t *)objp))
 		return (FALSE);
@@ -20,7 +23,7 @@ bool_t
 xdr_ecs_Region(register XDR *xdrs, ecs_Region *objp)
 {
 
-	register long *buf;
+//	register long *buf;
 
 	if (!xdr_double(xdrs, &objp->north))
 		return (FALSE);
@@ -41,7 +44,7 @@ bool_t
 xdr_ecs_Resampling(register XDR *xdrs, ecs_Resampling *objp)
 {
 
-	register long *buf;
+//        register long *buf;
 
 	if (!xdr_enum(xdrs, (enum_t *)objp))
 		return (FALSE);
@@ -52,7 +55,7 @@ bool_t
 xdr_ecs_Transformation(register XDR *xdrs, ecs_Transformation *objp)
 {
 
-	register long *buf;
+//	register long *buf;
 
 	if (!xdr_enum(xdrs, (enum_t *)objp))
 		return (FALSE);
@@ -63,7 +66,7 @@ bool_t
 xdr_ecs_RasterConversion(register XDR *xdrs, ecs_RasterConversion *objp)
 {
 
-	register long *buf;
+//	register long *buf;
 
 	if (!xdr_array(xdrs, (char **)&objp->coef.coef_val, (u_int *) &objp->coef.coef_len, ~0,
 		sizeof (double), (xdrproc_t) xdr_double))
@@ -81,7 +84,7 @@ bool_t
 xdr_ecs_Coordinate(register XDR *xdrs, ecs_Coordinate *objp)
 {
 
-	register long *buf;
+//	register long *buf;
 
 	if (!xdr_double(xdrs, &objp->x))
 		return (FALSE);
@@ -94,7 +97,7 @@ bool_t
 xdr_ecs_FeatureRing(register XDR *xdrs, ecs_FeatureRing *objp)
 {
 
-	register long *buf;
+//	register long *buf;
 
 	if (!xdr_ecs_Coordinate(xdrs, &objp->centroid))
 		return (FALSE);
@@ -108,7 +111,7 @@ bool_t
 xdr_ecs_Area(register XDR *xdrs, ecs_Area *objp)
 {
 
-	register long *buf;
+//	register long *buf;
 
 	if (!xdr_array(xdrs, (char **)&objp->ring.ring_val, (u_int *) &objp->ring.ring_len, ~0,
 		sizeof (ecs_FeatureRing), (xdrproc_t) xdr_ecs_FeatureRing))
@@ -120,7 +123,7 @@ bool_t
 xdr_ecs_Line(register XDR *xdrs, ecs_Line *objp)
 {
 
-	register long *buf;
+//	register long *buf;
 
 	if (!xdr_array(xdrs, (char **)&objp->c.c_val, (u_int *) &objp->c.c_len, ~0,
 		sizeof (ecs_Coordinate), (xdrproc_t) xdr_ecs_Coordinate))
@@ -132,7 +135,7 @@ bool_t
 xdr_ecs_Point(register XDR *xdrs, ecs_Point *objp)
 {
 
-	register long *buf;
+//	register long *buf;
 
 	if (!xdr_ecs_Coordinate(xdrs, &objp->c))
 		return (FALSE);
@@ -143,7 +146,7 @@ bool_t
 xdr_ecs_Matrix(register XDR *xdrs, ecs_Matrix *objp)
 {
 
-	register long *buf;
+//	register long *buf;
 
 	if (!xdr_array(xdrs, (char **)&objp->x.x_val, (u_int *) &objp->x.x_len, ~0,
 		sizeof (u_int), (xdrproc_t) xdr_u_int))
@@ -155,7 +158,7 @@ bool_t
 xdr_ecs_Image(register XDR *xdrs, ecs_Image *objp)
 {
 
-	register long *buf;
+//	register long *buf;
 
 	if (!xdr_array(xdrs, (char **)&objp->x.x_val, (u_int *) &objp->x.x_len, ~0,
 		sizeof (u_int), (xdrproc_t) xdr_u_int))
@@ -167,7 +170,7 @@ bool_t
 xdr_ecs_Text(register XDR *xdrs, ecs_Text *objp)
 {
 
-	register long *buf;
+//	register long *buf;
 
 	if (!xdr_string(xdrs, &objp->desc, ~0))
 		return (FALSE);
@@ -180,7 +183,7 @@ bool_t
 xdr_ecs_Node(register XDR *xdrs, ecs_Node *objp)
 {
 
-	register long *buf;
+//	register long *buf;
 
 	if (!xdr_int(xdrs, &objp->id))
 		return (FALSE);
@@ -195,8 +198,7 @@ bool_t
 xdr_ecs_Edge(register XDR *xdrs, ecs_Edge *objp)
 {
 
-	register long *buf;
-
+	register int *buf;
 
 	if (xdrs->x_op == XDR_ENCODE) {
 		buf = XDR_INLINE(xdrs, 7 * BYTES_PER_XDR_UNIT);
@@ -217,13 +219,13 @@ xdr_ecs_Edge(register XDR *xdrs, ecs_Edge *objp)
 				return (FALSE);
 
 		} else {
-			IXDR_PUT_LONG(buf, objp->id);
-			IXDR_PUT_LONG(buf, objp->startnodeid);
-			IXDR_PUT_LONG(buf, objp->endnodeid);
-			IXDR_PUT_LONG(buf, objp->rightfaceid);
-			IXDR_PUT_LONG(buf, objp->leftfaceid);
-			IXDR_PUT_LONG(buf, objp->rightfedgeid);
-			IXDR_PUT_LONG(buf, objp->leftfedgeid);
+			ogdi_IXDR_PUT_LONG(buf, objp->id);
+			ogdi_IXDR_PUT_LONG(buf, objp->startnodeid);
+			ogdi_IXDR_PUT_LONG(buf, objp->endnodeid);
+			ogdi_IXDR_PUT_LONG(buf, objp->rightfaceid);
+			ogdi_IXDR_PUT_LONG(buf, objp->leftfaceid);
+			ogdi_IXDR_PUT_LONG(buf, objp->rightfedgeid);
+			ogdi_IXDR_PUT_LONG(buf, objp->leftfedgeid);
 		}
 		if (!xdr_array(xdrs, (char **)&objp->c.c_val, (u_int *) &objp->c.c_len, ~0,
 			sizeof (ecs_Coordinate), (xdrproc_t) xdr_ecs_Coordinate))
@@ -286,7 +288,7 @@ bool_t
 xdr_ecs_TopoLevel(register XDR *xdrs, ecs_TopoLevel *objp)
 {
 
-	register long *buf;
+//	register long *buf;
 
 	if (!xdr_enum(xdrs, (enum_t *)objp))
 		return (FALSE);
@@ -297,7 +299,7 @@ bool_t
 xdr_ecs_Face(register XDR *xdrs, ecs_Face *objp)
 {
 
-	register long *buf;
+//	register long *buf;
 
 	if (!xdr_int(xdrs, &objp->id))
 		return (FALSE);
@@ -311,7 +313,7 @@ bool_t
 xdr_ecs_AreaPrim(register XDR *xdrs, ecs_AreaPrim *objp)
 {
 
-	register long *buf;
+//	register long *buf;
 
 	if (!xdr_ecs_TopoLevel(xdrs, &objp->level))
 		return (FALSE);
@@ -334,7 +336,7 @@ bool_t
 xdr_ecs_Geometry(register XDR *xdrs, ecs_Geometry *objp)
 {
 
-	register long *buf;
+//	register long *buf;
 
 	if (!xdr_ecs_Family(xdrs, &objp->family))
 		return (FALSE);
@@ -375,6 +377,8 @@ xdr_ecs_Geometry(register XDR *xdrs, ecs_Geometry *objp)
 		if (!xdr_ecs_AreaPrim(xdrs, &objp->ecs_Geometry_u.ring))
 			return (FALSE);
 		break;
+	case Face:
+		break;
 	}
 	return (TRUE);
 }
@@ -383,7 +387,7 @@ bool_t
 xdr_ecs_Object(register XDR *xdrs, ecs_Object *objp)
 {
 
-	register long *buf;
+//	register long *buf;
 
 	if (!xdr_string(xdrs, &objp->Id, ~0))
 		return (FALSE);
@@ -406,7 +410,7 @@ bool_t
 xdr_ecs_AttributeFormat(register XDR *xdrs, ecs_AttributeFormat *objp)
 {
 
-	register long *buf;
+//	register long *buf;
 
 	if (!xdr_enum(xdrs, (enum_t *)objp))
 		return (FALSE);
@@ -417,7 +421,7 @@ bool_t
 xdr_ecs_ObjAttribute(register XDR *xdrs, ecs_ObjAttribute *objp)
 {
 
-	register long *buf;
+//	register long *buf;
 
 	if (!xdr_string(xdrs, &objp->name, ~0))
 		return (FALSE);
@@ -436,7 +440,7 @@ bool_t
 xdr_ecs_ObjAttributeFormat(register XDR *xdrs, ecs_ObjAttributeFormat *objp)
 {
 
-	register long *buf;
+//	register long *buf;
 
 	if (!xdr_array(xdrs, (char **)&objp->oa.oa_val, (u_int *) &objp->oa.oa_len, ~0,
 		sizeof (ecs_ObjAttribute), (xdrproc_t) xdr_ecs_ObjAttribute))
@@ -448,7 +452,7 @@ bool_t
 xdr_ecs_Category(register XDR *xdrs, ecs_Category *objp)
 {
 
-	register long *buf;
+//	register long *buf;
 
 	if (!xdr_long(xdrs, &objp->no_cat))
 		return (FALSE);
@@ -469,7 +473,7 @@ bool_t
 xdr_ecs_RasterInfo(register XDR *xdrs, ecs_RasterInfo *objp)
 {
 
-	register long *buf;
+//	register long *buf;
 
 	if (!xdr_long(xdrs, &objp->mincat))
 		return (FALSE);
@@ -489,8 +493,7 @@ bool_t
 xdr_ecs_Compression(register XDR *xdrs, ecs_Compression *objp)
 {
 
-	register long *buf;
-
+	register int *buf;
 
 	if (xdrs->x_op == XDR_ENCODE) {
 		buf = XDR_INLINE(xdrs, 6 * BYTES_PER_XDR_UNIT);
@@ -508,12 +511,12 @@ xdr_ecs_Compression(register XDR *xdrs, ecs_Compression *objp)
 			if (!xdr_u_int(xdrs, &objp->cfullsize))
 				return (FALSE);
 		} else {
-			IXDR_PUT_U_LONG(buf, objp->cachesize);
-			IXDR_PUT_U_LONG(buf, objp->ctype);
-			IXDR_PUT_U_LONG(buf, objp->cversion);
-			IXDR_PUT_U_LONG(buf, objp->clevel);
-			IXDR_PUT_U_LONG(buf, objp->cblksize);
-			IXDR_PUT_U_LONG(buf, objp->cfullsize);
+			ogdi_IXDR_PUT_U_LONG(buf, objp->cachesize);
+			ogdi_IXDR_PUT_U_LONG(buf, objp->ctype);
+			ogdi_IXDR_PUT_U_LONG(buf, objp->cversion);
+			ogdi_IXDR_PUT_U_LONG(buf, objp->clevel);
+			ogdi_IXDR_PUT_U_LONG(buf, objp->cblksize);
+			ogdi_IXDR_PUT_U_LONG(buf, objp->cfullsize);
 		}
 		return (TRUE);
 	} else if (xdrs->x_op == XDR_DECODE) {
@@ -561,7 +564,7 @@ bool_t
 xdr_ecs_ResultType(register XDR *xdrs, ecs_ResultType *objp)
 {
 
-	register long *buf;
+//	register long *buf;
 
 	if (!xdr_enum(xdrs, (enum_t *)objp))
 		return (FALSE);
@@ -572,7 +575,7 @@ bool_t
 xdr_ecs_ResultUnion(register XDR *xdrs, ecs_ResultUnion *objp)
 {
 
-	register long *buf;
+//	register long *buf;
 
 	if (!xdr_ecs_ResultType(xdrs, &objp->type))
 		return (FALSE);
@@ -602,6 +605,8 @@ xdr_ecs_ResultUnion(register XDR *xdrs, ecs_ResultUnion *objp)
 			sizeof (ecs_ResultUnion), (xdrproc_t) xdr_ecs_ResultUnion))
 			return (FALSE);
 		break;
+	case SimpleError:
+		break;
 	}
 	return (TRUE);
 }
@@ -610,7 +615,7 @@ bool_t
 xdr_ecs_Result_Work(register XDR *xdrs, ecs_Result *objp)
 {
 
-	register long *buf;
+//	register long *buf;
 
 	if (!xdr_int(xdrs, &objp->error))
 		return (FALSE);
@@ -625,7 +630,7 @@ bool_t
 xdr_ecs_LayerSelection(register XDR *xdrs, ecs_LayerSelection *objp)
 {
 
-	register long *buf;
+//	register long *buf;
 
 	if (!xdr_string(xdrs, &objp->Select, ~0))
 		return (FALSE);
@@ -638,7 +643,7 @@ bool_t
 xdr_ecs_ProxyCreateServer(register XDR *xdrs, ecs_ProxyCreateServer *objp)
 {
 
-	register long *buf;
+//	register long *buf;
 
 	if (!xdr_string(xdrs, &objp->server_name, ~0))
 		return (FALSE);

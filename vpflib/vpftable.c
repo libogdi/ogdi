@@ -366,13 +366,12 @@ int32 parse_data_def (vpf_table_type *table)
   int32 ddlen;
   int32 reclen = 0;
 
-
   if (table->mode == Read)
     {
-      fread ((void*)&ddlen, sizeof(ddlen), 1, table->fp);
+      ogdi_fread ((void*)&ddlen, sizeof(ddlen), 1, table->fp);
 
       /* Check the next byte to see if the byte order is specified */
-      fread (&byte, 1, 1, table->fp);
+      ogdi_fread (&byte, 1, 1, table->fp);
       p = 0;
       table->byte_order = LEAST_SIGNIFICANT; /* default */
       switch (toupper (byte))
@@ -1142,7 +1141,7 @@ void vpf_close_table( vpf_table_type *table )
 	free_row (table->row[i], *table);
       if (table->row != (ROW*)NULL)
 	{
-	  gunlock (table->row_handle);
+//	  gunlock (table->row_handle);
 	  gfree (table->row_handle);
 	  table->row = (ROW*)NULL;
 	}
@@ -1162,7 +1161,7 @@ void vpf_close_table( vpf_table_type *table )
     case RAM:
       if (table->index != (index_type)NULL)
 	{
-	  gunlock (table->idx_handle);
+//	  gunlock (table->idx_handle);
 	  gfree (table->idx_handle);
 	  table->index = (index_type)NULL;
 	}

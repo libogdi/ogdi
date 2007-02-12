@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id$
+ * dbfopen.c,v 1.1 2000/11/23 19:13:49 warmerda Exp
  *
  * Project:  Shapelib
  * Purpose:  Implementation of .dbf access API documented in dbf_api.html.
@@ -33,8 +33,8 @@
  * DEALINGS IN THE SOFTWARE.
  ******************************************************************************
  *
- * $Log$
- * Revision 1.1  2000-11-23 19:13:49  warmerda
+ * dbfopen.c,v
+ * Revision 1.1  2000/11/23 19:13:49  warmerda
  * new
  *
  * Revision 1.29  2000/10/05 14:36:44  warmerda
@@ -131,8 +131,6 @@
  * Added header.
  */
 
-static char rcsid[] = 
-  "$Id$";
 
 #include "shapefil.h"
 
@@ -205,8 +203,8 @@ static void DBFWriteHeader(DBFHandle psDBF)
 /*      descriptions.                                     		*/
 /* -------------------------------------------------------------------- */
     fseek( psDBF->fp, 0, 0 );
-    fwrite( abyHeader, XBASE_FLDHDR_SZ, 1, psDBF->fp );
-    fwrite( psDBF->pszHeader, XBASE_FLDHDR_SZ, psDBF->nFields, psDBF->fp );
+    ogdi_fwrite( abyHeader, XBASE_FLDHDR_SZ, 1, psDBF->fp );
+    ogdi_fwrite( psDBF->pszHeader, XBASE_FLDHDR_SZ, psDBF->nFields, psDBF->fp );
 
 /* -------------------------------------------------------------------- */
 /*      Write out the newline character if there is room for it.        */
@@ -216,7 +214,7 @@ static void DBFWriteHeader(DBFHandle psDBF)
         char	cNewline;
 
         cNewline = 0x0d;
-        fwrite( &cNewline, 1, 1, psDBF->fp );
+        ogdi_fwrite( &cNewline, 1, 1, psDBF->fp );
     }
 }
 
@@ -239,7 +237,7 @@ static void DBFFlushRecord( DBFHandle psDBF )
 	                                             + psDBF->nHeaderLength;
 
 	fseek( psDBF->fp, nRecordOffset, 0 );
-	fwrite( psDBF->pszCurrentRecord, psDBF->nRecordLength, 1, psDBF->fp );
+	ogdi_fwrite( psDBF->pszCurrentRecord, psDBF->nRecordLength, 1, psDBF->fp );
     }
 }
 
@@ -308,7 +306,7 @@ DBFHandle DBFOpen( const char * pszFilename, const char * pszAccess )
 /*  Read Table Header info                                              */
 /* -------------------------------------------------------------------- */
     pabyBuf = (unsigned char *) malloc(500);
-    fread( pabyBuf, 32, 1, psDBF->fp );
+    ogdi_fread( pabyBuf, 32, 1, psDBF->fp );
 
     psDBF->nRecords = nRecords = 
      pabyBuf[4] + pabyBuf[5]*256 + pabyBuf[6]*256*256 + pabyBuf[7]*256*256*256;
@@ -328,7 +326,7 @@ DBFHandle DBFOpen( const char * pszFilename, const char * pszAccess )
     psDBF->pszHeader = (char *) pabyBuf;
 
     fseek( psDBF->fp, 32, 0 );
-    fread( pabyBuf, nHeadLen, 1, psDBF->fp );
+    ogdi_fread( pabyBuf, nHeadLen, 1, psDBF->fp );
 
     psDBF->panFieldOffset = (int *) malloc(sizeof(int) * nFields);
     psDBF->panFieldSize = (int *) malloc(sizeof(int) * nFields);
@@ -386,7 +384,7 @@ void	DBFClose(DBFHandle psDBF)
 	unsigned char		abyFileHeader[32];
 
 	fseek( psDBF->fp, 0, 0 );
-	fread( abyFileHeader, 32, 1, psDBF->fp );
+	ogdi_fread( abyFileHeader, 32, 1, psDBF->fp );
 
 	abyFileHeader[1] = 95;			/* YY */
 	abyFileHeader[2] = 7;			/* MM */
@@ -398,7 +396,7 @@ void	DBFClose(DBFHandle psDBF)
 	abyFileHeader[7] = (psDBF->nRecords/(256*256*256)) % 256;
 
 	fseek( psDBF->fp, 0, 0 );
-	fwrite( abyFileHeader, 32, 1, psDBF->fp );
+	ogdi_fwrite( abyFileHeader, 32, 1, psDBF->fp );
     }
 
 /* -------------------------------------------------------------------- */
@@ -872,7 +870,7 @@ static int DBFWriteAttribute(DBFHandle psDBF, int hEntity, int iField,
 	nRecordOffset = psDBF->nRecordLength * hEntity + psDBF->nHeaderLength;
 
 	fseek( psDBF->fp, nRecordOffset, 0 );
-	fread( psDBF->pszCurrentRecord, psDBF->nRecordLength, 1, psDBF->fp );
+	ogdi_fread( psDBF->pszCurrentRecord, psDBF->nRecordLength, 1, psDBF->fp );
 
 	psDBF->nCurrentRecord = hEntity;
     }
@@ -1027,7 +1025,7 @@ int DBFWriteTuple(DBFHandle psDBF, int hEntity, void * pRawTuple )
 	nRecordOffset = psDBF->nRecordLength * hEntity + psDBF->nHeaderLength;
 
 	fseek( psDBF->fp, nRecordOffset, 0 );
-	fread( psDBF->pszCurrentRecord, psDBF->nRecordLength, 1, psDBF->fp );
+	ogdi_fread( psDBF->pszCurrentRecord, psDBF->nRecordLength, 1, psDBF->fp );
 
 	psDBF->nCurrentRecord = hEntity;
     }
@@ -1070,7 +1068,7 @@ const char *DBFReadTuple(DBFHandle psDBF, int hEntity )
 	nRecordOffset = psDBF->nRecordLength * hEntity + psDBF->nHeaderLength;
 
 	fseek( psDBF->fp, nRecordOffset, 0 );
-	fread( psDBF->pszCurrentRecord, psDBF->nRecordLength, 1, psDBF->fp );
+	ogdi_fread( psDBF->pszCurrentRecord, psDBF->nRecordLength, 1, psDBF->fp );
 
 	psDBF->nCurrentRecord = hEntity;
     }

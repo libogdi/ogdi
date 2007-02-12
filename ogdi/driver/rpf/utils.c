@@ -17,7 +17,24 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.8  2004-03-29 05:18:05  warmerda
+ * Revision 1.9  2007-02-12 16:09:06  cbalint
+ *   *  Add hook macros for all GNU systems, hook fread,fwrite,read,fgets.
+ *   *  Handle errors in those macro, if there are any.
+ *   *  Fix some includes for GNU systems.
+ *   *  Reduce remaining warnings, now we got zero warnings with GCC.
+ *
+ *  Modified Files:
+ *  	config/unix.mak contrib/ogdi_import/dbfopen.c
+ *  	contrib/ogdi_import/shapefil.h contrib/ogdi_import/shpopen.c
+ *  	ogdi/c-api/ecs_xdr.c ogdi/c-api/ecsinfo.c ogdi/c-api/server.c
+ *  	ogdi/datum_driver/canada/nadconv.c ogdi/driver/adrg/adrg.c
+ *  	ogdi/driver/adrg/adrg.h ogdi/driver/adrg/object.c
+ *  	ogdi/driver/adrg/utils.c ogdi/driver/rpf/rpf.h
+ *  	ogdi/driver/rpf/utils.c ogdi/gltpd/asyncsvr.c
+ *  	ogdi/glutil/iofile.c vpflib/vpfprim.c vpflib/vpfspx.c
+ *  	vpflib/vpftable.c vpflib/vpftidx.c vpflib/xvt.h
+ *
+ * Revision 1.8  2004/03/29 05:18:05  warmerda
  * Added check for FSDEVG field when reading TOC file (in parse_toc).
  * Apparently needed for CIB1 data, as per bug 917678.
  *
@@ -795,7 +812,7 @@ Toc_entry *parse_toc(ecs_Server *s, char *dir, Header *head, uint *num_boundarie
  /* Check for NITF header */
 
   fseek(toc, 0, SEEK_SET);
-  fread(NITF, 4L, 1, toc) ;
+  ogdi_fread(NITF, 4L, 1, toc) ;
   NITF[4] = '\0';
   if (strcmp(NITF, "NITF") == 0) /* Match: skip NITF hdr */
   {
@@ -808,7 +825,7 @@ Toc_entry *parse_toc(ecs_Server *s, char *dir, Header *head, uint *num_boundarie
       /* Adjust hdr length by 40 characters if needed */
       /* note: rpf/cib1 products need this */
       fseek(toc, 280, SEEK_SET);
-      fread(FSDWNG, 6L, 1, toc);
+      ogdi_fread(FSDWNG, 6L, 1, toc);
       if( memcmp(FSDWNG, "999998", 6) == 0 )
           head->NITF_hdr_len += 40L;
   }
@@ -823,22 +840,22 @@ Toc_entry *parse_toc(ecs_Server *s, char *dir, Header *head, uint *num_boundarie
 
  /* Read header */
 
-  fread(&head->endian, sizeof(head->endian), 1, toc) ;   /* 1 byte */
+  ogdi_fread(&head->endian, sizeof(head->endian), 1, toc) ;   /* 1 byte */
   check_swap(head->endian);
 
-  fread(&head->hdr_sec_len, sizeof(head->hdr_sec_len), 1, toc);  /* 2 bytes */
+  ogdi_fread(&head->hdr_sec_len, sizeof(head->hdr_sec_len), 1, toc);  /* 2 bytes */
   swap((ucharp)&head->hdr_sec_len, sizeof(head->hdr_sec_len)) ;
-  fread(head->filename, sizeof(head->filename), 1, toc);  /* 12 bytes */
+  ogdi_fread(head->filename, sizeof(head->filename), 1, toc);  /* 12 bytes */
 
  /* Read rest of header so we can write it later */
 
-  fread(&head->new, sizeof(head->new), 1, toc) ;
-  fread(head->standard_num, sizeof(head->standard_num), 1, toc) ;
-  fread(head->standard_date, sizeof(head->standard_date), 1, toc);
-  fread(&head->classification, sizeof(head->classification), 1, toc);
-  fread(head->country, sizeof(head->country), 1, toc);
-  fread(head->release, sizeof(head->release), 1, toc); 
-  fread(&head->loc_sec_phys_loc, sizeof(head->loc_sec_phys_loc), 1, toc) ;
+  ogdi_fread(&head->new, sizeof(head->new), 1, toc) ;
+  ogdi_fread(head->standard_num, sizeof(head->standard_num), 1, toc) ;
+  ogdi_fread(head->standard_date, sizeof(head->standard_date), 1, toc);
+  ogdi_fread(&head->classification, sizeof(head->classification), 1, toc);
+  ogdi_fread(head->country, sizeof(head->country), 1, toc);
+  ogdi_fread(head->release, sizeof(head->release), 1, toc); 
+  ogdi_fread(&head->loc_sec_phys_loc, sizeof(head->loc_sec_phys_loc), 1, toc) ;
   swap((ucharp)&head->loc_sec_phys_loc,sizeof(head->loc_sec_phys_loc));
 
  /* Fseek to start of location section */
@@ -866,9 +883,9 @@ Toc_entry *parse_toc(ecs_Server *s, char *dir, Header *head, uint *num_boundarie
  /* Number of Boundary records */
 
   fseek(toc, locations[0].phys_index, SEEK_SET);
-  fread(&bnd_rec_tbl_off, sizeof(bnd_rec_tbl_off), 1, toc);
+  ogdi_fread(&bnd_rec_tbl_off, sizeof(bnd_rec_tbl_off), 1, toc);
   swap((ucharp)&bnd_rec_tbl_off, sizeof(bnd_rec_tbl_off));
-  fread(&n, sizeof(n), 1, toc);
+  ogdi_fread(&n, sizeof(n), 1, toc);
   swap((ucharp)&n, sizeof(n));
 
   *num_boundaries = (int)n;
@@ -877,7 +894,7 @@ Toc_entry *parse_toc(ecs_Server *s, char *dir, Header *head, uint *num_boundarie
 
  /* Boundary record length */
 
-  fread(&Bound_rec_len, sizeof(Bound_rec_len), 1, toc) ;
+  ogdi_fread(&Bound_rec_len, sizeof(Bound_rec_len), 1, toc) ;
   swap((ucharp)&Bound_rec_len, sizeof(Bound_rec_len));
 
   fseek(toc, locations[1].phys_index, SEEK_SET);
@@ -892,7 +909,7 @@ Toc_entry *parse_toc(ecs_Server *s, char *dir, Header *head, uint *num_boundarie
     }
   for (i = 0; i < (int)n; i++)
   {
-    fread(&entries[i].type, 1, 5, toc);         /* e.g. "CADRG" */
+    ogdi_fread(&entries[i].type, 1, 5, toc);         /* e.g. "CADRG" */
     entries[i].type[5] = '\0';
     if (i == 0L)
     {
@@ -903,25 +920,25 @@ Toc_entry *parse_toc(ecs_Server *s, char *dir, Header *head, uint *num_boundarie
       else if (strncmp(entries[i].type,"CDTED",5) == 0)
 	head->rpf_type = RPF_CDTED;
     }
-    fread(&entries[i].compression, 1, 5, toc);
-    fread(&entries[i].scale, 1, 12, toc);
-    fread(&entries[i].zone, 1, 1, toc);
-    fread(&entries[i].producer, 1, 5, toc);
+    ogdi_fread(&entries[i].compression, 1, 5, toc);
+    ogdi_fread(&entries[i].scale, 1, 12, toc);
+    ogdi_fread(&entries[i].zone, 1, 1, toc);
+    ogdi_fread(&entries[i].producer, 1, 5, toc);
 
-    fread(&entries[i].nw_lat, sizeof(real8), 1, toc);
-    fread(&entries[i].nw_long, sizeof(real8), 1, toc);
-    fread(&entries[i].sw_lat, sizeof(real8), 1, toc);
-    fread(&entries[i].sw_long, sizeof(real8), 1, toc);
-    fread(&entries[i].ne_lat, sizeof(real8), 1, toc);
-    fread(&entries[i].ne_long, sizeof(real8), 1, toc);
-    fread(&entries[i].se_lat, sizeof(real8), 1, toc);
-    fread(&entries[i].se_long, sizeof(real8), 1, toc);
-    fread(&entries[i].vert_resolution, sizeof(real8), 1, toc);
-    fread(&entries[i].horiz_resolution, sizeof(real8), 1, toc);
-    fread(&entries[i].vert_interval, sizeof(real8), 1, toc);
-    fread(&entries[i].horiz_interval, sizeof(real8), 1, toc);
-    fread(&entries[i].vert_frames, sizeof(uint), 1, toc);
-    fread(&entries[i].horiz_frames, sizeof(uint), 1, toc);
+    ogdi_fread(&entries[i].nw_lat, sizeof(real8), 1, toc);
+    ogdi_fread(&entries[i].nw_long, sizeof(real8), 1, toc);
+    ogdi_fread(&entries[i].sw_lat, sizeof(real8), 1, toc);
+    ogdi_fread(&entries[i].sw_long, sizeof(real8), 1, toc);
+    ogdi_fread(&entries[i].ne_lat, sizeof(real8), 1, toc);
+    ogdi_fread(&entries[i].ne_long, sizeof(real8), 1, toc);
+    ogdi_fread(&entries[i].se_lat, sizeof(real8), 1, toc);
+    ogdi_fread(&entries[i].se_long, sizeof(real8), 1, toc);
+    ogdi_fread(&entries[i].vert_resolution, sizeof(real8), 1, toc);
+    ogdi_fread(&entries[i].horiz_resolution, sizeof(real8), 1, toc);
+    ogdi_fread(&entries[i].vert_interval, sizeof(real8), 1, toc);
+    ogdi_fread(&entries[i].horiz_interval, sizeof(real8), 1, toc);
+    ogdi_fread(&entries[i].vert_frames, sizeof(uint), 1, toc);
+    ogdi_fread(&entries[i].horiz_frames, sizeof(uint), 1, toc);
 
     swap((ucharp)&entries[i].nw_lat, sizeof(real8));
     swap((ucharp)&entries[i].nw_long, sizeof(real8));
@@ -996,15 +1013,15 @@ Toc_entry *parse_toc(ecs_Server *s, char *dir, Header *head, uint *num_boundarie
  /* locations[2] is loc of frame file index section subheader */
 
   fseek(toc, locations[2].phys_index + 1, SEEK_SET);
-  fread(&frm_index_tbl_off, sizeof(frm_index_tbl_off), 1, toc);
+  ogdi_fread(&frm_index_tbl_off, sizeof(frm_index_tbl_off), 1, toc);
   swap((ucharp)&frm_index_tbl_off, sizeof(frm_index_tbl_off));
-  fread(&N_index_recs, sizeof(N_index_recs), 1, toc);
+  ogdi_fread(&N_index_recs, sizeof(N_index_recs), 1, toc);
   swap((ucharp)&N_index_recs, sizeof(N_index_recs));
 
-  fread(&N_pathname_recs, sizeof(N_pathname_recs), 1, toc);
+  ogdi_fread(&N_pathname_recs, sizeof(N_pathname_recs), 1, toc);
   swap((ucharp)&N_pathname_recs, sizeof(N_pathname_recs));
 
-  fread(&Index_rec_len, sizeof(Index_rec_len), 1, toc);
+  ogdi_fread(&Index_rec_len, sizeof(Index_rec_len), 1, toc);
   swap((ucharp)&Index_rec_len, sizeof(Index_rec_len));
 
  /* Read frame file index records */
@@ -1016,7 +1033,7 @@ Toc_entry *parse_toc(ecs_Server *s, char *dir, Header *head, uint *num_boundarie
 
     fseek(toc, locations[3].phys_index + Index_rec_len*i, SEEK_SET);
 
-    fread(&boundary_id, sizeof(boundary_id), 1, toc);
+    ogdi_fread(&boundary_id, sizeof(boundary_id), 1, toc);
     swap((ucharp)&boundary_id, sizeof(boundary_id));
     if (i == 0 && boundary_id == 0)
        new_boundary_ids = 1L;
@@ -1033,8 +1050,8 @@ Toc_entry *parse_toc(ecs_Server *s, char *dir, Header *head, uint *num_boundarie
     entry = &entries[boundary_id];
     entry->boundary_id = boundary_id;
 
-    fread(&frame_row, sizeof(frame_row), 1, toc);
-    fread(&frame_col, sizeof(frame_col), 1, toc);
+    ogdi_fread(&frame_row, sizeof(frame_row), 1, toc);
+    ogdi_fread(&frame_col, sizeof(frame_col), 1, toc);
     swap((ucharp)&frame_row, sizeof(frame_row));
     swap((ucharp)&frame_col, sizeof(frame_col));
     if (new_boundary_ids == 0L)
@@ -1076,12 +1093,12 @@ Toc_entry *parse_toc(ecs_Server *s, char *dir, Header *head, uint *num_boundarie
 
    /* Pathname offset */
 
-    fread(&path_off, sizeof(path_off), 1, toc);
+    ogdi_fread(&path_off, sizeof(path_off), 1, toc);
     swap((ucharp)&path_off, sizeof(path_off));
 
    /* Get filename tail */
 
-    fread(frame->filename, 1, 12, toc);
+    ogdi_fread(frame->filename, 1, 12, toc);
     frame->filename[12] = '\0';
 #ifndef _WINDOWS
     dyn_string_tolower((char *) frame->filename);
@@ -1099,7 +1116,7 @@ Toc_entry *parse_toc(ecs_Server *s, char *dir, Header *head, uint *num_boundarie
 
    /* Get file geo reference */
 
-    fread(frame->georef, 1, 6, toc);
+    ogdi_fread(frame->georef, 1, 6, toc);
     frame->georef[6] = '\0';
 
    /* Go to start of pathname record */
@@ -1108,7 +1125,7 @@ Toc_entry *parse_toc(ecs_Server *s, char *dir, Header *head, uint *num_boundarie
 
     fseek(toc, locations[3].phys_index + path_off, SEEK_SET); 
 
-    fread(&path_length, sizeof(path_length), 1, toc);
+    ogdi_fread(&path_length, sizeof(path_length), 1, toc);
     swap((ucharp)&path_length, sizeof(path_length));
 
     frame->directory = (char *) malloc((size_t)path_length + (size_t)4L +
@@ -1129,7 +1146,7 @@ Toc_entry *parse_toc(ecs_Server *s, char *dir, Header *head, uint *num_boundarie
 
    /* Read directory name from toc. */
 
-    fread(directory, 1, path_length, toc);
+    ogdi_fread(directory, 1, path_length, toc);
     directory[path_length] = '\0';
 
    /* Skip 1st 2 chars: "./": */
@@ -1172,7 +1189,6 @@ int parse_locations(ecs_Server *s, FILE *fin, Location *locs, int count)
   uint     phys_index;
   ushort   us;
   uint     ui;
-
   (void) s;
 
  /* Initialize indices so we can later tell if they weren't found */
@@ -1182,36 +1198,36 @@ int parse_locations(ecs_Server *s, FILE *fin, Location *locs, int count)
 
  /* Skip location section length */
 
-  fread(&us, sizeof(us), 1, fin);
+  ogdi_fread(&us, sizeof(us), 1, fin);
 
  /* Skip component location table offset */
 
-  fread(&ui, sizeof(ui), 1, fin);
+  ogdi_fread(&ui, sizeof(ui), 1, fin);
 
  /* How many sections: # of section location records */
 
-  fread(&n, sizeof(n), 1, fin);
+  ogdi_fread(&n, sizeof(n), 1, fin);
   swap((ucharp)&n, sizeof(n));
 
  /* Skip location record length */
 
-  fread(&us, sizeof(us), 1, fin);
+  ogdi_fread(&us, sizeof(us), 1, fin);
 
  /* Skip component aggregate length */
 
-  fread(&ui, sizeof(ui), 1, fin);
+  ogdi_fread(&ui, sizeof(ui), 1, fin);
 
  /* Now go find the ones we want */
 
   for (i = 0; i < (int)n; i++)
   {
-    fread(&id, sizeof(id), 1, fin);
+    ogdi_fread(&id, sizeof(id), 1, fin);
 
    /* Skip section length */
 
-    fread(&ui, sizeof(ui), 1, fin);
+    ogdi_fread(&ui, sizeof(ui), 1, fin);
 
-    fread(&phys_index, sizeof(phys_index), 1, fin);
+    ogdi_fread(&phys_index, sizeof(phys_index), 1, fin);
 
     swap((ucharp)&id, sizeof(id));
     swap((ucharp)&phys_index, sizeof(phys_index));
@@ -1300,7 +1316,7 @@ uchar *blackpixel;
 
   fseek(fin, 48-4, SEEK_CUR);
 
-  fread(&loc_sec_phys_loc, sizeof(loc_sec_phys_loc), 1, fin);
+  ogdi_fread(&loc_sec_phys_loc, sizeof(loc_sec_phys_loc), 1, fin);
   swap((ucharp)&loc_sec_phys_loc, sizeof(loc_sec_phys_loc));
 
  /* Go to location section */
@@ -1327,11 +1343,11 @@ uchar *blackpixel;
  /* Read section subheader */
  /* Number of offset records:1-5  */
 
-  fread(&N_offset_recs, sizeof(N_offset_recs), 1, fin);
+  ogdi_fread(&N_offset_recs, sizeof(N_offset_recs), 1, fin);
 
  /* Number of color converter offset records */
 
-  fread(&N_cc_offset_recs, sizeof(N_cc_offset_recs), 1, fin);
+  ogdi_fread(&N_cc_offset_recs, sizeof(N_cc_offset_recs), 1, fin);
 
  /* Read colormap offset table */
 
@@ -1359,12 +1375,12 @@ uchar *blackpixel;
 
  /* colormap offset table offset length:4 */
 
-  fread(&clrmap_off_tbl_off, sizeof(clrmap_off_tbl_off), 1, fin);
+  ogdi_fread(&clrmap_off_tbl_off, sizeof(clrmap_off_tbl_off), 1, fin);
   swap((ucharp)&clrmap_off_tbl_off, sizeof(clrmap_off_tbl_off));
 
  /* offset record length:17 */
 
-  fread(&Offset_rec_len, sizeof(Offset_rec_len), 1, fin);
+  ogdi_fread(&Offset_rec_len, sizeof(Offset_rec_len), 1, fin);
   swap((ucharp)&Offset_rec_len, sizeof(Offset_rec_len));
 
  /* Read colormap offset table */
@@ -1374,27 +1390,27 @@ uchar *blackpixel;
 
    /* id: 3:grayscale 4:rgbm216, 5:rgbm32, 6:rgbm16 */
 
-    fread(&table_id[i], sizeof(table_id[i]), 1, fin);
+    ogdi_fread(&table_id[i], sizeof(table_id[i]), 1, fin);
     swap((ucharp)&table_id[i], sizeof(table_id[i]));
 
-    fread(&n_col_recs[i], sizeof(n_col_recs[i]), 1, fin);
+    ogdi_fread(&n_col_recs[i], sizeof(n_col_recs[i]), 1, fin);
     swap((ucharp)&n_col_recs[i], sizeof(n_col_recs[i]));
 
-    fread(&col_elem_len[i], sizeof(col_elem_len[i]), 1, fin);
+    ogdi_fread(&col_elem_len[i], sizeof(col_elem_len[i]), 1, fin);
 
    /* Moved down to here */
 
-    fread(&hist_rec_len[i], sizeof(hist_rec_len[i]), 1, fin);
+    ogdi_fread(&hist_rec_len[i], sizeof(hist_rec_len[i]), 1, fin);
     swap((ucharp)&hist_rec_len[i], sizeof(hist_rec_len[i]));
 
    /* Color table offset */
 
-    fread(&color_tbl_offset[i], sizeof(color_tbl_offset[i]), 1, fin);
+    ogdi_fread(&color_tbl_offset[i], sizeof(color_tbl_offset[i]), 1, fin);
     swap((ucharp)&color_tbl_offset[i], sizeof(color_tbl_offset[i]));
 
    /* Hist. table offset */
 
-    fread(&hist_tbl_offset[i], sizeof(hist_tbl_offset[i]), 1, fin);
+    ogdi_fread(&hist_tbl_offset[i], sizeof(hist_tbl_offset[i]), 1, fin);
     swap((ucharp)&hist_tbl_offset[i], sizeof(hist_tbl_offset[i]));
 
   } /* for i = N_offset_recs */
@@ -1417,11 +1433,11 @@ uchar *blackpixel;
       {
         if (table_id[i] == 3L)
         {
-           fread(&rgb[j].r, 1, 1, fin);             /* rgb is mono */
+           ogdi_fread(&rgb[j].r, 1, 1, fin);             /* rgb is mono */
            rgb[j].g = rgb[j].b = rgb[j].r;
         }
         else
-           fread(&rgb[j], sizeof(rgb[j]), 1, fin);  /* rgb is rgba, size=4 */
+           ogdi_fread(&rgb[j], sizeof(rgb[j]), 1, fin);  /* rgb is rgba, size=4 */
         r = (double)(unsigned char)(rgb[j].r);
         g = (double)(unsigned char)(rgb[j].g);
         b = (double)(unsigned char)(rgb[j].b);
@@ -1443,13 +1459,13 @@ uchar *blackpixel;
 
     fseek(fin, loc[2].phys_index, SEEK_SET);
  
-    fread(&cct_off_tbl_off, sizeof(cct_off_tbl_off), 1, fin);
+    ogdi_fread(&cct_off_tbl_off, sizeof(cct_off_tbl_off), 1, fin);
     swap ((ucharp)&cct_off_tbl_off, sizeof(cct_off_tbl_off)) ;
  
-    fread(&cct_off_recl, sizeof(cct_off_recl), 1, fin);
+    ogdi_fread(&cct_off_recl, sizeof(cct_off_recl), 1, fin);
     swap ((ucharp)&cct_off_recl, sizeof(cct_off_recl)) ;
  
-    fread(&cct_recl, sizeof(cct_recl), 1, fin);
+    ogdi_fread(&cct_recl, sizeof(cct_recl), 1, fin);
     swap ((ucharp)&cct_recl, sizeof(cct_recl)) ;
  
    /* Read colormap conversion table */
@@ -1459,19 +1475,19 @@ uchar *blackpixel;
 
      /* id: 128:cct/rgbm/32, 129:cct/rgbm/16 */
 
-      fread(&cct_id[i], sizeof(cct_id[i]), 1, fin);
+      ogdi_fread(&cct_id[i], sizeof(cct_id[i]), 1, fin);
       swap((ucharp)&cct_id[i], sizeof(cct_id[i]));
 
-      fread(&cct_nrec[i], sizeof(cct_nrec[i]), 1, fin);
+      ogdi_fread(&cct_nrec[i], sizeof(cct_nrec[i]), 1, fin);
       swap((ucharp)&cct_nrec[i], sizeof(cct_nrec[i]));
 
-      fread(&cct_tbl_off[i], sizeof(cct_tbl_off[i]), 1, fin);
+      ogdi_fread(&cct_tbl_off[i], sizeof(cct_tbl_off[i]), 1, fin);
       swap((ucharp)&cct_tbl_off[i], sizeof(cct_tbl_off[i]));
 
-      fread(&cct_src[i], sizeof(cct_src[i]), 1, fin);
+      ogdi_fread(&cct_src[i], sizeof(cct_src[i]), 1, fin);
       swap((ucharp)&cct_src[i], sizeof(cct_src[i]));
 
-      fread(&cct_tgt[i], sizeof(cct_tgt[i]), 1, fin);
+      ogdi_fread(&cct_tgt[i], sizeof(cct_tgt[i]), 1, fin);
       swap((ucharp)&cct_tgt[i], sizeof(cct_tgt[i]));
 
     } /* for i = N_cc_offset_recs */
@@ -1484,27 +1500,27 @@ uchar *blackpixel;
 
      /* id: 3:grayscale 4:rgbm216, 5:rgbm32, 6:rgbm16 */
 
-      fread(&table_id[i], sizeof(table_id[i]), 1, fin);
+      ogdi_fread(&table_id[i], sizeof(table_id[i]), 1, fin);
       swap((ucharp)&table_id[i], sizeof(table_id[i]));
 
-      fread(&n_col_recs[i], sizeof(n_col_recs[i]), 1, fin);
+      ogdi_fread(&n_col_recs[i], sizeof(n_col_recs[i]), 1, fin);
       swap((ucharp)&n_col_recs[i], sizeof(n_col_recs[i]));
 
-      fread(&col_elem_len[i], sizeof(col_elem_len[i]), 1, fin);
+      ogdi_fread(&col_elem_len[i], sizeof(col_elem_len[i]), 1, fin);
 
      /* Moved down to here */
 
-      fread(&hist_rec_len[i], sizeof(hist_rec_len[i]), 1, fin);
+      ogdi_fread(&hist_rec_len[i], sizeof(hist_rec_len[i]), 1, fin);
       swap((ucharp)&hist_rec_len[i], sizeof(hist_rec_len[i]));
 
      /* Color table offset */
 
-      fread(&color_tbl_offset[i], sizeof(color_tbl_offset[i]), 1, fin);
+      ogdi_fread(&color_tbl_offset[i], sizeof(color_tbl_offset[i]), 1, fin);
       swap((ucharp)&color_tbl_offset[i], sizeof(color_tbl_offset[i]));
 
      /* Hist. table offset */
 
-      fread(&hist_tbl_offset[i], sizeof(hist_tbl_offset[i]), 1, fin);
+      ogdi_fread(&hist_tbl_offset[i], sizeof(hist_tbl_offset[i]), 1, fin);
       swap((ucharp)&hist_tbl_offset[i], sizeof(hist_tbl_offset[i]));
 
      /* Go to proper file position wrt colormap subsection (loc[1]) */
@@ -1517,7 +1533,7 @@ uchar *blackpixel;
         mindistblackp = 1.E20;
         for (j = 0; j < (int)n_col_recs[i]; j++)     /* 32 or 16 */
         {
-          fread(&rgb[j], sizeof(rgb[j]), 1, fin);  /* rgb is rgba, size=4 */
+          ogdi_fread(&rgb[j], sizeof(rgb[j]), 1, fin);  /* rgb is rgba, size=4 */
           r = (double)(unsigned char)(rgb[j].r);
           g = (double)(unsigned char)(rgb[j].g);
           b = (double)(unsigned char)(rgb[j].b);
@@ -1540,7 +1556,7 @@ uchar *blackpixel;
 
       if ((i+1L) == ReducedColorTable)
       {
-        fread(cct, sizeof(uint), 216, fin);
+        ogdi_fread(cct, sizeof(uint), 216, fin);
       } /* if table_id */
 
     } /* for i = N_cc_offset_recs */
@@ -1581,7 +1597,7 @@ char *filename;
   uint     lkup_off_tbl_off;     /* 2lookup offset table offset */
   ushort   lkup_tbl_off_recl;    /* lookup table offset record length */
   uint     subfr_mask_tbl_off;   /* subframe mask table offset */
-  int     nsubfr;               /* the number of subframes */
+  int      nsubfr=0;               /* the number of subframes */
   char     string[256];
   register ServerPrivateData *spriv = (ServerPrivateData *) s->priv;
 
@@ -1596,13 +1612,13 @@ char *filename;
  /* Check for NITF header */
 
   fseek(fin, 0, SEEK_SET);
-  fread(NITF, 4L, 1, fin) ;
+  ogdi_fread(NITF, 4L, 1, fin) ;
   NITF[4] = '\0';
   if (strcmp(NITF, "NITF") == 0) /* Match: skip NITF hdr */
   {
     fseek(fin,413, SEEK_SET) ;
     fseek(fin, 31, SEEK_CUR) ;  /* Key off date, pos 32 in RPF header */
-    fread( date, sizeof(date), 1, fin);
+    ogdi_fread( date, sizeof(date), 1, fin);
     if (strncmp(date,"199",3) == 0)        /* Check for short 413 hdr */
        file->NITF_hdr_len = 413L;
     else                                   /* Else long 426 hdr */
@@ -1619,23 +1635,23 @@ char *filename;
 
  /* Read header */
 
-  fread(&file->head.endian, sizeof(file->head.endian), 1, fin) ;
+  ogdi_fread(&file->head.endian, sizeof(file->head.endian), 1, fin) ;
   check_swap(file->head.endian);
-  fread(&file->head.hdr_sec_len, sizeof(file->head.hdr_sec_len), 1, fin);
-  fread( file->head.filename, sizeof(file->head.filename), 1, fin);
-  fread(&file->head.new, sizeof(file->head.new), 1, fin) ;
-  fread( file->head.standard_num, sizeof(file->head.standard_num), 1, fin) ;
+  ogdi_fread(&file->head.hdr_sec_len, sizeof(file->head.hdr_sec_len), 1, fin);
+  ogdi_fread( file->head.filename, sizeof(file->head.filename), 1, fin);
+  ogdi_fread(&file->head.new, sizeof(file->head.new), 1, fin) ;
+  ogdi_fread( file->head.standard_num, sizeof(file->head.standard_num), 1, fin) ;
   if (strncmp(&file->head.standard_num[9],"41",2) == 0)
      file->head.rpf_type = RPF_CIB;
   else if (strncmp(&file->head.standard_num[9],"38",2) == 0)
      file->head.rpf_type = RPF_CADRG;
   else if (strncmp(&file->head.standard_num[9],"44",2) == 0)
      file->head.rpf_type = RPF_CDTED;
-  fread( file->head.standard_date, sizeof(file->head.standard_date), 1, fin);
-  fread(&file->head.classification, sizeof(file->head.classification), 1,fin);
-  fread( file->head.country, sizeof(file->head.country), 1, fin);
-  fread( file->head.release, sizeof(file->head.release), 1, fin); 
-  fread(&file->head.loc_sec_phys_loc, sizeof(file->head.loc_sec_phys_loc), 1, fin) ;
+  ogdi_fread( file->head.standard_date, sizeof(file->head.standard_date), 1, fin);
+  ogdi_fread(&file->head.classification, sizeof(file->head.classification), 1,fin);
+  ogdi_fread( file->head.country, sizeof(file->head.country), 1, fin);
+  ogdi_fread( file->head.release, sizeof(file->head.release), 1, fin); 
+  ogdi_fread(&file->head.loc_sec_phys_loc, sizeof(file->head.loc_sec_phys_loc), 1, fin) ;
 
   swap((ucharp)&file->head.hdr_sec_len, sizeof(file->head.hdr_sec_len)) ;
   swap((ucharp)&file->head.loc_sec_phys_loc, sizeof(file->head.loc_sec_phys_loc));
@@ -1681,18 +1697,18 @@ char *filename;
     return(0L);
   }
 
-  fread(&file->cover.nw_lat, sizeof(real8), 1, fin);
-  fread(&file->cover.nw_long, sizeof(real8), 1, fin);
-  fread(&file->cover.sw_lat, sizeof(real8), 1, fin);
-  fread(&file->cover.sw_long, sizeof(real8), 1, fin);
-  fread(&file->cover.ne_lat, sizeof(real8), 1, fin);
-  fread(&file->cover.ne_long, sizeof(real8), 1, fin);
-  fread(&file->cover.se_lat, sizeof(real8), 1, fin);
-  fread(&file->cover.se_long, sizeof(real8), 1, fin);
-  fread(&file->cover.vert_resolution, sizeof(real8), 1, fin);
-  fread(&file->cover.horiz_resolution, sizeof(real8), 1, fin);
-  fread(&file->cover.vert_interval, sizeof(real8), 1, fin);
-  fread(&file->cover.horiz_interval, sizeof(real8), 1, fin);
+  ogdi_fread(&file->cover.nw_lat, sizeof(real8), 1, fin);
+  ogdi_fread(&file->cover.nw_long, sizeof(real8), 1, fin);
+  ogdi_fread(&file->cover.sw_lat, sizeof(real8), 1, fin);
+  ogdi_fread(&file->cover.sw_long, sizeof(real8), 1, fin);
+  ogdi_fread(&file->cover.ne_lat, sizeof(real8), 1, fin);
+  ogdi_fread(&file->cover.ne_long, sizeof(real8), 1, fin);
+  ogdi_fread(&file->cover.se_lat, sizeof(real8), 1, fin);
+  ogdi_fread(&file->cover.se_long, sizeof(real8), 1, fin);
+  ogdi_fread(&file->cover.vert_resolution, sizeof(real8), 1, fin);
+  ogdi_fread(&file->cover.horiz_resolution, sizeof(real8), 1, fin);
+  ogdi_fread(&file->cover.vert_interval, sizeof(real8), 1, fin);
+  ogdi_fread(&file->cover.horiz_interval, sizeof(real8), 1, fin);
 
   swap((ucharp)&file->cover.nw_lat, sizeof(real8));
   swap((ucharp)&file->cover.nw_long, sizeof(real8));
@@ -1712,9 +1728,9 @@ char *filename;
   if ((int) loc[0].phys_index != ~0)
   {
      fseek(fin, loc[0].phys_index, SEEK_SET);
-     fread(&file->compr.algorithm   , sizeof(file->compr.algorithm   ), 1, fin);
-     fread(&file->compr.noff_recs   ,sizeof(file->compr.noff_recs   ), 1,fin);
-     fread(&file->compr.nparm_off_recs,sizeof(file->compr.nparm_off_recs), 1,fin);
+     ogdi_fread(&file->compr.algorithm   , sizeof(file->compr.algorithm   ), 1, fin);
+     ogdi_fread(&file->compr.noff_recs   ,sizeof(file->compr.noff_recs   ), 1,fin);
+     ogdi_fread(&file->compr.nparm_off_recs,sizeof(file->compr.nparm_off_recs), 1,fin);
 
      swap((ucharp)&file->compr.algorithm     ,sizeof(file->compr.algorithm   ));
      swap((ucharp)&file->compr.noff_recs     ,sizeof(file->compr.noff_recs   ));
@@ -1741,18 +1757,18 @@ char *filename;
 
    /* Read Header fields for CIB */
 
-    fread(&lkup_off_tbl_off, sizeof(lkup_off_tbl_off), 1, fin);
-    fread(&lkup_tbl_off_recl, sizeof(lkup_tbl_off_recl), 1, fin);
+    ogdi_fread(&lkup_off_tbl_off, sizeof(lkup_off_tbl_off), 1, fin);
+    ogdi_fread(&lkup_tbl_off_recl, sizeof(lkup_tbl_off_recl), 1, fin);
     swap ((ucharp)&lkup_off_tbl_off, sizeof(lkup_off_tbl_off)) ;
     swap ((ucharp)&lkup_tbl_off_recl, sizeof(lkup_tbl_off_recl)) ;
 
     for (i=0; i<4; i++)
     {
-      fread(&file->lut[i].id         , sizeof(file->lut[i].id         ), 1,fin);
-      fread(&file->lut[i].records    , sizeof(file->lut[i].records    ), 1, fin);
-      fread(&file->lut[i].values     , sizeof(file->lut[i].values     ), 1, fin);
-      fread(&file->lut[i].bit_length , sizeof(file->lut[i].bit_length ), 1, fin);
-      fread(&file->lut[i].phys_offset, sizeof(file->lut[i].phys_offset), 1, fin);
+      ogdi_fread(&file->lut[i].id         , sizeof(file->lut[i].id         ), 1,fin);
+      ogdi_fread(&file->lut[i].records    , sizeof(file->lut[i].records    ), 1, fin);
+      ogdi_fread(&file->lut[i].values     , sizeof(file->lut[i].values     ), 1, fin);
+      ogdi_fread(&file->lut[i].bit_length , sizeof(file->lut[i].bit_length ), 1, fin);
+      ogdi_fread(&file->lut[i].phys_offset, sizeof(file->lut[i].phys_offset), 1, fin);
       swap((ucharp)&file->lut[i].id         , sizeof(file->lut[i].id         ));
       swap((ucharp)&file->lut[i].records    , sizeof(file->lut[i].records    ));
       swap((ucharp)&file->lut[i].values     , sizeof(file->lut[i].values     ));
@@ -1793,7 +1809,7 @@ char *filename;
     int bits_off;
     int bitshuff_off;
     uchar bits[16];
-    int hufflen;
+    int hufflen=0;
 
     file->comp_parm_shdr = loc[2].phys_index;
     if ((int) loc[2].phys_index == ~0)
@@ -1809,8 +1825,8 @@ char *filename;
 
    /* Read Header fields for CDTED */
 
-    fread(&comp_off_tbl_off, sizeof(comp_off_tbl_off), 1, fin);
-    fread(&comp_off_recl, sizeof(comp_off_recl), 1, fin);
+    ogdi_fread(&comp_off_tbl_off, sizeof(comp_off_tbl_off), 1, fin);
+    ogdi_fread(&comp_off_recl, sizeof(comp_off_recl), 1, fin);
     swap ((ucharp)&comp_off_tbl_off, sizeof(comp_off_tbl_off)) ;
     swap ((ucharp)&comp_off_recl, sizeof(comp_off_recl)) ;
 
@@ -1819,8 +1835,8 @@ char *filename;
     bitshuff_off = ~0;
     for (i=0; i<file->compr.nparm_off_recs; i++)
     {
-      fread(&file->comp[i].id     , sizeof(file->comp[i].id     ), 1,fin);
-      fread(&file->comp[i].rec_off, sizeof(file->comp[i].rec_off), 1, fin);
+      ogdi_fread(&file->comp[i].id     , sizeof(file->comp[i].id     ), 1,fin);
+      ogdi_fread(&file->comp[i].rec_off, sizeof(file->comp[i].rec_off), 1, fin);
       swap((ucharp)&file->comp[i].id     , sizeof(file->comp[i].id     ));
       swap((ucharp)&file->comp[i].rec_off, sizeof(file->comp[i].rec_off));
 
@@ -1841,7 +1857,7 @@ char *filename;
 
     file->comp_parm_shdr = loc[2].phys_index + bits_off;
     fseek(fin, loc[2].phys_index + bits_off, SEEK_SET);
-    fread(bits, 16, 1, fin) ;    /* bits array */
+    ogdi_fread(bits, 16, 1, fin) ;    /* bits array */
     for (i=0; i<16; i++)
        hufflen += bits[i];   /* len of huffval table */
     fseek(fin, hufflen, SEEK_CUR);
@@ -1851,14 +1867,14 @@ char *filename;
  /* Read the image data */
 
   fseek(fin, loc[1].phys_index, SEEK_SET);
-  fread(&file->img.spectral_groups, sizeof(file->img.spectral_groups), 1, fin);
-  fread(&file->img.subframe_tables, sizeof(file->img.subframe_tables), 1, fin);
-  fread(&file->img.spectral_tables, sizeof(file->img.spectral_tables), 1, fin);
-  fread(&file->img.spectral_lines,  sizeof(file->img.spectral_lines ), 1, fin);
-  fread(&file->img.horiz_subframes, sizeof(file->img.horiz_subframes), 1, fin);
-  fread(&file->img.vert_subframes,  sizeof(file->img.vert_subframes ), 1, fin);
-  fread(&file->img.output_cols,     sizeof(file->img.output_cols    ), 1, fin);
-  fread(&file->img.output_rows,     sizeof(file->img.output_rows    ), 1, fin);
+  ogdi_fread(&file->img.spectral_groups, sizeof(file->img.spectral_groups), 1, fin);
+  ogdi_fread(&file->img.subframe_tables, sizeof(file->img.subframe_tables), 1, fin);
+  ogdi_fread(&file->img.spectral_tables, sizeof(file->img.spectral_tables), 1, fin);
+  ogdi_fread(&file->img.spectral_lines,  sizeof(file->img.spectral_lines ), 1, fin);
+  ogdi_fread(&file->img.horiz_subframes, sizeof(file->img.horiz_subframes), 1, fin);
+  ogdi_fread(&file->img.vert_subframes,  sizeof(file->img.vert_subframes ), 1, fin);
+  ogdi_fread(&file->img.output_cols,     sizeof(file->img.output_cols    ), 1, fin);
+  ogdi_fread(&file->img.output_rows,     sizeof(file->img.output_rows    ), 1, fin);
 
   swap((ucharp)&file->img.spectral_groups, sizeof(file->img.spectral_groups));
   swap((ucharp)&file->img.subframe_tables, sizeof(file->img.subframe_tables));
@@ -1868,7 +1884,7 @@ char *filename;
   swap((ucharp)&file->img.vert_subframes,  sizeof(file->img.vert_subframes));
   swap((ucharp)&file->img.output_cols,     sizeof(file->img.output_cols));
   swap((ucharp)&file->img.output_rows,     sizeof(file->img.output_rows));
-  fread(&subfr_mask_tbl_off, sizeof(subfr_mask_tbl_off), 1, fin) ;
+  ogdi_fread(&subfr_mask_tbl_off, sizeof(subfr_mask_tbl_off), 1, fin) ;
   swap((ucharp)&subfr_mask_tbl_off,sizeof(subfr_mask_tbl_off));
   if (subfr_mask_tbl_off == 0xFFFFFFFFL)
      file->all_subframes = 1;  /* TRUE */
@@ -1924,7 +1940,7 @@ char *filename;
     for (i=0; i<nsubfr; i++)
     for (j=0; j<nsubfr; j++)
     {
-      fread(&file->indices[i][j], sizeof(uint), 1, fin);
+      ogdi_fread(&file->indices[i][j], sizeof(uint), 1, fin);
       swap((ucharp)&file->indices[i][j], sizeof(uint));
     }
   }
@@ -1950,7 +1966,7 @@ char *filename;
     return(0L);
   }
   fseek(fin, loc[10].phys_index, SEEK_SET);
-  fread(&num_att_rec, sizeof(num_att_rec), 1, fin) ;
+  ogdi_fread(&num_att_rec, sizeof(num_att_rec), 1, fin) ;
   swap((ucharp)&num_att_rec, sizeof(num_att_rec));
 #endif
 
@@ -1985,7 +2001,7 @@ int         ReducedColorTable;
   int i,j,k;
   char string[256];
   register ServerPrivateData *spriv = (ServerPrivateData *) s->priv;
-
+  
  /* Open the file */
 
   fin = rpf_fopen_ci( spriv->pathname, filename, "rb" );
@@ -2008,7 +2024,7 @@ int         ReducedColorTable;
 
    /* Read the table */
 
-    fread(&table[i*4096L*4L], (size_t)1, (size_t)(4096*4), fin);
+    ogdi_fread(&table[i*4096L*4L], (size_t)1, (size_t)(4096*4), fin);
 
    /* Transform the table if reduced color table */
 
@@ -2061,7 +2077,7 @@ uchar      blackpixel;
   int  cc;
   char  string[256];
   register ServerPrivateData *spriv = (ServerPrivateData *) s->priv;
-
+  
  /* If blank subframe zero out tile */
 
   if (tno == -1L && tno == ~0)

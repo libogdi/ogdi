@@ -63,6 +63,11 @@
 #include <unistd.h>
 #include <fcntl.h>
 
+#ifdef __GNU_LIBRARY__
+#include <ogdi_macro.h>
+#endif
+
+
 
 
 
@@ -94,6 +99,7 @@
  *
  ************************************************************
  */
+
 
 typedef struct subGridType {
   double alimit[6];
@@ -623,19 +629,19 @@ NAD_Reverse(nadPtr, lat, lon)
 
 #define GET_INT(REC, VAR) \
     lseek(nadPtr->fd, ((REC)-1)*16, SEEK_SET); \
-    read(nadPtr->fd, &buff, 16); \
+    ogdi_read(nadPtr->fd, &buff, 16); \
     VAR = buff.value.i; \
     BYTESWAP(&VAR, sizeof(VAR), 1); 
 
 #define GET_CHAR(REC, VAR) \
     lseek(nadPtr->fd, ((REC)-1)*16, SEEK_SET); \
-    read(nadPtr->fd, &buff, 16); \
+    ogdi_read(nadPtr->fd, &buff, 16); \
     strncpy(VAR, buff.value.c, 8); \
     {char *s; for(s=(VAR)+7; s>=(VAR) && (*s==0 || *s == ' '); *s--=0);}
 
 #define GET_DBL(REC, VAR) \
     lseek(nadPtr->fd, ((REC)-1)*16, SEEK_SET); \
-    read(nadPtr->fd, &buff, 16); \
+    ogdi_read(nadPtr->fd, &buff, 16); \
     VAR = buff.value.d; \
     BYTESWAP(&VAR,sizeof(VAR),1); 
 

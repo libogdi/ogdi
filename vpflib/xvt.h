@@ -3,6 +3,8 @@
 #include <string.h>
 #include <limits.h>
 #include <ctype.h>
+#include <signal.h>
+#include <wait.h>
 
 extern  void G_warning (char *msg);
 
@@ -25,20 +27,21 @@ extern  void G_warning (char *msg);
 #define GHANDLE void *
 #define xvt_zmalloc(n) calloc(n,1)
 #define xvt_free(a) free(a)
-#define xvt_note
+#define xvt_note printf
 #define xvt_malloc(a) malloc(a)
 #define xvt_realloc(m,s) realloc(m,s)
 #define gmemset memset
 
 
-#define xvt_fatal
+#define xvt_fatal printf
 #define gunlock
 #define gfree(a) free(a)
-#define xvt_error
+#define xvt_error printf
 #define XVT_CC_ARGS(p) p
  
 #define BOOLEAN unsigned char
 /* typedef unsigned char BOOLEAN; */
 
-
-
+#ifdef __GNU_LIBRARY__
+#include <ogdi_macro.h>
+#endif

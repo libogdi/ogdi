@@ -17,7 +17,24 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.7  2001-04-09 15:04:34  warmerda
+ * Revision 1.8  2007-02-12 16:09:06  cbalint
+ *   *  Add hook macros for all GNU systems, hook fread,fwrite,read,fgets.
+ *   *  Handle errors in those macro, if there are any.
+ *   *  Fix some includes for GNU systems.
+ *   *  Reduce remaining warnings, now we got zero warnings with GCC.
+ *
+ *  Modified Files:
+ *  	config/unix.mak contrib/ogdi_import/dbfopen.c
+ *  	contrib/ogdi_import/shapefil.h contrib/ogdi_import/shpopen.c
+ *  	ogdi/c-api/ecs_xdr.c ogdi/c-api/ecsinfo.c ogdi/c-api/server.c
+ *  	ogdi/datum_driver/canada/nadconv.c ogdi/driver/adrg/adrg.c
+ *  	ogdi/driver/adrg/adrg.h ogdi/driver/adrg/object.c
+ *  	ogdi/driver/adrg/utils.c ogdi/driver/rpf/rpf.h
+ *  	ogdi/driver/rpf/utils.c ogdi/gltpd/asyncsvr.c
+ *  	ogdi/glutil/iofile.c vpflib/vpfprim.c vpflib/vpfspx.c
+ *  	vpflib/vpftable.c vpflib/vpftidx.c vpflib/xvt.h
+ *
+ * Revision 1.7  2001/04/09 15:04:34  warmerda
  * applied new source headers
  *
  */
@@ -30,6 +47,10 @@
 #include <stdio.h>
 #else
 #include <stdio.h>
+#endif
+
+#ifdef __GNU_LIBRARY__
+#include <ogdi_macro.h>
 #endif
 
 ECS_CVSID("$Id$");
@@ -445,7 +466,7 @@ ecs_Result *svr_SelectLayer(s,ls)
 {
   ecs_Result *msg;
   char *error;
-  ecs_Region region;
+  ecs_Region region = {0,0,0,0,0,0};
   int regionset = FALSE;
 
   ecs_CleanUp(&(s->result));
@@ -2008,7 +2029,7 @@ int ecs_RemoveDir(path)
   struct _finddata_t c_file;
   long hfile;
   char current_dir[_MAX_PATH];
-  
+      
   if (_getcwd(current_dir,_MAX_PATH) == NULL) {
     return 0;
   }
@@ -2033,9 +2054,9 @@ int ecs_RemoveDir(path)
   return (int) RemoveDirectory(path);
 #else
   char buffer[256];
-  
+    
   sprintf(buffer,"rm -r %s",path);
-  system(buffer);
+  ogdi_system(buffer);
   return 1;
 #endif
 }
@@ -2098,7 +2119,7 @@ int ecs_GetLateralDBConnectionCtrlFile(s)
   FILE *attr;
   char *url = NULL;
   char *layer = NULL;
-  ecs_Family family;
+  ecs_Family family = 0;
   char *drivertype = NULL;
   char *informationSource = NULL;
   char *user = NULL;
@@ -2760,7 +2781,7 @@ int ecs_SetAttributeQuery(s,l,error)
   int i,j,count,k,pos;
   ecs_AttributeLink *link;
   char **ptr,*request;
-  ecs_Result *res;
+  ecs_Result *res = NULL;
   char buffer[100];
   int isAttributes;
   char *temp,*ptr1;

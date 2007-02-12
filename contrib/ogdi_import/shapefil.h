@@ -2,7 +2,7 @@
 #define _SHAPEFILE_H_INCLUDED
 
 /******************************************************************************
- * $Id$
+ * shapefil.h,v 1.1 2000/11/23 19:14:32 warmerda Exp
  *
  * Project:  Shapelib
  * Purpose:  Primary include file for Shapelib.
@@ -36,8 +36,8 @@
  * DEALINGS IN THE SOFTWARE.
  ******************************************************************************
  *
- * $Log$
- * Revision 1.1  2000-11-23 19:14:32  warmerda
+ * shapefil.h,v
+ * Revision 1.1  2000/11/23 19:14:32  warmerda
  * New
  *
  * Revision 1.16  2000/09/25 14:15:59  warmerda
@@ -88,6 +88,10 @@
  */
 
 #include <stdio.h>
+#include <string.h>
+#ifdef __GNU_LIBRARY__
+#include <ogdi_macro.h>
+#endif
 
 #ifdef USE_DBMALLOC
 #include <dbmalloc.h>

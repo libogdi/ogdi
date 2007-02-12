@@ -17,7 +17,24 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.6  2003-08-27 05:00:06  warmerda
+ * Revision 1.7  2007-02-12 16:09:06  cbalint
+ *   *  Add hook macros for all GNU systems, hook fread,fwrite,read,fgets.
+ *   *  Handle errors in those macro, if there are any.
+ *   *  Fix some includes for GNU systems.
+ *   *  Reduce remaining warnings, now we got zero warnings with GCC.
+ *
+ *  Modified Files:
+ *  	config/unix.mak contrib/ogdi_import/dbfopen.c
+ *  	contrib/ogdi_import/shapefil.h contrib/ogdi_import/shpopen.c
+ *  	ogdi/c-api/ecs_xdr.c ogdi/c-api/ecsinfo.c ogdi/c-api/server.c
+ *  	ogdi/datum_driver/canada/nadconv.c ogdi/driver/adrg/adrg.c
+ *  	ogdi/driver/adrg/adrg.h ogdi/driver/adrg/object.c
+ *  	ogdi/driver/adrg/utils.c ogdi/driver/rpf/rpf.h
+ *  	ogdi/driver/rpf/utils.c ogdi/gltpd/asyncsvr.c
+ *  	ogdi/glutil/iofile.c vpflib/vpfprim.c vpflib/vpfspx.c
+ *  	vpflib/vpftable.c vpflib/vpftidx.c vpflib/xvt.h
+ *
+ * Revision 1.6  2003/08/27 05:00:06  warmerda
  * Fixed problems with _read_adrg(), _read_overview() and _initRegionWithDefault
  * so that the files are actually closed after use.  As per bug 795612.
  *
@@ -54,7 +71,7 @@ int _read_adrg(s,l)
   double x,y;
   int i,j,count;
   int isTiled;
-
+  
   fichier = fopen(spriv->genfilename,"r");
   if (fichier == NULL) {
     ecs_SetError(&(s->result),1,"Unable to open the .GEN file");
@@ -65,7 +82,7 @@ int _read_adrg(s,l)
 
   while(!feof(fichier)) {
     if (c==(char) 30) {
-      fread(sc,3,1,fichier);
+      ogdi_fread(sc,3,1,fichier);
       if(strncmp("GIN",sc,3) == 0) {
 	first = TRUE;
 
@@ -75,7 +92,7 @@ int _read_adrg(s,l)
 
 	/* Read NAM */
 
-	fread(buffer,8,1,fichier);
+	ogdi_fread(buffer,8,1,fichier);
 	strncpy(lpriv->imgname,buffer,8);
 	lpriv->imgname[8] = '\0';
 
@@ -87,10 +104,10 @@ int _read_adrg(s,l)
 	/* Read SWO SWA NWO NWA NEO NEA SEO SEA */
 
 	for(i=0;i<4;i++) {
-	  fread(buffer,11,1,fichier);
+	  ogdi_fread(buffer,11,1,fichier);
 	  buffer[11] = '\0';
 	  x = parse_coord_x(buffer);
-	  fread(buffer,10,1,fichier);
+	  ogdi_fread(buffer,10,1,fichier);
 	  buffer[10] = '\0';
 	  y = parse_coord_y(buffer);
 
@@ -118,7 +135,7 @@ int _read_adrg(s,l)
 	
 	/* Read ZNA */
 	
-	fread(buffer,2,1,fichier);
+	ogdi_fread(buffer,2,1,fichier);
 	buffer[2] = '\0';
 	lpriv->zonenumber = atoi(buffer);
 	
@@ -128,23 +145,23 @@ int _read_adrg(s,l)
 	
 	/* Read ARV */
 	
-	fread(buffer,8,1,fichier);
+	ogdi_fread(buffer,8,1,fichier);
 	buffer[8] = '\0';
 	lpriv->ARV = atoi(buffer);
 	
 	/* Read BRV */
 	
-	fread(buffer,8,1,fichier);
+	ogdi_fread(buffer,8,1,fichier);
 	buffer[8] = '\0';
 	lpriv->BRV = atoi(buffer);
 	
 	/* Read LSO PSO */
 	
-	fread(buffer,11,1,fichier);
+	ogdi_fread(buffer,11,1,fichier);
 	buffer[11] = '\0';
 	lpriv->LSO = parse_coord_x(buffer);
 
-	fread(buffer,10,1,fichier);
+	ogdi_fread(buffer,10,1,fichier);
 	buffer[10] = '\0';
 	lpriv->PSO = parse_coord_y(buffer);
 	
@@ -154,7 +171,7 @@ int _read_adrg(s,l)
 	
 	/* Read NFL */
 
-	fread(buffer,3,1,fichier);
+	ogdi_fread(buffer,3,1,fichier);
 	buffer[3] = '\0';
 	lpriv->rowtiles = atoi(buffer);
 	lpriv->rows = lpriv->rowtiles * 128;
@@ -162,7 +179,7 @@ int _read_adrg(s,l)
 	
 	/* Read NFC */
 	
-	fread(buffer,3,1,fichier);
+	ogdi_fread(buffer,3,1,fichier);
 	buffer[3] = '\0';
 	lpriv->coltiles = atoi(buffer);
 	lpriv->columns = lpriv->coltiles * 128;
@@ -174,7 +191,7 @@ int _read_adrg(s,l)
 	
 	/* Read BAD and check if it valid. If not, search another GIN */
 	
-	fread(buffer,12,1,fichier);
+	ogdi_fread(buffer,12,1,fichier);
 #ifdef _WINDOWS
 	if (strnicmp(buffer,lpriv->imgfilename,12) != 0) {
 #else
@@ -187,7 +204,7 @@ int _read_adrg(s,l)
 	
 	/* Read the TIF */
 	
-	fread(buffer,1,1,fichier);
+	ogdi_fread(buffer,1,1,fichier);
 	if (buffer[0] == 'N')
 	  isTiled = FALSE;
 	else
@@ -212,7 +229,7 @@ int _read_adrg(s,l)
 	for(i=0;i<lpriv->rowtiles;i++) {
 	  for(j=0;j<lpriv->coltiles;j++) {
 	    if (isTiled) {
-	      fread(buffer,5,1,fichier);
+	      ogdi_fread(buffer,5,1,fichier);
 	      buffer[5] = '\0';
 	      lpriv->tilelist[count] = atoi(buffer);
 	    } else {
@@ -258,7 +275,7 @@ int _read_overview(s)
   char buffer[20];
   int i,j,count;
   int isTiled;
-
+  
   lpriv->tilelist = NULL;
   lpriv->buffertile = NULL;
 
@@ -272,7 +289,7 @@ int _read_overview(s)
 
   while(!feof(fichier)) {
     if (c==(char) 30) {
-      fread(sc,3,1,fichier);
+      ogdi_fread(sc,3,1,fichier);
       if(strncmp("OVV",sc,3) == 0) {
 	first = TRUE;
 
@@ -282,7 +299,7 @@ int _read_overview(s)
 
 	/* Read NAM */
 
-	fread(buffer,8,1,fichier);
+	ogdi_fread(buffer,8,1,fichier);
 	strncpy(lpriv->imgname,buffer,8);
 	lpriv->imgname[8] = '\0';
 
@@ -292,22 +309,22 @@ int _read_overview(s)
 	
 	/* Read ARV */
 	
-	fread(buffer,8,1,fichier);
+	ogdi_fread(buffer,8,1,fichier);
 	buffer[8] = '\0';
 	lpriv->ARV = atoi(buffer);
 	
 	/* Read BRV */
 	
-	fread(buffer,8,1,fichier);
+	ogdi_fread(buffer,8,1,fichier);
 	buffer[8] = '\0';
 	lpriv->BRV = atoi(buffer);
 	
 	/* Read LSO PSO */
 	
-	fread(buffer,11,1,fichier);
+	ogdi_fread(buffer,11,1,fichier);
 	buffer[11] = '\0';
 	lpriv->LSO = parse_coord_x(buffer);
-	fread(buffer,10,1,fichier);
+	ogdi_fread(buffer,10,1,fichier);
 	buffer[10] = '\0';
 	lpriv->PSO = parse_coord_y(buffer);
 	
@@ -317,14 +334,14 @@ int _read_overview(s)
 	
 	/* Read NFL */
 
-	fread(buffer,3,1,fichier);
+	ogdi_fread(buffer,3,1,fichier);
 	buffer[3] = '\0';
 	lpriv->rowtiles = atoi(buffer);
 	lpriv->rows = lpriv->rowtiles * 128;
 	
 	/* Read NFC */
 	
-	fread(buffer,3,1,fichier);
+	ogdi_fread(buffer,3,1,fichier);
 	buffer[3] = '\0';
 	lpriv->coltiles = atoi(buffer);
 	lpriv->columns = lpriv->coltiles * 128;
@@ -335,13 +352,13 @@ int _read_overview(s)
 	
 	/* Read BAD and check if it valid. If not, search another GIN */
 	
-	fread(buffer,12,1,fichier);
+	ogdi_fread(buffer,12,1,fichier);
 	strncpy(lpriv->imgfilename,buffer,12);
 	lpriv->imgfilename[12] = '\0';
 	
 	/* Read the TIF */
 	
-	fread(buffer,1,1,fichier);
+	ogdi_fread(buffer,1,1,fichier);
 	if (buffer[0] == 'N')
 	  isTiled = FALSE;
 	else
@@ -366,7 +383,7 @@ int _read_overview(s)
 	for(i=0;i<lpriv->rowtiles;i++) {
 	  for(j=0;j<lpriv->coltiles;j++) {
 	    if (isTiled) {
-	      fread(buffer,5,1,fichier);
+	      ogdi_fread(buffer,5,1,fichier);
 	      buffer[5] = '\0';
 	      lpriv->tilelist[count] = atoi(buffer);
 	    } else {
@@ -501,7 +518,7 @@ int _initRegionWithDefault(s)
   char buffer[12];
   double x,y;
   int i;
-
+  
   fichier = fopen(spriv->genfilename,"r");
   if (fichier == NULL) {
     ecs_SetError(&(s->result),1,"Unable to open the .GEN file");
@@ -512,13 +529,13 @@ int _initRegionWithDefault(s)
 
   while(!feof(fichier)) {
     if (c==(char) 30) {
-      fread(sc,3,1,fichier);
+      ogdi_fread(sc,3,1,fichier);
       if(strncmp("GIN",sc,3) == 0) {
 	fseek(fichier,32,SEEK_CUR);
 	for(i=0;i<4;i++) {
-	  fread(buffer,11,1,fichier);
+	  ogdi_fread(buffer,11,1,fichier);
 	  x = parse_coord_x(buffer);
-	  fread(buffer,10,1,fichier);
+	  ogdi_fread(buffer,10,1,fichier);
 	  y = parse_coord_y(buffer);
 
 	  if (first) {

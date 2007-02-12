@@ -402,23 +402,23 @@
    fseek(edge_rec->fp,edge_rec->startpos,SEEK_SET);
    switch (edge_rec->coord_type) {
       case 'C':
-	 fread(&coord,sizeof(coord),1,edge_rec->fp);
+	 ogdi_fread(&coord,sizeof(coord),1,edge_rec->fp);
 	 Bcoord.x = (double) coord.x;
 	 Bcoord.y = (double) coord.y;
 	 size = sizeof(coord);
 	 break;
       case 'Z':
-	 fread(&Zcoord,sizeof(Zcoord),1,edge_rec->fp);
+	 ogdi_fread(&Zcoord,sizeof(Zcoord),1,edge_rec->fp);
 	 Bcoord.x = (double) Zcoord.x;
 	 Bcoord.y = (double) Zcoord.y;
 	 size = sizeof(Zcoord);
 	 break;
       case 'B':
-	 fread(&Bcoord,sizeof(Bcoord),1,edge_rec->fp);
+	 ogdi_fread(&Bcoord,sizeof(Bcoord),1,edge_rec->fp);
 	 size = sizeof(Bcoord);
 	 break;
       case 'Y':
-	 fread(&Ycoord,sizeof(Ycoord),1,edge_rec->fp);
+	 ogdi_fread(&Ycoord,sizeof(Ycoord),1,edge_rec->fp);
 	 Bcoord.x = Ycoord.x;
 	 Bcoord.y = Ycoord.y;
 	 size = sizeof(Ycoord);
@@ -496,23 +496,23 @@
    /* Read coordinate from table */
    switch (edge_rec->coord_type) {
       case 'C':
-	 fread(&coord,sizeof(coord),1,edge_rec->fp);
+	 ogdi_fread(&coord,sizeof(coord),1,edge_rec->fp);
 	 Bcoord.x = (double) coord.x;
 	 Bcoord.y = (double) coord.y;
 	 size = sizeof(coord);
 	 break;
       case 'Z':
-	 fread(&Zcoord,sizeof(Zcoord),1,edge_rec->fp);
+	 ogdi_fread(&Zcoord,sizeof(Zcoord),1,edge_rec->fp);
 	 Bcoord.x = (double) Zcoord.x;
 	 Bcoord.y = (double) Zcoord.y;
 	 size = sizeof(Zcoord);
 	 break;
       case 'B':
-	 fread(&Bcoord,sizeof(Bcoord),1,edge_rec->fp);
+	 ogdi_fread(&Bcoord,sizeof(Bcoord),1,edge_rec->fp);
 	 size = sizeof(Bcoord);
 	 break;
       case 'Y':
-	 fread(&Ycoord,sizeof(Ycoord),1,edge_rec->fp);
+	 ogdi_fread(&Ycoord,sizeof(Ycoord),1,edge_rec->fp);
 	 Bcoord.x = Ycoord.x;
 	 Bcoord.y = Ycoord.y;
 	 size = sizeof(Ycoord);
@@ -604,20 +604,20 @@
    fseek(edge_rec->fp,edge_rec->pos,SEEK_SET);
    switch (edge_rec->coord_type) {
       case 'C':
-	 fread(&coord,sizeof(coord),1,edge_rec->fp);
+	 ogdi_fread(&coord,sizeof(coord),1,edge_rec->fp);
 	 Bcoord.x = (double) coord.x;
 	 Bcoord.y = (double) coord.y;
 	 break;
       case 'Z':
-	 fread(&Zcoord,sizeof(Zcoord),1,edge_rec->fp);
+	 ogdi_fread(&Zcoord,sizeof(Zcoord),1,edge_rec->fp);
 	 Bcoord.x = (double) Zcoord.x;
 	 Bcoord.y = (double) Zcoord.y;
 	 break;
       case 'B':
-	 fread(&Bcoord,sizeof(Bcoord),1,edge_rec->fp);
+	 ogdi_fread(&Bcoord,sizeof(Bcoord),1,edge_rec->fp);
 	 break;
       case 'Y':
-	 fread(&Ycoord,sizeof(Ycoord),1,edge_rec->fp);
+	 ogdi_fread(&Ycoord,sizeof(Ycoord),1,edge_rec->fp);
 	 Bcoord.x = Ycoord.x;
 	 Bcoord.y = Ycoord.y;
 	 break;

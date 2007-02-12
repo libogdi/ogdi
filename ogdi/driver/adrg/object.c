@@ -17,7 +17,24 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.5  2001-06-22 16:37:50  warmerda
+ * Revision 1.6  2007-02-12 16:09:06  cbalint
+ *   *  Add hook macros for all GNU systems, hook fread,fwrite,read,fgets.
+ *   *  Handle errors in those macro, if there are any.
+ *   *  Fix some includes for GNU systems.
+ *   *  Reduce remaining warnings, now we got zero warnings with GCC.
+ *
+ *  Modified Files:
+ *  	config/unix.mak contrib/ogdi_import/dbfopen.c
+ *  	contrib/ogdi_import/shapefil.h contrib/ogdi_import/shpopen.c
+ *  	ogdi/c-api/ecs_xdr.c ogdi/c-api/ecsinfo.c ogdi/c-api/server.c
+ *  	ogdi/datum_driver/canada/nadconv.c ogdi/driver/adrg/adrg.c
+ *  	ogdi/driver/adrg/adrg.h ogdi/driver/adrg/object.c
+ *  	ogdi/driver/adrg/utils.c ogdi/driver/rpf/rpf.h
+ *  	ogdi/driver/rpf/utils.c ogdi/gltpd/asyncsvr.c
+ *  	ogdi/glutil/iofile.c vpflib/vpfprim.c vpflib/vpfspx.c
+ *  	vpflib/vpftable.c vpflib/vpftidx.c vpflib/xvt.h
+ *
+ * Revision 1.5  2001/06/22 16:37:50  warmerda
  * added Image support, upgraded headers
  *
  */
@@ -46,7 +63,7 @@ void _LoadADRGTiles(s,l,UseOverview)
   register LayerPrivateData *lpriv = (LayerPrivateData *) l->priv;
   int i1,j1,i2,j2,prev_i,prev_j,i,count,tile,tile_physique;
   double y,prev_y;
-
+  
   /* Found the first and the last request point in adrg matrix */
   
   y = s->currentRegion.north - l->index*s->currentRegion.ns_res;
@@ -111,7 +128,7 @@ void _LoadADRGTiles(s,l,UseOverview)
 	  
 	  if (tile_physique != 0) {
 	    fseek(spriv->overview.imgfile,(spriv->overview.firstposition + (tile_physique-1)*49152) - 1,SEEK_SET);
-	    fread(spriv->overview.buffertile[count].data,49152,1,spriv->overview.imgfile);
+	    ogdi_fread(spriv->overview.buffertile[count].data,49152,1,spriv->overview.imgfile);
 	    spriv->overview.buffertile[count].isActive = TRUE;
 	  } else {
 	    spriv->overview.buffertile[count].isActive = FALSE;
@@ -154,7 +171,7 @@ void _LoadADRGTiles(s,l,UseOverview)
 
       if (tile_physique != 0) {
 	fseek(lpriv->imgfile,(lpriv->firstposition + (tile_physique-1)*49152) - 1,SEEK_SET);
-	fread(lpriv->buffertile[count].data,49152,1,lpriv->imgfile);
+	ogdi_fread(lpriv->buffertile[count].data,49152,1,lpriv->imgfile);
 	lpriv->buffertile[count].isActive = TRUE;
       } else {
 	lpriv->buffertile[count].isActive = FALSE;

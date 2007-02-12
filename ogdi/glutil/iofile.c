@@ -5,12 +5,15 @@
 #include <direct.h>
 #include <stdio.h>
 #else
+#include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 #endif
 
 #include "glutil.h"
-
+#ifdef __GNU_LIBRARY__
+#include <ogdi_macro.h>
+#endif
 /*
  *----------------------------------------------------------------------
  * remove_dir 
@@ -54,9 +57,9 @@ int remove_dir(path)
   return (int) RemoveDirectory(path);
 #else
  char buffer[256];
-
+ 
  sprintf(buffer,"rm -r %s",path);
- system(buffer);
+ ogdi_system(buffer);
  return 0;
 #endif
 }

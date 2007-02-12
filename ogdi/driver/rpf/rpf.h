@@ -17,7 +17,24 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.5  2001-04-12 19:22:46  warmerda
+ * Revision 1.6  2007-02-12 16:09:06  cbalint
+ *   *  Add hook macros for all GNU systems, hook fread,fwrite,read,fgets.
+ *   *  Handle errors in those macro, if there are any.
+ *   *  Fix some includes for GNU systems.
+ *   *  Reduce remaining warnings, now we got zero warnings with GCC.
+ *
+ *  Modified Files:
+ *  	config/unix.mak contrib/ogdi_import/dbfopen.c
+ *  	contrib/ogdi_import/shapefil.h contrib/ogdi_import/shpopen.c
+ *  	ogdi/c-api/ecs_xdr.c ogdi/c-api/ecsinfo.c ogdi/c-api/server.c
+ *  	ogdi/datum_driver/canada/nadconv.c ogdi/driver/adrg/adrg.c
+ *  	ogdi/driver/adrg/adrg.h ogdi/driver/adrg/object.c
+ *  	ogdi/driver/adrg/utils.c ogdi/driver/rpf/rpf.h
+ *  	ogdi/driver/rpf/utils.c ogdi/gltpd/asyncsvr.c
+ *  	ogdi/glutil/iofile.c vpflib/vpfprim.c vpflib/vpfspx.c
+ *  	vpflib/vpftable.c vpflib/vpftidx.c vpflib/xvt.h
+ *
+ * Revision 1.5  2001/04/12 19:22:46  warmerda
  * applied DND support Image type support
  *
  */
@@ -40,6 +57,10 @@
 #endif
 #include <fcntl.h>
 #include <string.h>
+
+#ifdef __GNU_LIBRARY__
+#include <ogdi_macro.h>
+#endif
 
 
 #ifndef max

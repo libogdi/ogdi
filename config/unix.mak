@@ -88,12 +88,12 @@ $(ARCHGEN): $(OBJECTS)
 
 $(PROGGEN): $(OBJECTS)
 	@echo Making executable: $@
-	$(LD) $(COMMON_LDFLAGS) -o $@ $^ $(LINK_LIBS)
+	$(LD) $(COMMON_LDFLAGS) $(COMMON_CFLAGS) -o $@ $^ $(LINK_LIBS)
 	@echo $@ made successfully ...
 
 $(DYNAGEN): $(OBJECTS)
 	@echo Making shared library: $@
-	$(SHLIB_LD) $(SHLIB_LDFLAGS) $(COMMON_LDFLAGS) -o $@ $^ $(LINK_LIBS) 
+	$(SHLIB_LD) $(SHLIB_LDFLAGS) $(COMMON_LDFLAGS) $(COMMON_CFLAGS) -o $@ $^ $(LINK_LIBS) 
 	@echo $@ made successfully ...
 
 

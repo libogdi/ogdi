@@ -17,7 +17,24 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.8  2003-08-27 04:50:01  warmerda
+ * Revision 1.9  2007-02-12 16:09:06  cbalint
+ *   *  Add hook macros for all GNU systems, hook fread,fwrite,read,fgets.
+ *   *  Handle errors in those macro, if there are any.
+ *   *  Fix some includes for GNU systems.
+ *   *  Reduce remaining warnings, now we got zero warnings with GCC.
+ *
+ *  Modified Files:
+ *  	config/unix.mak contrib/ogdi_import/dbfopen.c
+ *  	contrib/ogdi_import/shapefil.h contrib/ogdi_import/shpopen.c
+ *  	ogdi/c-api/ecs_xdr.c ogdi/c-api/ecsinfo.c ogdi/c-api/server.c
+ *  	ogdi/datum_driver/canada/nadconv.c ogdi/driver/adrg/adrg.c
+ *  	ogdi/driver/adrg/adrg.h ogdi/driver/adrg/object.c
+ *  	ogdi/driver/adrg/utils.c ogdi/driver/rpf/rpf.h
+ *  	ogdi/driver/rpf/utils.c ogdi/gltpd/asyncsvr.c
+ *  	ogdi/glutil/iofile.c vpflib/vpfprim.c vpflib/vpfspx.c
+ *  	vpflib/vpftable.c vpflib/vpftidx.c vpflib/xvt.h
+ *
+ * Revision 1.8  2003/08/27 04:50:01  warmerda
  * Fixed _releaseAllLayers() to release the layers starting with the
  * last till the first since it appears that ecs_FreeLayer() is unexpectedly
  * reducing the layer count, and shuffling layers down in the ecs_Server
@@ -215,12 +232,11 @@ ecs_Result *dyn_CreateServer(s,Request)
       }
     }
   }
-
   spriv->overview.firstposition = 1;
   cc = getc(spriv->overview.imgfile);
   while(!feof(spriv->overview.imgfile)) {
     if (cc==(char) 30) {
-      fread(sc,3,1,spriv->overview.imgfile);
+      ogdi_fread(sc,3,1,spriv->overview.imgfile);
       spriv->overview.firstposition+=3;
       if (strncmp(sc,"IMG",3) == 0) {
 	spriv->overview.firstposition+=4;
@@ -322,7 +338,7 @@ ecs_Result *dyn_SelectLayer(s,sel)
   register ServerPrivateData *spriv = s->priv;
   char c,sc[3];
   char buffer[128];
-
+  
   /* first, try to find an existing layer with same request and family */
 
   if ((layer = ecs_GetLayer(s,sel)) != -1) {
@@ -402,7 +418,7 @@ ecs_Result *dyn_SelectLayer(s,sel)
   c = getc(lpriv->imgfile);
   while(!feof(lpriv->imgfile)) {
     if (c==(char) 30) {
-      fread(sc,3,1,lpriv->imgfile);
+      ogdi_fread(sc,3,1,lpriv->imgfile);
       lpriv->firstposition+=3;
       if (strncmp(sc,"IMG",3) == 0) {
 	lpriv->firstposition+=4;
@@ -446,7 +462,6 @@ ecs_Result *dyn_ReleaseLayer(s,sel)
   int layer;
   char buffer[128];
   register LayerPrivateData *lpriv;
-
   /* first, try to find an existing layer with same request and family */
 
   if ((layer = ecs_GetLayer(s,sel)) == -1) {

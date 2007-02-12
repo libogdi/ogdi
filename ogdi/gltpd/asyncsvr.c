@@ -17,7 +17,24 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.4  2002-02-21 16:38:19  warmerda
+ * Revision 1.5  2007-02-12 16:09:06  cbalint
+ *   *  Add hook macros for all GNU systems, hook fread,fwrite,read,fgets.
+ *   *  Handle errors in those macro, if there are any.
+ *   *  Fix some includes for GNU systems.
+ *   *  Reduce remaining warnings, now we got zero warnings with GCC.
+ *
+ *  Modified Files:
+ *  	config/unix.mak contrib/ogdi_import/dbfopen.c
+ *  	contrib/ogdi_import/shapefil.h contrib/ogdi_import/shpopen.c
+ *  	ogdi/c-api/ecs_xdr.c ogdi/c-api/ecsinfo.c ogdi/c-api/server.c
+ *  	ogdi/datum_driver/canada/nadconv.c ogdi/driver/adrg/adrg.c
+ *  	ogdi/driver/adrg/adrg.h ogdi/driver/adrg/object.c
+ *  	ogdi/driver/adrg/utils.c ogdi/driver/rpf/rpf.h
+ *  	ogdi/driver/rpf/utils.c ogdi/gltpd/asyncsvr.c
+ *  	ogdi/glutil/iofile.c vpflib/vpfprim.c vpflib/vpfspx.c
+ *  	vpflib/vpftable.c vpflib/vpftidx.c vpflib/xvt.h
+ *
+ * Revision 1.4  2002/02/21 16:38:19  warmerda
  * undefine svc_fdset if defined - helps avoid odd library requirements on linux
  *
  * Revision 1.3  2001/04/09 15:04:35  warmerda
@@ -26,6 +43,9 @@
  */
 
 #include "ecs.h"
+#ifdef __GNU_LIBRARY__
+#include <ogdi_macro.h>
+#endif
 
 ECS_CVSID("$Id$");
 
@@ -34,6 +54,7 @@ ECS_CVSID("$Id$");
 #  include "time.h"
 #else
 #  include <sys/wait.h>
+#  include "time.h"
 #endif
 
 #include <unistd.h>
@@ -54,7 +75,7 @@ ECS_CVSID("$Id$");
 
 #define COMTIMEOUT 900
 
-unsigned long timecount;
+long timecount;
 
 static void dispatchno_1();
 extern void ecsprog_1();
@@ -429,7 +450,7 @@ dispatchno_1(rqstp, transp)
     
     /* Reap zombie children */
     while (waitpid(-1, NULL, WNOHANG) > 0);
-    system(temp);
+    ogdi_system(temp);
 
     /* Rtourner le resultat au client, mais auparavent on laisse le
        temps au serveur de s'intialiser */
@@ -503,7 +524,7 @@ void gltpd_svc_run()
   static int tsize = 0;
   struct timeval timeout;
   xdrproc_t xdr_argument, xdr_result;
-  unsigned long currenttime;
+  long currenttime;
   
   timeout.tv_sec = COMTIMEOUT;
   timeout.tv_usec = 0;

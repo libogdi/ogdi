@@ -17,12 +17,32 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.2  2001-04-09 15:04:34  warmerda
+ * Revision 1.3  2007-02-12 16:09:06  cbalint
+ *   *  Add hook macros for all GNU systems, hook fread,fwrite,read,fgets.
+ *   *  Handle errors in those macro, if there are any.
+ *   *  Fix some includes for GNU systems.
+ *   *  Reduce remaining warnings, now we got zero warnings with GCC.
+ *
+ *  Modified Files:
+ *  	config/unix.mak contrib/ogdi_import/dbfopen.c
+ *  	contrib/ogdi_import/shapefil.h contrib/ogdi_import/shpopen.c
+ *  	ogdi/c-api/ecs_xdr.c ogdi/c-api/ecsinfo.c ogdi/c-api/server.c
+ *  	ogdi/datum_driver/canada/nadconv.c ogdi/driver/adrg/adrg.c
+ *  	ogdi/driver/adrg/adrg.h ogdi/driver/adrg/object.c
+ *  	ogdi/driver/adrg/utils.c ogdi/driver/rpf/rpf.h
+ *  	ogdi/driver/rpf/utils.c ogdi/gltpd/asyncsvr.c
+ *  	ogdi/glutil/iofile.c vpflib/vpfprim.c vpflib/vpfspx.c
+ *  	vpflib/vpftable.c vpflib/vpftidx.c vpflib/xvt.h
+ *
+ * Revision 1.2  2001/04/09 15:04:34  warmerda
  * applied new source headers
  *
  */
 
 #include "ecs.h"
+#ifdef __GNU_LIBRARY__
+#include <ogdi_macro.h>
+#endif
 
 ECS_CVSID("$Id$");
 
@@ -346,7 +366,7 @@ printf ("Could not open the index file \n");
   filename=NULL;
   found=FALSE;
   while (!feof(fptr)) {
-    fgets(buf, MAX_DEF_LINE_LENGTH, fptr);
+    ogdi_fgets(buf, MAX_DEF_LINE_LENGTH, fptr);
     if (ecs_DefReadALine(buf,&tmpkey,&filename)) {
 #ifdef INFO_DEBUG
       printf("read KEY=>%s< FILENAME=>%s<\n", tmpkey, filename); 
@@ -505,7 +525,7 @@ int ecs_DefReadFile(char *directory, char *filename, char *key, char **result) {
   char buf[1024];
   char *tmpkey, *value, *tmpfile;
   size_t len;
-
+  
   indexfile=(char *) malloc (strlen(directory) +strlen(filename)+3);
   if (!indexfile) {
     return FALSE;
@@ -529,7 +549,7 @@ int ecs_DefReadFile(char *directory, char *filename, char *key, char **result) {
 
   filename=NULL;
   while (!feof(fptr)) {
-    fgets(buf, MAX_DEF_LINE_LENGTH, fptr);
+    ogdi_fgets(buf, MAX_DEF_LINE_LENGTH, fptr);
     if (ecs_DefReadALine(buf,&tmpkey,&value)) {
 #ifdef INFO_DEBUG
       printf("read KEY=>%s< VALUE=>%s<\n", tmpkey, value);

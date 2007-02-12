@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id$
+ * shpopen.c,v 1.1 2000/11/23 19:13:49 warmerda Exp
  *
  * Project:  Shapelib
  * Purpose:  Implementation of core Shapefile read/write functions.
@@ -33,8 +33,8 @@
  * DEALINGS IN THE SOFTWARE.
  ******************************************************************************
  *
- * $Log$
- * Revision 1.1  2000-11-23 19:13:49  warmerda
+ * shpopen.c,v
+ * Revision 1.1  2000/11/23 19:13:49  warmerda
  * new
  *
  * Revision 1.27  2000/07/18 15:21:33  warmerda
@@ -124,9 +124,6 @@
  * Added header.
  *
  */
-
-static char rcsid[] = 
-  "$Id$";
 
 #include "shapefil.h"
 
@@ -268,7 +265,7 @@ static void SHPWriteHeader( SHPHandle psSHP )
 /*      Write .shp file header.                                         */
 /* -------------------------------------------------------------------- */
     fseek( psSHP->fpSHP, 0, 0 );
-    fwrite( abyHeader, 100, 1, psSHP->fpSHP );
+    ogdi_fwrite( abyHeader, 100, 1, psSHP->fpSHP );
 
 /* -------------------------------------------------------------------- */
 /*      Prepare, and write .shx file header.                            */
@@ -278,7 +275,7 @@ static void SHPWriteHeader( SHPHandle psSHP )
     if( !bBigEndian ) SwapWord( 4, abyHeader+24 );
     
     fseek( psSHP->fpSHX, 0, 0 );
-    fwrite( abyHeader, 100, 1, psSHP->fpSHX );
+    ogdi_fwrite( abyHeader, 100, 1, psSHP->fpSHX );
 
 /* -------------------------------------------------------------------- */
 /*      Write out the .shx contents.                                    */
@@ -293,7 +290,7 @@ static void SHPWriteHeader( SHPHandle psSHP )
 	if( !bBigEndian ) SwapWord( 4, panSHX+i*2+1 );
     }
 
-    fwrite( panSHX, sizeof(int32) * 2, psSHP->nRecords, psSHP->fpSHX );
+    ogdi_fwrite( panSHX, sizeof(int32) * 2, psSHP->nRecords, psSHP->fpSHX );
 
     free( panSHX );
 }
@@ -390,7 +387,7 @@ SHPHandle SHPOpen( const char * pszLayer, const char * pszAccess )
 /*  Read the file size from the SHP file.				*/
 /* -------------------------------------------------------------------- */
     pabyBuf = (uchar *) malloc(100);
-    fread( pabyBuf, 100, 1, psSHP->fpSHP );
+    ogdi_fread( pabyBuf, 100, 1, psSHP->fpSHP );
 
     psSHP->nFileSize = (pabyBuf[24] * 256 * 256 * 256
 			+ pabyBuf[25] * 256 * 256
@@ -400,7 +397,7 @@ SHPHandle SHPOpen( const char * pszLayer, const char * pszAccess )
 /* -------------------------------------------------------------------- */
 /*  Read SHX file Header info                                           */
 /* -------------------------------------------------------------------- */
-    fread( pabyBuf, 100, 1, psSHP->fpSHX );
+    ogdi_fread( pabyBuf, 100, 1, psSHP->fpSHX );
 
     if( pabyBuf[0] != 0 
         || pabyBuf[1] != 0 
@@ -469,7 +466,7 @@ SHPHandle SHPOpen( const char * pszLayer, const char * pszAccess )
         (int *) malloc(sizeof(int) * MAX(1,psSHP->nMaxRecords) );
 
     pabyBuf = (uchar *) malloc(8 * MAX(1,psSHP->nRecords) );
-    fread( pabyBuf, 8, psSHP->nRecords, psSHP->fpSHX );
+    ogdi_fread( pabyBuf, 8, psSHP->nRecords, psSHP->fpSHX );
 
     for( i = 0; i < psSHP->nRecords; i++ )
     {
@@ -639,7 +636,7 @@ SHPHandle SHPCreate( const char * pszLayer, int nShapeType )
 /* -------------------------------------------------------------------- */
 /*      Write .shp file header.                                         */
 /* -------------------------------------------------------------------- */
-    fwrite( abyHeader, 100, 1, fpSHP );
+    ogdi_fwrite( abyHeader, 100, 1, fpSHP );
 
 /* -------------------------------------------------------------------- */
 /*      Prepare, and write .shx file header.                            */
@@ -648,7 +645,7 @@ SHPHandle SHPCreate( const char * pszLayer, int nShapeType )
     ByteCopy( &i32, abyHeader+24, 4 );
     if( !bBigEndian ) SwapWord( 4, abyHeader+24 );
     
-    fwrite( abyHeader, 100, 1, fpSHX );
+    ogdi_fwrite( abyHeader, 100, 1, fpSHX );
 
 /* -------------------------------------------------------------------- */
 /*      Close the files, and then open them as regular existing files.  */
@@ -1222,7 +1219,7 @@ SHPObject *SHPReadObject( SHPHandle psSHP, int hEntity )
 /*      Read the record.                                                */
 /* -------------------------------------------------------------------- */
     fseek( psSHP->fpSHP, psSHP->panRecOffset[hEntity], 0 );
-    fread( pabyRec, psSHP->panRecSize[hEntity]+8, 1, psSHP->fpSHP );
+    ogdi_fread( pabyRec, psSHP->panRecSize[hEntity]+8, 1, psSHP->fpSHP );
 
 /* -------------------------------------------------------------------- */
 /*	Allocate and minimally initialize the object.			*/

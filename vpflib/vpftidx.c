@@ -126,10 +126,9 @@
 #include "vpftidx.h"
 #endif
 
-
-
+#ifndef __USE_BSD
 #define bcopy(src,dest,size)  memcpy(dest,src,size)
-
+#endif
 
 #ifdef PROTO
 int32 read_gazetteer_index_directory(
@@ -420,7 +419,7 @@ char *idx_set;
        totalids = 0,
        bin,
        binoff,
-       datasize ;	      /* Directory value data size */
+       datasize = 0;	      /* Directory value data size */
   char           *buf ,
 		 ch ,
 		 hack[255] ;
@@ -578,9 +577,10 @@ char *idx_set;
   d[loc].num_items = 0 ; }
 
 #define INCR_ID(loc,id) { \
-  fwrite(&loc,sizeof(int32),1,tmpfp); \
+  int rtrn; \
+  rtrn = fwrite(&loc,sizeof(int32),1,tmpfp); \
   j = d[loc].num_items; \
-  fwrite(&j,sizeof(int32),1,tmpfp); \
+  rtrn = fwrite(&j,sizeof(int32),1,tmpfp); \
   d[loc].num_items++ ; \
   if (d[loc].num_items == 1) \
     d[loc].start_offset = id; \
@@ -881,8 +881,9 @@ char *idx_set;
   qsort ((void*)d, (size_t)h.nbins, sizeof(ThematicIndexDirectory), bincmp);
 
   for ( j=1; j <= table.nrows; j++ ) {
-     fread(&bin,sizeof(bin),1,tmpfp);
-     fread(&binoff,sizeof(binoff),1,tmpfp);
+     int result;
+     result = fread(&bin,sizeof(bin),1,tmpfp);
+     result = fread(&binoff,sizeof(binoff),1,tmpfp);
      if (d[bin].num_items == 1) continue;
      if ( h.id_data_type == 'I' ) {
 	fseek(ifp, d[bin].start_offset + (binoff*sizeof(int32)), 0);
@@ -1039,7 +1040,7 @@ FILE *ifp;
 #endif
 {
   int32 			i , ival = 0, left, right;
-  short int			sval = 0 , found = 0 , recsize;
+  short int			sval = 0 , found = 0 , recsize = 0;
   float fval = (float)0.0 ;
   double			dval = 0.0 , atof () ;
   date_type			dateval;
@@ -1530,7 +1531,7 @@ char *value;
 {
   int32 			i , ival = 0;
   short int			sval = 0 ;
-  ThematicIndexDirectory	d, dsearch, *dptr ;
+  ThematicIndexDirectory	d, dsearch, *dptr = NULL;
   set_type			s ;
 
   /* open output index file */

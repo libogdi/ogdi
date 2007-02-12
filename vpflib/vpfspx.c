@@ -201,7 +201,7 @@ set_type set;
    fseek(spx->fp,offset,SEEK_SET);
    rec = (spx_rec_type *)xvt_zmalloc(spx->cellmap[index].numfeat*
                                 sizeof(spx_rec_type));
-   fread(rec,sizeof(spx_rec_type),spx->cellmap[index].numfeat,spx->fp);
+   ogdi_fread(rec,sizeof(spx_rec_type),spx->cellmap[index].numfeat,spx->fp);
 
    if(machine_byte_order != LEAST_SIGNIFICANT)    /* DGM */
      for(i=0;i<spx->cellmap[index].numfeat;i++){ 
@@ -354,7 +354,7 @@ float y2;
 /*                       int  1 - 4 -> boundaries of coverage     */
 /*                       int  5 -> size of tree in records - each */
 /*                                 record = 2 integers (8 byte)   */
-   fread (htmp, sizeof (int32), 6, spx.fp);
+   ogdi_fread (htmp, sizeof (int32), 6, spx.fp);
 
    if (machine_byte_order != LEAST_SIGNIFICANT) 
       for (i=0; i<6; i++)
@@ -393,7 +393,7 @@ float y2;
    }
 
 /* read the cell tree */
-   fread(spx.cellmap,sizeof(cellmap_rec_type),spx.maplen,spx.fp);
+   ogdi_fread(spx.cellmap,sizeof(cellmap_rec_type),spx.maplen,spx.fp);
 
    if(machine_byte_order != LEAST_SIGNIFICANT)  /* DGM */
      for(i=0;i<spx.maplen;i++){
