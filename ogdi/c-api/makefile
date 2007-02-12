@@ -11,8 +11,8 @@
 # It is provided "as is" without express or implied warranty.
 #
 
-TOBEGEN	= ogdi$(OGDI_VERSION)
-TARGETGEN=$(DYNAGEN)
+TOBEGEN	= ogdi
+TARGETGEN=$(SHRDGEN)
 
 SOURCES = ecs_dyna.c ecsregex.c ecssplit.c \
           ecsassoc.c ecshash.c ecstile.c server.c ecsdist.c \
@@ -23,7 +23,7 @@ INCLUDES = $(CURRENT_INCLUDE) $(GENERAL_INCLUDE) $(OGDI_INCLUDE) \
 		$(GRASS_INCLUDE) $(ZLIB_INCLUDE) $(PROJ_INCLUDE) \
 		$(EXPAT_INCLUDE)
 
-CFLAGS 	= $(INCLUDES) $(COMMON_CFLAGS)
+CFLAGS 	= $(INCLUDES) $(COMMON_CFLAGS) -DMODULES_PATH="\"$(INST_LIB)/ogdi/\""
 
 LINK_LIBS= $(RPC_LINKLIB) $(ZLIB_LINKLIB) $(EXPAT_LINKLIB) $(WIN_LINKLIB) \
 		$(PROJ_STATICLIB) $(MATH_LINKLIB)

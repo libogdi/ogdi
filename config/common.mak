@@ -10,7 +10,24 @@
 # representations about the suitability of this software for any purpose.
 # It is provided "as is" without express or implied warranty.
 
-OGDI_VERSION      = 31
+# Release versioning.
+# 
+# MAJOR releases represent major ABI changes in the exposed shared lib.
+# This should not be so offen, only once with major code change wich due
+# to a change in how ogdi is called external by other applications.
+#
+# MINOR releases represents revisions or bugfixes over ogdi.
+#
+# The exposed soname of lib is libogdi.so.($major) an lies in $(INST_LIB)
+# Plugins lies in $(INST_LIB)/ogdi/
+#
+
+
+OGDI_MAJOR	  = 3
+OGDI_MINOR	  = 1
+
+
+OGDI_VERSION      = $(OGDI_MAJOR)$(OGDI_MINOR)
 
 # Common macros and symbols used by all platforms
 #
@@ -104,7 +121,7 @@ EXPAT_INCLUDE   = $(INCL_SW)$(TOPDIR)/external/expat
 #
 
 ODBCEXT_LINKLIB	= $(LINK_SW)$(LINKDIR)$(LIB_SW)odbcext$(LIB_SUFFIX)
-OGDI_LINKLIB	= $(LINK_SW)$(LINKDIR)$(LIB_SW)ogdi$(OGDI_VERSION)$(LIB_SUFFIX)
+OGDI_LINKLIB	= $(LINK_SW)$(LINKDIR)$(LIB_SW)ogdi$(LIB_SUFFIX)
 ZLIB_LINKLIB	= $(LINK_SW)$(LINKDIR)$(LIB_SW)zlib_ogdi$(OGDI_VERSION)$(LIB_SUFFIX)
 EXPAT_LINKLIB	= $(LINK_SW)$(LINKDIR)$(LIB_SW)expat_ogdi$(OGDI_VERSION)$(LIB_SUFFIX)
 
@@ -150,6 +167,9 @@ ARCHGEN = $(TOPDIR)/lib/$(TARGET)/static/$(LIB_PREFIX)$(TOBEGEN).$(ARCH_EXT)
 endif
 ifndef DYNAGEN
 DYNAGEN = $(TOPDIR)/bin/$(TARGET)/$(LIB_PREFIX)$(TOBEGEN).$(SHLIB_EXT)
+endif
+ifndef SHRDGEN
+SHRDGEN = $(TOPDIR)/bin/$(TARGET)/$(LIB_PREFIX)$(TOBEGEN).$(SHLIB_EXT).$(OGDI_MAJOR).$(OGDI_MINOR)
 endif
 ifndef PROGGEN
 PROGGEN = $(TOPDIR)/bin/$(TARGET)/$(TOBEGEN)$(APP_EXT)
@@ -201,13 +221,36 @@ default-clean:
 #
 #	Default rule(s) to install stuff if appropriate.
 #
+
+#ifeq ($(TARGETGEN),$(SHRDGEN))
+#default-install:
+#	cp $(TARGETGEN) $(INST_LIB)/ogdi
+#endif
+
 ifeq ($(TARGETGEN),$(DYNAGEN))
 default-install:
+	mkdir -p $(INST_LIB)/ogdi
+	cp $(TARGETGEN) $(INST_LIB)/ogdi
+endif
+
+ifeq ($(TARGETGEN),$(SHRDGEN))
+default-install:
 	cp $(TARGETGEN) $(INST_LIB)
+	pushd $(INST_LIB); \
+	      ln -s $(LIB_PREFIX)$(TOBEGEN).$(SHLIB_EXT).$(OGDI_MAJOR).$(OGDI_MINOR) \
+	            $(LIB_PREFIX)$(TOBEGEN_STRIPPED).$(SHLIB_EXT).$(OGDI_MAJOR); \
+	      ln -s $(LIB_PREFIX)$(TOBEGEN).$(SHLIB_EXT).$(OGDI_MAJOR).$(OGDI_MINOR) \
+	            $(LIB_PREFIX)$(TOBEGEN_STRIPPED).$(SHLIB_EXT); \
+	popd
 endif
 
 ifeq ($(TARGETGEN),$(ARCHGEN))
 default-install:
+endif
+
+ifeq ($(TARGETGEN),$(PROGGEN))
+default-install:
+	cp $(TARGETGEN) $(INST_BIN)
 endif
 
 ifeq ($(TARGETGEN),$(PROGGEN))
@@ -220,9 +263,11 @@ default-install:
 endif
 
 install-so-link:
-	rm -f $(INST_LIB)/$(LIB_PREFIX)$(TOBEGEN_STRIPPED).$(SHLIB_EXT)
-	ln -s $(LIB_PREFIX)$(TOBEGEN).$(SHLIB_EXT) \
-	      $(INST_LIB)/$(LIB_PREFIX)$(TOBEGEN_STRIPPED).$(SHLIB_EXT)
+	mv -f $(INST_LIB)/$(LIB_PREFIX)$(TOBEGEN).$(SHLIB_EXT).$(OGDI_MAJOR).$(OGDI_MINOR) $(INST_LIB)
+	mv -f $(INST_LIB)/$(LIB_PREFIX)$(TOBEGEN).$(SHLIB_EXT).$(OGDI_MAJOR) $(INST_LIB)
+	pushd $(INST_LIB); ln -s $(LIB_PREFIX)$(TOBEGEN).$(SHLIB_EXT).$(OGDI_MAJOR).$(OGDI_MINOR) \
+	      $(LIB_PREFIX)$(TOBEGEN_STRIPPED).$(SHLIB_EXT) ; \
+	popd
 
 install:	default-install $(EXTRA_INSTALL_TARGETS)
 
