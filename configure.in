@@ -1,6 +1,14 @@
 dnl Process this file with autoconf to produce a configure script.
 AC_INIT(config/unix.mak)
 
+OGDI_VERSION=3.1.5
+OGDI_MAJOR=3
+OGDI_MINOR=1
+
+AC_SUBST(OGDI_VERSION)
+AC_SUBST(OGDI_MAJOR)
+AC_SUBST(OGDI_MINOR)
+
 dnl ---------------------------------------------------------------------------
 dnl	Check if we have a doomed configuration.
 dnl ---------------------------------------------------------------------------
@@ -310,6 +318,34 @@ fi
 AC_SUBST(EXPAT_SETTING,$EXPAT_SETTING)
 AC_SUBST(EXPAT_INCLUDE,$EXPAT_INCLUDE)
 AC_SUBST(EXPAT_LIB,$EXPAT_LIB)
+
+# Allow the pkg-config directory to be set
+AC_ARG_WITH(pkgconfigdir,
+	AC_HELP_STRING([--with-pkgconfigdir],
+	[Use the specified pkgconfig dir (default is libdir/pkgconfig)]),
+	[pkgconfigdir=${withval}],
+	[pkgconfigdir='${libdir}/pkgconfig'])
+AC_SUBST([pkgconfigdir])
+AC_MSG_NOTICE([pkgconfig directory is ${pkgconfigdir}])
+
+# Make the *-config binary config scripts optional
+AC_ARG_WITH(binconfigs,
+	AC_HELP_STRING([--with-binconfigs],
+		[Generate shell ogdi-config scripts as well as pkg-config data]
+		[@<:@default=yes@:>@]),
+	[if test "${withval}" = no; then
+		binconfigs=
+		AC_MSG_NOTICE([ogdi-config scripts will not be built])
+	else
+		binconfigs='${binconfigs}'
+	fi],
+	[binconfigs='${binconfigs}'])
+AC_SUBST([binconfigs])
+
+# Config files, substituting as above
+AC_CONFIG_FILES([ogdi.pc:ogdi.pc.in])
+AC_CONFIG_FILES([ogdi-config:ogdi-config.in],
+		[chmod +x ogdi-config])
 
 AC_OUTPUT(config/generic.mak)
 mv config/generic.mak config/`uname`.mak
