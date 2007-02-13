@@ -248,11 +248,6 @@ default-install:
 	cp $(TARGETGEN) $(INST_BIN)
 endif
 
-ifeq ($(TARGETGEN),$(PROGGEN))
-default-install:
-	cp $(TARGETGEN) $(INST_BIN)
-endif
-
 ifeq ($(TARGETGEN),)
 default-install:
 endif
