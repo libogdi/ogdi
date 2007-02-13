@@ -4,6 +4,15 @@
 View the ChangeLog file for detailed, file by file notes on changes.  The
 NEWS file is just used to sumarize major changes, and new features. 
 
+3.1.6
+=====
+
+ o  Hide internal plugin objects from system libs path on unixes.
+ 
+ o  Release versioning using soname of libogdi shared library.
+ 
+ o  Clean up tons of compiler warnings over GCC.
+
 3.1.5
 =====
 
