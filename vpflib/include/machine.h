@@ -32,11 +32,11 @@ typedef struct
 #ifndef __INT32DEF__
 #define __INT32DEF__
 #ifdef _ALPHA
-typedef int int32;
-typedef unsigned int uint32;
+typedef int32_t int32;
+typedef uint32_t uint32;
 #else
-typedef long int32;
-typedef unsigned long uint32;
+typedef int32_t int32;
+typedef uint32_t uint32;
 #endif
 #endif
 

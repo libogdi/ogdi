@@ -19,7 +19,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.20  2007-02-13 02:11:18  cbalint
+ * Revision 1.21  2007-02-13 20:24:28  cbalint
+ * fix 64bit platforms.
+ *
+ * Revision 1.20  2007/02/13 02:11:18  cbalint
  *      3.1.6 release.
  *
  * Revision 1.19  2005/03/01 00:49:27  warmerda
@@ -112,11 +115,11 @@
 #ifndef __INT32DEF__
 #define __INT32DEF__
 #ifdef _ALPHA
-typedef int int32;
-typedef unsigned int uint32;
+typedef int32_t int32;
+typedef uint32_t uint32;
 #else
-typedef long int32;
-typedef unsigned long uint32;
+typedef int32_t int32;
+typedef uint32_t uint32;
 #endif
 #endif
 
