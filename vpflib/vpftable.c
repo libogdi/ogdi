@@ -518,7 +518,7 @@ int32 parse_data_def (vpf_table_type *table)
         case 'I':
 	  if (reclen >= 0)
 	    reclen += (sizeof (int32) * table->header[i].count);
-	  table->header[i].nullval.Int = NULLINT ;
+	  table->header[i].nullval.Int = (int32) NULLINT ;
 	  break;
         case 'S':
 	  if (reclen >= 0)

@@ -504,7 +504,7 @@ static unsigned char setmask[] = {1,2,4,8,16,32,64,128};
    register int32 nbyte, bit, element, nbytes;
    unsigned char byte = ' ';
 
-   if (!set.size) return MAXLONG;
+   if (!set.size) return (int32) MAXLONG;
 
    /* Find the first byte with a bit set */
    nbytes = NBYTES(set);
@@ -518,10 +518,10 @@ static unsigned char setmask[] = {1,2,4,8,16,32,64,128};
    /* Now find the first bit set in the byte */
    element = nbyte*8L;
    for (bit=0; bit<8; bit++,element++) {
-      if (element > set.size) return MAXLONG;
+      if (element > set.size) return (int32) MAXLONG;
       if (BITSET(bit,byte)) return element;
    }
-   return MAXLONG;
+   return (int32) MAXLONG;
 }
 
 /*************************************************************************
@@ -579,7 +579,7 @@ static unsigned char setmask[] = {1,2,4,8,16,32,64,128};
    register int32 bytenum, bit, nbytes;
    unsigned char byte;
 
-   if (!set.size) return -MAXLONG;
+   if (!set.size) return (int32) -MAXLONG;
 
    /* Find the last byte with a bit set */
    nbytes = NBYTES(set);
@@ -592,7 +592,7 @@ static unsigned char setmask[] = {1,2,4,8,16,32,64,128};
      }
    }
 
-   if (bytenum < 0) return -MAXLONG;
+   if (bytenum < 0) return (int32) -MAXLONG;
 
    for (bit=7;bit>=0;bit--) {
      if (BITSET(bit,byte)) {
@@ -600,7 +600,7 @@ static unsigned char setmask[] = {1,2,4,8,16,32,64,128};
      }
    }
 
-   return -MAXLONG;
+   return (int32) -MAXLONG;
 }
 
 /*************************************************************************

@@ -278,7 +278,7 @@ vpf_projection_type NOPROJ = {DDS, 0.0, 0.0, 0.0, 0.0, 0, 0.0, 0.0,
       if (next_edge < 0)
          {
          xvt_note (
-         "topology error! Edge: %ld  face: %ld  left: %ld  right: %ld\n",
+         "topology error! Edge: %d  face: %d  left: %d  right: %d\n",
          edge_rec.id,face_id,edge_rec.left_face,edge_rec.right_face);
          done = TRUE;
          }

@@ -610,7 +610,7 @@ int32        count;
 
    if ((count != table.header[field].count) &&
        (table.header[field].count > 0)) {
-      xvt_note ("Invalid element count! (%ld, %ld)\n",
+      xvt_note ("Invalid element count! (%d, %d)\n",
              count,table.header[field].count);
       return -1;
    }
