@@ -22,7 +22,7 @@ endif
 SOURCES = ecs_dyna.c ecsregex.c ecssplit.c \
           ecsassoc.c ecshash.c ecstile.c server.c ecsdist.c \
           ecslist.c ecsinfo.c ecsgeo.c ecs_xdr.c ecs_xdrz.c\
-          gmath.c client.c ecs_capabilities.c
+          matrix.c client.c ecs_capabilities.c
 
 INCLUDES = $(CURRENT_INCLUDE) $(GENERAL_INCLUDE) $(OGDI_INCLUDE) \
 		$(GRASS_INCLUDE) $(ZLIB_INCLUDE) $(PROJ_INCLUDE) \

@@ -18,7 +18,14 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.14  2007-02-12 15:52:57  cbalint
+ * Revision 1.15  2007-02-19 19:31:33  cbalint
+ *    Reimplement Matrix algebra under an opensource compatible license.
+ *  Modified Files:
+ *  	LICENSE ogdi/c-api/client.c ogdi/c-api/makefile
+ *  Added Files:
+ *  	ogdi/c-api/matrix.c ogdi/c-api/matrix.h
+ *
+ * Revision 1.14  2007/02/12 15:52:57  cbalint
  *
  *    Preliminary cleanup.
  *    Get rif of unitialized variables, and unused ones.
@@ -52,7 +59,7 @@
  */
 
 #include "ecs.h"
-#include "gmath.h"
+#include "matrix.h"
 #include <assert.h>
 
 ECS_CVSID("$Id$");
@@ -4089,12 +4096,12 @@ int cln_SetRasterConversion(ClientID,pts,resampling,trans,error_message)
 
   /* step 2: Generate matrix A and vector W for least-squares adjustment */
 
-  A    = alloc_dmatrix(localpts->nbpts*2, 8);
-  AtA  = alloc_dmatrix(8, 8);
-  Atw  = alloc_dmatrix(8, 1);
-  w    = alloc_dmatrix(localpts->nbpts*2, 1);
-  d    = alloc_dmatrix(8, 1);
-  res  = alloc_dmatrix(localpts->nbpts, 2);
+  A    = mat_malloc(localpts->nbpts*2, 8);
+  AtA  = mat_malloc(8, 8);
+  Atw  = mat_malloc(8, 1);
+  w    = mat_malloc(localpts->nbpts*2, 1);
+  d    = mat_malloc(8, 1);
+  res  = mat_malloc(localpts->nbpts, 2);
 
   if ((A == NULL) || (AtA == NULL) || (Atw == NULL) || (w == NULL) || 
       (d == NULL) || (res == NULL)) {
@@ -4144,13 +4151,13 @@ int cln_SetRasterConversion(ClientID,pts,resampling,trans,error_message)
   /* Compute the parameters using a least-squares adjustment */
   /* d = (AtA)-1 * Atw */
 
-  mult_dmatrix(A,localpts->nbpts*2,8,A,localpts->nbpts*2,8,AtA,ATA);
+  mat_mul_transposed(A,localpts->nbpts*2,8,A,localpts->nbpts*2,8,AtA);
   
-  invert_dmatrix(AtA, 8);
+  mat_inverse(AtA, 8);
   
-  mult_dmatrix(A,localpts->nbpts*2,8,w,localpts->nbpts*2,1,Atw,ATA);
+  mat_mul_transposed(A,localpts->nbpts*2,8,w,localpts->nbpts*2,1,Atw);
   
-  mult_dmatrix(AtA,8,8,Atw,8,1,d,AA);
+  mat_mul_direct(AtA,8,8,Atw,8,1,d);
 
   /* Compute the residuals */
 
@@ -4180,21 +4187,21 @@ int cln_SetRasterConversion(ClientID,pts,resampling,trans,error_message)
   if (result->error != 0) {
     *error_message = result->message;
     *pts = NULL;
-    free_dmatrix(A,localpts->nbpts*2);
-    free_dmatrix(AtA, 8);
-    free_dmatrix(Atw, 8);
-    free_dmatrix(w, localpts->nbpts*2);
-    free_dmatrix(d, 8);
-    free_dmatrix(res, localpts->nbpts);  
+    mat_free(A,localpts->nbpts*2);
+    mat_free(AtA, 8);
+    mat_free(Atw, 8);
+    mat_free(w, localpts->nbpts*2);
+    mat_free(d, 8);
+    mat_free(res, localpts->nbpts);  
     free(rc.coef.coef_val);
     return FALSE;
   }
-  free_dmatrix(A,localpts->nbpts*2);
-  free_dmatrix(AtA, 8);
-  free_dmatrix(Atw, 8);
-  free_dmatrix(w, localpts->nbpts*2);
-  free_dmatrix(d, 8);
-  free_dmatrix(res, localpts->nbpts);  
+  mat_free(A,localpts->nbpts*2);
+  mat_free(AtA, 8);
+  mat_free(Atw, 8);
+  mat_free(w, localpts->nbpts*2);
+  mat_free(d, 8);
+  mat_free(res, localpts->nbpts);  
   free(rc.coef.coef_val);
   *pts = localpts;
   return TRUE;

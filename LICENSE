@@ -75,8 +75,8 @@ ogdi/c-api/ecsregex.c is:
 
 ===============================================================================
 
-ogdi/c-api/gmath.c is:
-   Derived from Numerical methods in C
+ogdi/c-api/marix.c is:
+        GPL Version 2 License.
 
 
 ===============================================================================
