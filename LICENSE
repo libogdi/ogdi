@@ -76,8 +76,20 @@ ogdi/c-api/ecsregex.c is:
 ===============================================================================
 
 ogdi/c-api/marix.c is:
-        GPL Version 2 License.
 
+ * A public domain implementation.
+ *
+ * Author: Balint Cristian <cbalint@redhat.com>
+ *
+ *    matrix invert code derivate from GRASS project (< 4.0 version):
+ *        http://grass.itc.it/
+ *        http://en.wikipedia.org/wiki/Invertible_matrix
+ *
+ *   * matrix multiply algorithm:
+ *       http://en.wikipedia.org/wiki/Matrix_multiplication
+ *
+ *   * matrix transpose algorithm:
+ *        http://en.wikipedia.org/wiki/Transpose
 
 ===============================================================================
 
