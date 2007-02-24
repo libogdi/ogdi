@@ -19,7 +19,13 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.21  2007-02-13 20:24:28  cbalint
+ * Revision 1.22  2007-02-24 17:12:33  cbalint
+ * 3.2.0beta1 pre-release
+ *  Modified Files:
+ *  	ChangeLog HOWTO-RELEASE NEWS configure configure.in
+ *  	mkogdidist.sh ogdi/include/ecs_util.h
+ *
+ * Revision 1.21  2007/02/13 20:24:28  cbalint
  * fix 64bit platforms.
  *
  * Revision 1.20  2007/02/13 02:11:18  cbalint
@@ -72,8 +78,8 @@
 #ifndef ECS_UTIL
 #define ECS_UTIL 1
 
-#define OGDI_VERSION     316
-#define OGDI_RELEASEDATE 20070213
+#define OGDI_VERSION     320
+#define OGDI_RELEASEDATE 20070224
 
 #include <stdio.h>
 #include <stdlib.h>

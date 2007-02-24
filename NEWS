@@ -4,6 +4,12 @@
 View the ChangeLog file for detailed, file by file notes on changes.  The
 NEWS file is just used to sumarize major changes, and new features. 
 
+3.2.0beta1
+==========
+
+ o  Fix 64 bit platforms.
+ o  Fix malloc/free problem in rpf.c
+
 3.1.6
 =====
 

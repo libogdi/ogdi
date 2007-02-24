@@ -30,7 +30,7 @@ rm -rf dist_wrk
 mkdir dist_wrk
 cd dist_wrk
 
-export CVSROOT=:pserver:anonymous@cvs.ogdi.sourceforge.net:/cvsroot/ogdi
+export CVSROOT=:pserver:anonymous@ogdi.cvs.sourceforge.net:/cvsroot/ogdi
 
 echo "Please hit enter when prompted for a password."
 cvs login
@@ -42,7 +42,25 @@ if [ \! -d devdir ] ; then
   exit
 fi
 
+# remove junks
 find devdir -name CVS -exec rm -rf {} \;
+find devdir -name ".cvsignore" -exec rm -rf '{}' \;
+# fix wrongly encoded files from tarball
+set +x
+for f in `find . -type f` ; do
+   if file $f | grep -q ISO-8859 ; then
+      set -x
+      iconv -f ISO-8859-1 -t UTF-8 $f > ${f}.tmp && \
+         mv -f ${f}.tmp $f
+      set +x
+   fi
+   if file $f | grep -q CRLF ; then
+      set -x
+      sed -i -e 's|\r||g' $f
+      set +x
+   fi
+done
+set -x
 
 mv devdir $DIST_NAME
 
