@@ -17,7 +17,14 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.12  2004-03-26 22:33:41  warmerda
+ * Revision 1.13  2007-02-24 16:58:17  cbalint
+ *     Clear olso tilestruct while freeing memory in dyn_freelayerpriv()
+ *     glibc mtrace() reports zero malloc problems now.
+ *     Thanks to djdejohn for the report !
+ *  Modified Files:
+ *  	ChangeLog ogdi/driver/rpf/rpf.c
+ *
+ * Revision 1.12  2004/03/26 22:33:41  warmerda
  * Fixed computation of nbfeature in dyn_SelectRegion() to avoid rounding
  * error issues.  As per Bug 924250.
  *
@@ -171,6 +178,10 @@ void dyn_freelayerpriv(lpriv)
       free(lpriv->buffertile);
       lpriv->buffertile = NULL;
     }
+    
+   /* empty tilestruct */
+   ecs_TileDeleteAllLines (&(lpriv->tilestruct));
+    
     if (lpriv->ff != NULL) 
       free(lpriv->ff);
     if (lpriv->rgb_pal != NULL) 
