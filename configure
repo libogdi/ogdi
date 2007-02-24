@@ -4334,6 +4334,8 @@ fi;
 
 
 # Config files, substituting as above
+          ac_config_files="$ac_config_files config/common.mak:config/common.mak.in"
+
           ac_config_files="$ac_config_files ogdi.pc:ogdi.pc.in"
 
           ac_config_files="$ac_config_files ogdi-config:ogdi-config.in"
@@ -4890,6 +4892,7 @@ for ac_config_target in $ac_config_targets
 do
   case "$ac_config_target" in
   # Handling of arguments.
+  "config/common.mak" ) CONFIG_FILES="$CONFIG_FILES config/common.mak:config/common.mak.in" ;;
   "ogdi.pc" ) CONFIG_FILES="$CONFIG_FILES ogdi.pc:ogdi.pc.in" ;;
   "ogdi-config" ) CONFIG_FILES="$CONFIG_FILES ogdi-config:ogdi-config.in" ;;
   "config/generic.mak" ) CONFIG_FILES="$CONFIG_FILES config/generic.mak" ;;

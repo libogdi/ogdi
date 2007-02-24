@@ -22,10 +22,8 @@
 # Plugins lies in $(INST_LIB)/ogdi/
 #
 
-
-OGDI_MAJOR	  = 3
-OGDI_MINOR	  = 1
-
+OGDI_MAJOR	  = @OGDI_MAJOR@
+OGDI_MINOR	  = @OGDI_MINOR@
 
 OGDI_VERSION      = $(OGDI_MAJOR)$(OGDI_MINOR)
 

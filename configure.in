@@ -343,6 +343,7 @@ AC_ARG_WITH(binconfigs,
 AC_SUBST([binconfigs])
 
 # Config files, substituting as above
+AC_CONFIG_FILES([config/common.mak:config/common.mak.in])
 AC_CONFIG_FILES([ogdi.pc:ogdi.pc.in])
 AC_CONFIG_FILES([ogdi-config:ogdi-config.in],
 		[chmod +x ogdi-config])
