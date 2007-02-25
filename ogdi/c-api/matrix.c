@@ -42,6 +42,9 @@ void mat_mul_direct (matrix_a, height_a, width_a, matrix_b, height_b, width_b, m
 
  /* initialize loop iterators */
  int i=0, j=0, k=0;
+
+ /* initialise result matrix */
+ mat_init( matrix_result, width_a, width_b );
   
  /* compute multiply of each elements into destination matrix  */
  for ( i = 0 ; i< height_a; i++ )
@@ -65,14 +68,17 @@ void mat_mul_transposed (matrix_a, height_a, width_a, matrix_b, height_b, width_
     double **matrix_result; 
 {
  /* initialize loop iterators */
-  int i=0, j=0, k=0;
+ int i=0, j=0, k=0;
+
+ /* initialise result matrix */
+ mat_init( matrix_result, width_a, width_b );
 
  /* compute multiply of each elements into destination matrix */
- for ( i = 0 ; i< height_a; i++ )
-    for ( j = 0 ; j< width_b; j++ )
-      for ( k = 0 ; k< width_a; k++ )
-	matrix_result[i][j] += matrix_a[i][k]*matrix_b[j][k];
-  return;
+ for( i=0; i<width_a; ++i )
+   for( j=0; j<width_b; ++j )
+     for( k=0; k<height_a; ++k )
+   	  matrix_result[i][j] += matrix_a[k][i] * matrix_b[k][j];
+  return;    
 }
 
 /*
@@ -194,7 +200,7 @@ int mat_inverse (double **matrix,int n)
  */
 double **mat_malloc(int height,int width)
 {
-  unsigned i=0;
+  int i=0;
   double **matrix=NULL;
 
     matrix = (double **)malloc(height*sizeof(double *));
@@ -204,9 +210,9 @@ double **mat_malloc(int height,int width)
 		exit(1);
 		}
 
-    for (i=0;i < width;i++) {
-        matrix[i] = (double *)malloc(width * sizeof(double));
- 	  if(matrix == NULL) {
+    for (i=0;i < height;i++) {
+        matrix[i] = (double *)malloc(width*sizeof(double));
+	  if(matrix == NULL) {
 	        printf("Allocating memory for matrix data failed. \n");
 		free(matrix);
 		exit(1);
