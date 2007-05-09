@@ -19,7 +19,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.22  2007-02-24 17:12:33  cbalint
+ * Revision 1.23  2007-05-09 21:41:24  cbalint
+ * 3.2.0beta2 release
+ *
+ * Revision 1.22  2007/02/24 17:12:33  cbalint
  * 3.2.0beta1 pre-release
  *  Modified Files:
  *  	ChangeLog HOWTO-RELEASE NEWS configure configure.in
@@ -79,7 +82,7 @@
 #define ECS_UTIL 1
 
 #define OGDI_VERSION     320
-#define OGDI_RELEASEDATE 20070224
+#define OGDI_RELEASEDATE 20070509
 
 #include <stdio.h>
 #include <stdlib.h>

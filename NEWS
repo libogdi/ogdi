@@ -4,6 +4,19 @@
 View the ChangeLog file for detailed, file by file notes on changes.  The
 NEWS file is just used to sumarize major changes, and new features. 
 
+3.2.0beta2
+==========
+
+ o  Fix filename case sensitivity problems.  
+
+ o  Further fix memory leaks.
+
+ o  Fix read the VMAP2i 'MIG2i000' product.
+
+ o  Handle 'L' (Latin1) type for text files.
+
+ o  Suport optional text to UTF-8 convert. 
+
 3.2.0beta1
 ==========
 
