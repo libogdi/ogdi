@@ -17,7 +17,49 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.18  2007-02-12 21:01:48  cbalint
+ * Revision 1.19  2007-05-09 20:46:28  cbalint
+ * From: Even Rouault <even.rouault@mines-paris.org>
+ * Date: Friday 21:14:18
+ *
+ *         * fix filename case sensitivy problems (for Unix-like systems).
+ *
+ *         * fix incorrect use of sprintf in vrf_GetMetadata.
+ *
+ *         * report wgs84 instead of nad83, not sure whether that is true
+ *         for all VPF products, but at least it's correct for VMAP products
+ *         that *must* be WGS84. A better fix would be to read the VPF table
+ *         that contains this information.
+ *
+ *         * fix a few minor memory leaks and memory usage issues.
+ *
+ *         * enable XMIN, YMIN, XMAX and YMAX columns to be of type double
+ *         in EBR and FBR files (for read the VMAP2i 'MIG2i000' product).
+ *
+ *         * add .pjt and .tjt as possible extensions for join tables
+ *         (VMAP2i 'MIG2i000' product).
+ *
+ *         * fix duplicated layers report (VMAP2i 'MIG2i000' product).
+ *
+ *         * handle 'L' (Latin1) type for text files (GEOCAPI 'MIGxxx' products).
+ *
+ *         * optionnaly, convert text to UTF-8 when environment variable
+ *         CONVERT_OGDI_TXT_TO_UTF8 is defined. This part is not portable
+ *         on Windows I guess (only tested on Linux) and maybe too specific.
+ *
+ *         * enable reading of VPF products without table indexes file
+ *         (GEOCAPI 'MIG013' and 'MIG016' products). VPF norm says that when
+ *         there is a variable length field in one table, an index should exist,
+ *         but some test products don't follow this. The approach here is to read
+ *         the whole table content and build the index in memory.
+ *
+ *  Modified Files:
+ *  	ChangeLog ogdi/driver/vrf/feature.c ogdi/driver/vrf/object.c
+ *  	ogdi/driver/vrf/utils.c ogdi/driver/vrf/vrf.c
+ *  	ogdi/driver/vrf/vrfswq.c vpflib/musedir.c vpflib/strfunc.c
+ *  	vpflib/vpfbrows.c vpflib/vpfprop.c vpflib/vpfquery.c
+ *  	vpflib/vpfread.c vpflib/vpftable.c
+ *
+ * Revision 1.18  2007/02/12 21:01:48  cbalint
  *      Fix win32 target. It build and works now. (tested with VC6)
  *
  * Revision 1.17  2007/02/12 15:52:57  cbalint
@@ -196,7 +238,7 @@ ecs_Result *dyn_CreateServer(s,Request)
  */
 
 ecs_Result *dyn_DestroyServer(s)
-     ecs_Server *s;
+    ecs_Server *s;
 {
   register ServerPrivateData *spriv = s->priv;
 
@@ -332,13 +374,13 @@ ecs_Result *dyn_SelectLayer(s,sel)
 
   if ((layer = ecs_GetLayer(s,sel)) != -1) {
 
-    if (s->currentLayer != -1)
-      _closeLayerTable(s,&(s->layer[s->currentLayer]));
+  if (s->currentLayer != -1)
+    _closeLayerTable(s,&(s->layer[s->currentLayer]));
+#if 0
+  /* Close the join table for the previous layer */
 
-    /* Close the join table for the previous layer */
-
-    lpriv = (LayerPrivateData *) s->layer[s->currentLayer].priv; 
-    if (lpriv->joinTableName != NULL) {
+  lpriv = (LayerPrivateData *) s->layer[s->currentLayer].priv;
+  if (lpriv->joinTableName != NULL) {
 
 #ifdef TESTOPENTABLE
       printf("close lpriv->joinTable\n");
@@ -346,36 +388,36 @@ ecs_Result *dyn_SelectLayer(s,sel)
 
       if (lpriv->joinTable.fp == NULL) 
 	vpf_close_table(&(lpriv->joinTable));
-    }
-
+  }
+#endif
     
-    /* if it already exists than assign currentLayer and set index to 0 to force rewind */
+  /* if it already exists than assign currentLayer and set index to 0 to force rewind */
     
-    s->currentLayer = layer;
-    s->layer[layer].index = 0;
-    lpriv = (LayerPrivateData *) s->layer[layer].priv; 
+  s->currentLayer = layer;
+  s->layer[layer].index = 0;
+  lpriv = (LayerPrivateData *) s->layer[layer].priv;
+#if 0
+  /* Open the current join table */
 
-    /* Open the current join table */
-
-    if (lpriv->joinTableName != NULL) {
-      sprintf(buffer,"%s/%s/%s",spriv->library,lpriv->coverage,lpriv->joinTableName);
-      if (muse_access(buffer,0) == 0 ) {
+  if (lpriv->joinTableName != NULL) {
+    sprintf(buffer,"%s/%s/%s",spriv->library,lpriv->coverage,lpriv->joinTableName);
+    if (muse_access(buffer,0) == 0 ) {
 #ifdef TESTOPENTABLE
 	printf("open lpriv->joinTable:%s\n",buffer);
 #endif
 	lpriv->joinTable = vpf_open_table(buffer,disk,"rb",NULL);
 	if (lpriv->joinTable.fp == NULL) {
-	  ecs_SetError(&(s->result),1,"Unable to open the join table");
-	  vpf_close_table(lpriv->featureTable);
-	  free(s->layer[layer].priv);
-	  ecs_FreeLayer(s,layer);   
-	  return &(s->result);
-	}
-      }
+      ecs_SetError(&(s->result),1,"Unable to open the join table");
+      vpf_close_table(lpriv->featureTable);
+      free(s->layer[layer].priv);
+      ecs_FreeLayer(s,layer);
+      return &(s->result);
     }
-
-    ecs_SetSuccess(&(s->result));
-    return &(s->result);
+    }
+  }
+#endif
+  ecs_SetSuccess(&(s->result));
+  return &(s->result);
   }
 
   if (s->currentLayer != -1)
@@ -421,7 +463,6 @@ ecs_Result *dyn_SelectLayer(s,sel)
   }
 
   /* obtain the feature and primitive table file name from the FCS file */
-
 
   if (!vrf_getFileNameFromFcs(s,lpriv)) {
     free( lpriv->coverage );
@@ -473,12 +514,11 @@ ecs_Result *dyn_SelectLayer(s,sel)
         have TILE_ID, but do have feature joins so we assume in this case that
         it is a feature join.
 	*/
-#ifdef TESTOPENTABLE
-      printf("close lpriv->joinTable:%s\n");
-#endif
-
       if (table_pos("TILE_ID",lpriv->joinTable) == -1
           && lpriv->isTiled ) {
+#ifdef TESTOPENTABLE
+      printf("close lpriv->joinTable:%s\n", lpriv->joinTableName);
+#endif
 	vpf_close_table(&(lpriv->joinTable));
 	free(lpriv->joinTableName);
 	lpriv->joinTableName = NULL;
@@ -486,6 +526,12 @@ ecs_Result *dyn_SelectLayer(s,sel)
     }
 
   } else {
+    free( lpriv->coverage );
+    free( lpriv->fclass );
+    free( lpriv->expression );
+    free(lpriv->featureTableName);
+    free(lpriv->primitiveTableName);
+    free(lpriv->featureTablePrimIdName);
     free(s->layer[layer].priv);
     ecs_FreeLayer(s,layer);
     ecs_SetError(&(s->result),1,"Can't open this feature class");
@@ -570,7 +616,7 @@ ecs_Result *dyn_ReleaseLayer(s,sel)
 
   if (lpriv->joinTableName != NULL) {
 #ifdef TESTOPENTABLE
-    printf("close lpriv->joinTable:%s\n");
+    printf("close lpriv->joinTable:%s\n", lpriv->joinTableName);
 #endif
     vpf_close_table(&(lpriv->joinTable));
   }
@@ -720,6 +766,7 @@ ecs_Result *dyn_GetAttributesFormat(s)
     switch(lpriv->featureTable.header[i].type) {
 
     case 'T':
+    case 'L':
       length = lpriv->featureTable.header[i].count;
       if (length == -1) {
 	type = Varchar;
@@ -781,7 +828,6 @@ ecs_Result *dyn_GetAttributesFormat(s)
 ecs_Result *dyn_GetNextObject(s)
      ecs_Server *s;
 {
-
   (layerMethod[s->layer[s->currentLayer].sel.F].getNextObject)(s,&(s->layer[s->currentLayer]));
   return &(s->result);
 
@@ -904,7 +950,7 @@ ecs_Result *dyn_UpdateDictionary(s,arg)
 ecs_Result *dyn_GetServerProjection(s)
      ecs_Server *s;
 {
-  ecs_SetText(&(s->result), "+proj=longlat +datum=nad83");
+  ecs_SetText(&(s->result), "+proj=longlat +datum=wgs84");
   ecs_SetSuccess(&(s->result));
   return &(s->result);
 }

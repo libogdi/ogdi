@@ -2503,16 +2503,17 @@ Set the case of the filename for the current operating system.
       return FALSE;
       }
  
-   strcpy(locname,tablename);
-   rightjust(locname);
- 
    /* if '.' in string, delete through last . */
  
-   end = strrchr(locname,'.');
+   end = strrchr(tablename,'.');
 
    if (end != NULL) {
      strcpy(locname,end);
    }
+   else {
+     strcpy(locname,tablename);
+   }
+   rightjust(locname);
  
    strupr(locname);
  

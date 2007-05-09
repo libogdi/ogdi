@@ -58,6 +58,8 @@
 #include <dos.h>
 #endif
 
+#include <iconv.h>
+
 #ifdef _UNIX
 #include <sys/stat.h>
 #define   SEEK_SET    0         /* Turbo C fseek value */
@@ -546,6 +548,7 @@ vpf_table_type table;
          case 'S':
             offset += sizeof(short int)*row[i].count;
             break;
+         case 'L':
          case 'T':
             offset += sizeof(char)*row[i].count;
             break;
@@ -790,6 +793,7 @@ vpf_table_type table;
       status = 0;
       switch (table.header[i].type) {
       case 'T':
+      case 'L':
 	if (count == 1) {
 	  row[i].ptr = (char *)xvt_zmalloc(sizeof(char));
 	  Read_Vpf_Char(row[i].ptr, table.fp, 1) ;
@@ -945,6 +949,7 @@ vpf_table_type table;
       count = origrow[i].count;
       row[i].count = count;
       switch (table.header[i].type) {
+         case 'L':
          case 'T':
             if (count==1) {
                row[i].ptr = (char *)xvt_zmalloc(1);
@@ -1369,6 +1374,17 @@ int32  *count;
    int32   col;
    char     * tptr;
    void     * retvalue;
+   static int do_iconv = -1;
+   static iconv_t iconvd = (iconv_t)-1;
+
+   if (do_iconv == -1)
+   {
+     do_iconv = getenv("CONVERT_OGDI_TXT_TO_UTF8") != NULL;
+     if (do_iconv)
+     {
+       iconvd = iconv_open("UTF-8", "ISO-8859-1");
+     }
+   }
 
    retvalue = NULL;
    col = field_number;
@@ -1384,18 +1400,54 @@ int32  *count;
       case 'X':
          retvalue = NULL;
          break;
+      case 'L':
       case 'T':
          if (table.header[col].count == 1) {
             memcpy(value,row[col].ptr,sizeof(char));
          } else {
-            retvalue = (char*)xvt_zmalloc (((size_t)row[col].count + 1) *
+            int i, ascii = 1;
+            retvalue = (char*)xvt_zmalloc (((size_t)2 * row[col].count + 1) *
                                                                sizeof (char));
             tptr = (char*)xvt_zmalloc (((size_t)row[col].count + 1) *
                                                                sizeof (char));
             memcpy (tptr, row[col].ptr, (size_t)row[col].count *
                                                                sizeof (char));
             tptr[row[col].count] = '\0';
-            strcpy((char *)retvalue,tptr);
+            for(i=0;tptr[i]!=0;i++)
+            {
+              if ((unsigned char)tptr[i] >= 128)
+              {
+                ascii = 0;
+                if (table.header[col].type == 'T')
+                {
+                  //fprintf(stderr, "a T column contains non-ASCII text\n");
+                }
+                break;
+              }
+            }
+            if (ascii == 1 || iconvd == (iconv_t)-1)
+              strcpy((char *)retvalue,tptr);
+            else
+            {
+              size_t nin = row[col].count;
+              size_t nout = 2 * row[col].count;
+              void* saved_retvalue = retvalue;
+              char* saved_tptr = tptr;
+              char** outbuf = (char**)&retvalue;
+
+              size_t ret = iconv(iconvd, &tptr, &nin, outbuf, &nout);
+              tptr = saved_tptr;
+              retvalue = saved_retvalue;
+              row[col].count = strlen(retvalue);
+              if (ret == (size_t)-1)
+              {
+                fprintf(stderr, "Can't convert '%s' to UTF-8. Truncating to '%s'\n", tptr, (char*)retvalue);
+              }
+              else
+              {
+                //fprintf(stderr, "UTF-8 text : '%s'\n", (char*)retvalue);
+              }
+            }
             if(tptr != (char *)NULL)
               {xvt_free(tptr);tptr = (char *)NULL;}
          }

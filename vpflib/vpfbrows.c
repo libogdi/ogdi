@@ -811,6 +811,7 @@ static int32 maxlength;
    /*  Read Index Directory Records */
    switch (data_type)
       {
+      case 'L': /* Character String */
       case 'T': /* Character String */
          t_elt = (char*) xvt_zmalloc ((size_t) nr_elts);
          for (i=0; i<nr_entries; i++)

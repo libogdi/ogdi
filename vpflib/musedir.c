@@ -43,6 +43,137 @@
 /* FILE_OPEN                                                              */
 /**************************************************************************/
 
+static int muse_exists_path(const char* path)
+{
+  int acc;
+/*  fprintf(stderr, "trying %s\n", path);*/
+#ifdef _WINDOWS
+  acc = _access(path, 0);
+#else
+  acc = access(path, 0); 
+#endif
+  return acc == 0;
+}
+
+
+static int muse_fix_path_case(const char* src_path, char dest_path[SZ_FNAME])
+{
+  char tmp_path[SZ_FNAME];
+  int lastSlashPos;
+  int i;
+  int len;
+  int curPartHasDot = 0;
+  int curPartIsLowerCase = 1;
+  int curPartIsUpperCase = 1;
+
+  strcpy(dest_path, src_path);
+  if (muse_exists_path(dest_path))
+  {
+    return 1;
+  }
+
+  lastSlashPos = -1;
+  len = strlen(dest_path);
+
+  /* Find the maximum part of the path that exists */
+  for(i=len-1;i>=0;i--)
+  {
+    if (dest_path[i] == FILE_SEP)
+    {
+      memcpy(tmp_path, dest_path, i);
+      tmp_path[i] = 0;
+      if (muse_exists_path(tmp_path))
+      {
+        lastSlashPos = i;
+        break;
+      }
+    }
+  }
+
+  i++;
+
+  for(;i<len;i++)
+  {
+    if (dest_path[i] == '.')
+    {
+      curPartHasDot = 1;
+    }
+    else if (dest_path[i] >= 'a' && dest_path[i] <= 'z')
+    {
+      curPartIsUpperCase = 0;
+    }
+    else if (dest_path[i] >= 'A' && dest_path[i] <= 'Z')
+    {
+      curPartIsLowerCase = 0;
+    }
+    if ((dest_path[i] == FILE_SEP || i == len-1) && i != 0)
+    {
+      int limit = (dest_path[i] == FILE_SEP) ? i-1 : i;
+      memcpy(tmp_path, dest_path, limit+1);
+      tmp_path[limit+1] = 0;
+      if (muse_exists_path(tmp_path) == 0)
+      {
+        int j;
+        for(j=lastSlashPos+1;j<=limit;j++)
+        {
+          tmp_path[j] = toupper(tmp_path[j]);
+        }
+        if (curPartIsUpperCase == 1 || muse_exists_path(tmp_path) == 0)
+        {
+          for(j=lastSlashPos+1;j<=limit;j++)
+          {
+            tmp_path[j] = tolower(tmp_path[j]);
+          }
+          if (curPartIsLowerCase == 1 || muse_exists_path(tmp_path) == 0)
+          {
+            if (i == len-1 && !(dest_path[i] == '.' || (i-1>=0 && dest_path[i-1] == ';' && dest_path[i] == '1')))
+            {
+               char tmp_dest_path[SZ_FNAME];
+               if (curPartHasDot == 0)
+               {
+                 strcpy(tmp_path, dest_path);
+                 strcat(tmp_path, ".");
+                 if (muse_fix_path_case(tmp_path, tmp_dest_path))
+                 {
+                   strcpy(dest_path, tmp_dest_path);
+                   return 1;
+                 }
+               }
+
+               strcpy(tmp_path, dest_path);
+               strcat(tmp_path, ";1");
+               if (muse_fix_path_case(tmp_path, tmp_dest_path))
+               {
+                 strcpy(dest_path, tmp_dest_path);
+                 return 1;
+               }
+
+               return 0;
+            }
+            else
+            {
+              return 0;
+            }
+          }
+          else
+          {
+            memcpy(dest_path, tmp_path, limit+1);
+          }
+        }
+        else
+        {
+          memcpy(dest_path, tmp_path, limit+1);
+        }
+      }
+      curPartIsLowerCase = 1;
+      curPartIsUpperCase = 1;
+      curPartHasDot = 0;
+      lastSlashPos = i;
+    }
+  }
+  return 1;
+}
+
 
 
 #if XVT_CC_PROTO
@@ -56,99 +187,18 @@ muse_file_open(path, mode)
 #endif
 
 {
-    FILE           *file;
     char            pathext[SZ_FNAME];
-    char            lobuf[SZ_FNAME];
-    char            upbuf[SZ_FNAME];
-    int             i, len;
-    BOOLEAN         DOT_FOUND = 0;
-    int32            lenup;
-    char            *s;
+    char            real_path[SZ_FNAME];
 
     strcpy(pathext, path);
     muse_check_path(pathext);
 
-#ifdef _WINDOWS
-    file = fopen(pathext, mode);
-    return (file);
-#endif				
-
-#ifdef unix
-    memset(lobuf, (char) NULL, SZ_FNAME);
-    memset(upbuf, (char) NULL, SZ_FNAME);
-    len = strlen(pathext);
-    strcpy(upbuf, pathext);
-    strcpy(lobuf, pathext);
-
-    for (i = len-1; i >= 0; i--)
+    if (muse_fix_path_case(pathext, real_path) == 0)
     {
-	if (pathext[i] == '.')
-	{
-	    DOT_FOUND = TRUE;
-	}
-        if (pathext[i] == (int) FILE_SEP) 
-            break;
-    }
-#if 0
-    for (i = len - 1; (i >= 0 && pathext[i] != (int) FILE_SEP); i--)
-    {
-	upbuf[i] = toupper(pathext[i]);
-	lobuf[i] = tolower(pathext[i]);
-    }
-#endif
-    s = strchr(&pathext[1],'/');
-    if (s != (char *)NULL)
-      lenup = strlen(s);
-    else
-      lenup = len;
-    for (i = len - lenup; i < len; i++)
-    {
-	upbuf[i] = toupper(pathext[i]);
-	lobuf[i] = tolower(pathext[i]);
+      return NULL;
     }
 
-    if ((file = fopen(pathext, mode)) == (FILE *) NULL)
-    {
-
-	if (!DOT_FOUND)
-	    strcat(pathext, ".");
-	if ((file = fopen(pathext, mode)) == (FILE *) NULL)
-	{
-	    strcat(pathext, ";1");
-	    file = fopen(pathext, mode);
-	}
-    }
-    if (file == (FILE *) NULL)
-    {
-	if ((file = fopen(lobuf, mode)) == (FILE *) NULL)
-	{
-
-	    if (!DOT_FOUND)
-		strcat(lobuf, ".");
-	    if ((file = fopen(lobuf, mode)) == (FILE *) NULL)
-	    {
-		strcat(lobuf, ";1");
-		file = fopen(lobuf, mode);
-	    }
-	}
-    }
-    if (file == (FILE *) NULL)
-    {
-	if ((file = fopen(upbuf, mode)) == (FILE *) NULL)
-	{
-
-	    if (!DOT_FOUND)
-		strcat(upbuf, ".");
-	    if ((file = fopen(upbuf, mode)) == (FILE *) NULL)
-	    {
-		strcat(upbuf, ";1");
-		file = fopen(upbuf, mode);
-	    }
-	}
-    }
-
-    return (file);
-#endif
+    return fopen(real_path, mode);
 
 /*
 #ifdef _MAC
@@ -297,99 +347,24 @@ muse_access(path, amode)
 #endif
 
 {
-
-    char            pathext[SZ_FNAME];
     int             acc;
-    char            lobuf[SZ_FNAME];
-    char            upbuf[SZ_FNAME];
-    int             i, len;
-    BOOLEAN         DOT_FOUND = 0;
-    int32            lenup;
-    char            *s;
+    char            pathext[SZ_FNAME];
+    char            real_path[SZ_FNAME];
 
     strcpy(pathext, path);
+    muse_check_path(pathext);
+
+    if (muse_fix_path_case(pathext, real_path) == 0)
+    {
+      return -1;
+    }
 
 #ifdef _WINDOWS
-    acc = _access(pathext, amode);
-    return (acc);
+    acc = _access(real_path, amode);
+#else
+    acc = access(real_path, amode);
 #endif
-
-#ifdef unix
-    memset(lobuf, (char) NULL, SZ_FNAME);
-    memset(upbuf, (char) NULL, SZ_FNAME);
-    len = strlen(pathext);
-    strcpy(upbuf, pathext);
-    strcpy(lobuf, pathext);
-
-    for (i = len-1; i >= 0; i--)
-    {
-	if (pathext[i] == '.')
-	{
-	    DOT_FOUND = TRUE;
-	}
-        if (pathext[i] == (int) FILE_SEP) 
-            break;
-    }
-#if 0
-    for (i = len - 1; (i >= 0 && pathext[i] != (int) FILE_SEP); i--)
-    {
-	upbuf[i] = toupper(pathext[i]);
-	lobuf[i] = tolower(pathext[i]);
-    }
-#endif
-    s = strchr(&pathext[1],'/');
-    if (s != (char *)NULL)
-      lenup = strlen(s);
-    else
-      lenup = len;
-    for (i = len - lenup; i < len; i++)
-    {
-	upbuf[i] = toupper(pathext[i]);
-	lobuf[i] = tolower(pathext[i]);
-    }
-
-    if ((acc = access(pathext, amode)) == -1)
-    {
-
-	if (!DOT_FOUND)
-	    strcat(pathext, ".");
-	if ((acc = access(pathext, amode)) == -1)
-	{
-	    strcat(pathext, ";1");
-	    acc = access(pathext, amode);
-	}
-    }
-    if (acc == -1)
-    {
-	if ((acc = access(lobuf, amode)) == -1)
-	{
-
-	    if (!DOT_FOUND)
-		strcat(lobuf, ".");
-	    if ((acc = access(lobuf, amode)) == -1)
-	    {
-		strcat(lobuf, ";1");
-		acc = access(lobuf, amode);
-	    }
-	}
-    }
-    if (acc == -1)
-    {
-	if ((acc = access(upbuf, amode)) == -1)
-	{
-
-	    if (!DOT_FOUND)
-		strcat(upbuf, ".");
-	    if ((acc = access(upbuf, amode)) == -1)
-	    {
-		strcat(upbuf, ";1");
-		acc = access(upbuf, amode);
-	    }
-	}
-    }
-    return (acc);
-#endif				
-
+    return acc;
 }
 
 

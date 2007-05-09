@@ -18,7 +18,49 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.6  2007-02-12 15:52:57  cbalint
+ * Revision 1.7  2007-05-09 20:46:28  cbalint
+ * From: Even Rouault <even.rouault@mines-paris.org>
+ * Date: Friday 21:14:18
+ *
+ *         * fix filename case sensitivy problems (for Unix-like systems).
+ *
+ *         * fix incorrect use of sprintf in vrf_GetMetadata.
+ *
+ *         * report wgs84 instead of nad83, not sure whether that is true
+ *         for all VPF products, but at least it's correct for VMAP products
+ *         that *must* be WGS84. A better fix would be to read the VPF table
+ *         that contains this information.
+ *
+ *         * fix a few minor memory leaks and memory usage issues.
+ *
+ *         * enable XMIN, YMIN, XMAX and YMAX columns to be of type double
+ *         in EBR and FBR files (for read the VMAP2i 'MIG2i000' product).
+ *
+ *         * add .pjt and .tjt as possible extensions for join tables
+ *         (VMAP2i 'MIG2i000' product).
+ *
+ *         * fix duplicated layers report (VMAP2i 'MIG2i000' product).
+ *
+ *         * handle 'L' (Latin1) type for text files (GEOCAPI 'MIGxxx' products).
+ *
+ *         * optionnaly, convert text to UTF-8 when environment variable
+ *         CONVERT_OGDI_TXT_TO_UTF8 is defined. This part is not portable
+ *         on Windows I guess (only tested on Linux) and maybe too specific.
+ *
+ *         * enable reading of VPF products without table indexes file
+ *         (GEOCAPI 'MIG013' and 'MIG016' products). VPF norm says that when
+ *         there is a variable length field in one table, an index should exist,
+ *         but some test products don't follow this. The approach here is to read
+ *         the whole table content and build the index in memory.
+ *
+ *  Modified Files:
+ *  	ChangeLog ogdi/driver/vrf/feature.c ogdi/driver/vrf/object.c
+ *  	ogdi/driver/vrf/utils.c ogdi/driver/vrf/vrf.c
+ *  	ogdi/driver/vrf/vrfswq.c vpflib/musedir.c vpflib/strfunc.c
+ *  	vpflib/vpfbrows.c vpflib/vpfprop.c vpflib/vpfquery.c
+ *  	vpflib/vpfread.c vpflib/vpftable.c
+ *
+ * Revision 1.6  2007/02/12 15:52:57  cbalint
  *
  *    Preliminary cleanup.
  *    Get rif of unitialized variables, and unused ones.
@@ -96,7 +138,7 @@ int vrf_swq_evaluator( swq_field_op *op, void *raw_info )
 /* -------------------------------------------------------------------- */
 /*      String field comparison.                                        */
 /* -------------------------------------------------------------------- */
-    if( table.header[op->field_index].type == 'T' )
+    if( table.header[op->field_index].type == 'T' || table.header[op->field_index].type == 'L' )
     {
         int	ret_result, i;
 
@@ -231,7 +273,7 @@ set_type query_table2( char *expression, vpf_table_type table )
    for (i=0; i < nfields; i++)
    {
        fieldname[i] = (char *) table.header[i].name;
-       if( table.header[i].type == 'T' )
+       if( table.header[i].type == 'T' || table.header[i].type == 'L' )
            fieldtype[i] = SWQ_STRING;
        else if( table.header[i].type == 'F' )
            fieldtype[i] = SWQ_FLOAT;

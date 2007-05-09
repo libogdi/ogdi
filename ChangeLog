@@ -1,6 +1,42 @@
+2007-05-09  Balint Cristian <cbalint@redhat.com>
+
+From: Even Rouault <even.rouault@mines-paris.org>
+Date: Friday 21:14:18
+
+        * fix filename case sensitivy problems (for Unix-like systems).  
+
+        * fix incorrect use of sprintf in vrf_GetMetadata.
+
+        * report wgs84 instead of nad83, not sure whether that is true 
+        for all VPF products, but at least it's correct for VMAP products 
+        that *must* be WGS84. A better fix would be to read the VPF table 
+        that contains this information.
+
+        * fix a few minor memory leaks and memory usage issues.
+
+        * enable XMIN, YMIN, XMAX and YMAX columns to be of type double 
+        in EBR and FBR files (for read the VMAP2i 'MIG2i000' product).
+
+        * add .pjt and .tjt as possible extensions for join tables
+        (VMAP2i 'MIG2i000' product).
+        
+        * fix duplicated layers report (VMAP2i 'MIG2i000' product).
+        
+        * handle 'L' (Latin1) type for text files (GEOCAPI 'MIGxxx' products).
+        
+        * optionnaly, convert text to UTF-8 when environment variable 
+        CONVERT_OGDI_TXT_TO_UTF8 is defined. This part is not portable 
+        on Windows I guess (only tested on Linux) and maybe too specific.
+        
+        * enable reading of VPF products without table indexes file 
+        (GEOCAPI 'MIG013' and 'MIG016' products). VPF norm says that when 
+        there is a variable length field in one table, an index should exist, 
+        but some test products don't follow this. The approach here is to read 
+        the whole table content and build the index in memory.
+
 2007-03-26  Frank Warmerdam  <warmerdam@pobox.com>
 
-	* ogdi/glutil/RCa00246 temp file removed, per request from 
+        * ogdi/glutil/RCa00246 temp file removed, per request from 
 	frankie@debiangis. 
 
 ============================================================================

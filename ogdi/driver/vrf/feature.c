@@ -17,7 +17,49 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.15  2007-02-12 15:52:57  cbalint
+ * Revision 1.16  2007-05-09 20:46:28  cbalint
+ * From: Even Rouault <even.rouault@mines-paris.org>
+ * Date: Friday 21:14:18
+ *
+ *         * fix filename case sensitivy problems (for Unix-like systems).
+ *
+ *         * fix incorrect use of sprintf in vrf_GetMetadata.
+ *
+ *         * report wgs84 instead of nad83, not sure whether that is true
+ *         for all VPF products, but at least it's correct for VMAP products
+ *         that *must* be WGS84. A better fix would be to read the VPF table
+ *         that contains this information.
+ *
+ *         * fix a few minor memory leaks and memory usage issues.
+ *
+ *         * enable XMIN, YMIN, XMAX and YMAX columns to be of type double
+ *         in EBR and FBR files (for read the VMAP2i 'MIG2i000' product).
+ *
+ *         * add .pjt and .tjt as possible extensions for join tables
+ *         (VMAP2i 'MIG2i000' product).
+ *
+ *         * fix duplicated layers report (VMAP2i 'MIG2i000' product).
+ *
+ *         * handle 'L' (Latin1) type for text files (GEOCAPI 'MIGxxx' products).
+ *
+ *         * optionnaly, convert text to UTF-8 when environment variable
+ *         CONVERT_OGDI_TXT_TO_UTF8 is defined. This part is not portable
+ *         on Windows I guess (only tested on Linux) and maybe too specific.
+ *
+ *         * enable reading of VPF products without table indexes file
+ *         (GEOCAPI 'MIG013' and 'MIG016' products). VPF norm says that when
+ *         there is a variable length field in one table, an index should exist,
+ *         but some test products don't follow this. The approach here is to read
+ *         the whole table content and build the index in memory.
+ *
+ *  Modified Files:
+ *  	ChangeLog ogdi/driver/vrf/feature.c ogdi/driver/vrf/object.c
+ *  	ogdi/driver/vrf/utils.c ogdi/driver/vrf/vrf.c
+ *  	ogdi/driver/vrf/vrfswq.c vpflib/musedir.c vpflib/strfunc.c
+ *  	vpflib/vpfbrows.c vpflib/vpfprop.c vpflib/vpfquery.c
+ *  	vpflib/vpfread.c vpflib/vpftable.c
+ *
+ * Revision 1.15  2007/02/12 15:52:57  cbalint
  *
  *    Preliminary cleanup.
  *    Get rif of unitialized variables, and unused ones.
@@ -467,6 +509,51 @@ int vrf_get_line_feature (s, layer, prim_id, result)
   return TRUE;
 }
 
+
+static int vrf_get_mbr (table, prim_id, xmin, ymin, xmax, ymax)
+     vpf_table_type table;
+     int32 prim_id;
+     double *xmin;
+     double *ymin;
+     double *xmax;
+     double *ymax;
+{
+  int32 count;
+  float temp;
+  row_type row;
+
+  if (table.fp == NULL) {
+    return FALSE;
+  }
+
+  row = read_row (prim_id, table);
+
+  /* The 'DBVMAP2I' VMAP2i product has FBR tables with columns of type double instead of float */
+  /* so we must check for the type */
+  if (table.header[table_pos("XMIN",table)].type == 'F')
+  {
+    get_table_element (table_pos("XMIN",table), row, table, &temp, &count);
+    *xmin = (double) temp;
+    get_table_element (table_pos("XMAX",table), row, table, &temp, &count);
+    *xmax = (double) temp;
+    get_table_element (table_pos("YMIN",table), row, table, &temp, &count);
+    *ymin = (double) temp;
+    get_table_element (table_pos("YMAX",table), row, table, &temp, &count);
+    *ymax = (double) temp;
+  }
+  else
+  {
+    get_table_element (table_pos("XMIN",table), row, table, xmin, &count);
+    get_table_element (table_pos("XMAX",table), row, table, xmax, &count);
+    get_table_element (table_pos("YMIN",table), row, table, ymin, &count);
+    get_table_element (table_pos("YMAX",table), row, table, ymax, &count);
+  }
+
+  free_row(row,table);
+
+  return TRUE;
+}
+
 /*********************************************************************
   vrf_get_line_mbr
 
@@ -492,29 +579,8 @@ int vrf_get_line_mbr (layer, prim_id, xmin, ymin, xmax, ymax)
      double *xmax;
      double *ymax;
 {
-  int32 count;
-  register LayerPrivateData *lpriv = (LayerPrivateData *) layer->priv;
-  float temp;
-  row_type row;
-
-  if (lpriv->l.line.mbrTable.fp == NULL) {
-    return FALSE;
-  }
-
-  row = read_row (prim_id, lpriv->l.line.mbrTable);
-
-  get_table_element (table_pos("XMIN",lpriv->l.line.mbrTable), row, lpriv->l.line.mbrTable, &temp, &count);
-  *xmin = (double) temp;
-  get_table_element (table_pos("XMAX",lpriv->l.line.mbrTable), row, lpriv->l.line.mbrTable, &temp, &count);
-  *xmax = (double) temp;
-  get_table_element (table_pos("YMIN",lpriv->l.line.mbrTable), row, lpriv->l.line.mbrTable, &temp, &count);
-  *ymin = (double) temp;
-  get_table_element (table_pos("YMAX",lpriv->l.line.mbrTable), row, lpriv->l.line.mbrTable, &temp, &count);
-  *ymax = (double) temp;
-
-  free_row(row,lpriv->l.line.mbrTable);
-
-  return TRUE;
+  LayerPrivateData *lpriv = (LayerPrivateData *) layer->priv;
+  return vrf_get_mbr(lpriv->l.line.mbrTable, prim_id, xmin, ymin, xmax, ymax);
 }
 
 /*********************************************************************
@@ -1144,29 +1210,8 @@ int vrf_get_area_mbr (layer, prim_id, xmin, ymin, xmax, ymax)
      double *xmax;
      double *ymax;
 {
-  int32 count;
-  register LayerPrivateData *lpriv = (LayerPrivateData *) layer->priv;
-  float temp;
-  row_type row;
-
-  if (lpriv->l.area.mbrTable.fp == NULL) {
-    return FALSE;
-  }
-
-  row = read_row (prim_id, lpriv->l.area.mbrTable);
-
-  get_table_element (table_pos("XMIN",lpriv->l.area.mbrTable), row, lpriv->l.area.mbrTable, &temp, &count);
-  *xmin = (double) temp;
-  get_table_element (table_pos("XMAX",lpriv->l.area.mbrTable), row, lpriv->l.area.mbrTable, &temp, &count);
-  *xmax = (double) temp;
-  get_table_element (table_pos("YMIN",lpriv->l.area.mbrTable), row, lpriv->l.area.mbrTable, &temp, &count);
-  *ymin = (double) temp;
-  get_table_element (table_pos("YMAX",lpriv->l.area.mbrTable), row, lpriv->l.area.mbrTable, &temp, &count);
-  *ymax = (double) temp;
-
-  free_row(row,lpriv->l.area.mbrTable);
-
-  return TRUE;
+  LayerPrivateData *lpriv = (LayerPrivateData *) layer->priv;
+  return vrf_get_mbr(lpriv->l.area.mbrTable, prim_id, xmin, ymin, xmax, ymax);
 }
 
 
@@ -1318,6 +1363,7 @@ char *vrf_get_ObjAttributes(table, row_pos)
   for(i = 0; i < table.nfields; ++i) {
     switch(table.header[i].type) {
     case 'T':
+    case 'L':
       ptr1 = get_table_element (i, row, table, &temp1, &count);
       if ((count == 1) && (ptr1 == (char *) NULL)) {
 	lenght += 6;

@@ -204,6 +204,9 @@
    size_t len, i;
 
    len = strlen (str);
+   if (len == 0)
+     return str;
+
    i = len - 1;
    while ((i>0) && ((str[i]==0) || (str[i]==' '))) i--;
       if (i < (len-1))

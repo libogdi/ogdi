@@ -535,6 +535,7 @@ int32 parse_data_def (vpf_table_type *table)
 	    reclen += (sizeof (double) * table->header[i].count);
 	  table->header[i].nullval.Double = NULLDOUBLE;
 	  break;
+        case 'L':
         case 'T':
 	  if (reclen >= 0)
 	    {			/* if fixed length */
@@ -939,15 +940,40 @@ vpf_table_type vpf_open_table (char *tablename, storage_type storage,
 	}	
       }
 
+
+      if (idxname != (char*)NULL)
+      {
+        xvt_free (idxname);
+        idxname = (char*)NULL;
+      }
+      
       /* If mode is READ and no variable length index exists then */
-      /* something has gone wrong so free up memory and return NULL */
       if ((!table.xfp) && (table.mode == Read))
 	{
-	  if (idxname != (char*)NULL)
-            {
-	      xvt_free (idxname);
-	      idxname = (char*)NULL;
-            }
+      /* build in-memory index by reading the whole table file */
+      int pos;
+      table.nrows = 0;
+      table.xstorage = RAM;
+      table.index = NULL;
+      pos = table.ddlen;
+      fseek (table.fp, pos,SEEK_SET);
+      /*fprintf(stderr, "%s\n", tablepath);*/
+      while(pos != tablesize)
+      {
+        int nextPos;
+        free_row(read_next_row(table), table);
+        table.nrows++;
+        table.index = realloc(table.index, table.nrows * sizeof (index_cell));
+        nextPos = ftell(table.fp);
+        table.index[table.nrows-1].pos = pos;
+        table.index[table.nrows-1].length = nextPos - pos;
+        /*fprintf(stderr, "%d : %d %d\n", table.nrows-1, pos,nextPos - pos);*/
+        pos = nextPos;
+      }
+      
+      table.idx_handle = table.index;
+#if 0
+      /* something has gone wrong so free up memory and return NULL */
 	  for (i=0; i<table.nfields; i++)
             if (table.header[i].name != (char*)NULL)
 	      {
@@ -967,16 +993,11 @@ vpf_table_type vpf_open_table (char *tablename, storage_type storage,
 	  fclose (table.fp);
 	  table.fp = NULL;
 	  return table;
-	}
-
-      if (idxname != (char*)NULL)
-	{
-	  xvt_free (idxname);
-	  idxname = (char*)NULL;
+#endif
 	}
 
       /* Only read in index if file is read only */
-      if (table.xfp && (table.mode == Read))
+      else if (table.xfp && (table.mode == Read))
 	{
 	  Read_Vpf_Int (&(table.nrows), table.xfp, 1L);
 	  Read_Vpf_Int (&ulval, table.xfp, 1L);
@@ -1022,11 +1043,9 @@ vpf_table_type vpf_open_table (char *tablename, storage_type storage,
       table.row = (ROW*)glock (table.row_handle);
 #endif
       for (i=0; i<table.nrows; i++)
-	{
-	  if (i == 13271)
-            i = 13271;
-	  table.row[i] = read_next_row (table);
-	}
+      {
+        table.row[i] = read_next_row (table);
+      }
       fclose (table.fp);
       table.storage = RAM;
     }
@@ -1109,7 +1128,7 @@ void vpf_close_table( vpf_table_type *table )
 	  table->header[i].name = (char*)NULL;
 	}
       /* free up null text string */
-      if (table->header[i].type == 'T')
+      if (table->header[i].type == 'T' || table->header[i].type == 'L')
 	if (table->header[i].nullval.Char != (char *)NULL)
 	  {
             xvt_free (table->header[i].nullval.Char);

@@ -1075,6 +1075,7 @@ vpf_table_type table;
                }
                break;
             case 'T':
+            case 'L':
                if (table.header[expr.field].count == 1) {
                   get_table_element( expr.field, row, table, &tval, &count );
                   tval2 = expr.value[0];
@@ -1219,6 +1220,7 @@ vpf_table_type table;
 	        }
 	     break;
 	  case 'T':
+      case 'L':
 	     if (table.header[expr.field].count == 1)
            {
 	        get_table_element( expr.field, row, table, &tval, &count );
