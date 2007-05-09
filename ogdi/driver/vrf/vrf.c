@@ -17,7 +17,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.19  2007-05-09 20:46:28  cbalint
+ * Revision 1.20  2007-05-09 21:29:50  cbalint
+ * fix is to increase of 1 the size of smallint (5 -> 6)
+ *
+ * Revision 1.19  2007/05/09 20:46:28  cbalint
  * From: Even Rouault <even.rouault@mines-paris.org>
  * Date: Friday 21:14:18
  *
@@ -797,7 +800,7 @@ ecs_Result *dyn_GetAttributesFormat(s)
 
     case 'S':
       type = Smallint;
-      length = 5;
+      length = 6;
       precision = 0;
       break;
 
