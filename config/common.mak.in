@@ -229,12 +229,12 @@ endif
 ifeq ($(TARGETGEN),$(SHRDGEN))
 default-install:
 	cp $(TARGETGEN) $(INST_LIB)
-	pushd $(INST_LIB); \
+	cd $(INST_LIB); \
 	      ln -s $(LIB_PREFIX)$(TOBEGEN).$(SHLIB_EXT).$(OGDI_MAJOR).$(OGDI_MINOR) \
 	            $(LIB_PREFIX)$(TOBEGEN_STRIPPED).$(SHLIB_EXT).$(OGDI_MAJOR); \
 	      ln -s $(LIB_PREFIX)$(TOBEGEN).$(SHLIB_EXT).$(OGDI_MAJOR).$(OGDI_MINOR) \
 	            $(LIB_PREFIX)$(TOBEGEN_STRIPPED).$(SHLIB_EXT); \
-	popd
+	cd $(CURDIR)
 endif
 
 ifeq ($(TARGETGEN),$(ARCHGEN))
@@ -253,9 +253,9 @@ endif
 install-so-link:
 	mv -f $(INST_LIB)/$(LIB_PREFIX)$(TOBEGEN).$(SHLIB_EXT).$(OGDI_MAJOR).$(OGDI_MINOR) $(INST_LIB)
 	mv -f $(INST_LIB)/$(LIB_PREFIX)$(TOBEGEN).$(SHLIB_EXT).$(OGDI_MAJOR) $(INST_LIB)
-	pushd $(INST_LIB); ln -s $(LIB_PREFIX)$(TOBEGEN).$(SHLIB_EXT).$(OGDI_MAJOR).$(OGDI_MINOR) \
+	cd $(INST_LIB); ln -s $(LIB_PREFIX)$(TOBEGEN).$(SHLIB_EXT).$(OGDI_MAJOR).$(OGDI_MINOR) \
 	      $(LIB_PREFIX)$(TOBEGEN_STRIPPED).$(SHLIB_EXT) ; \
-	popd
+	cd $(CURDIR)
 
 install:	default-install $(EXTRA_INSTALL_TARGETS)
 
