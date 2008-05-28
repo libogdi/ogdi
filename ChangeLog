@@ -1,4 +1,12 @@
 ============================================================================
+
+2008-05-28  Balint Cristian  <rezso@rdsor.ro>
+
+        * New 3.2.0beta2 release
+        * fix path case sensitive problem for vpf driver
+        * fix build on GNU/kFreeBSD
+        * avoid bashism in makefiles
+
 2007-05-09  Balint Cristian  <cbalint@redhat.com>
 
         * Prepare for 3.2.0beta2 release.
