@@ -5875,5 +5875,9 @@ if test "$no_create" != yes; then
   $ac_cs_success || { (exit 1); exit 1; }
 fi
 
-mv config/generic.mak config/`uname`.mak
 
+target=`uname`
+if test "$target" = "GNU/kFreeBSD" ; then
+  target=Linux
+fi
+mv config/generic.mak config/$target.mak

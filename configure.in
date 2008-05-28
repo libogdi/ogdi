@@ -349,5 +349,9 @@ AC_CONFIG_FILES([ogdi-config:ogdi-config.in],
 		[chmod +x ogdi-config])
 
 AC_OUTPUT(config/generic.mak)
-mv config/generic.mak config/`uname`.mak
 
+target=`uname`
+if test "$target" = "GNU/kFreeBSD" ; then
+  target=Linux
+fi
+mv config/generic.mak config/$target.mak

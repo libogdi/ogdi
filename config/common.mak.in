@@ -52,6 +52,9 @@ endif
 
 ifndef TARGET
 TARGET = $(shell uname)
+ifeq ($(TARGET), GNU/kFreeBSD)
+TARGET = Linux
+endif
 endif
 
 #

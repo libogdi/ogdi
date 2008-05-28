@@ -18,6 +18,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <dirent.h>
 #endif
 
 #include "machine.h"
@@ -244,6 +245,7 @@ fil_open(path, mode)
     char            *s;
 
     strcpy(pathext, path);
+    muse_check_path(pathext);
 
 #ifdef _WINDOWS
     file = open(pathext, mode);
@@ -251,6 +253,9 @@ fil_open(path, mode)
 #endif				
 
 #ifdef unix
+    acc = access(pathext, amode);
+    return (acc);
+#if 0
     memset(lobuf, (char) NULL, SZ_FNAME);
     memset(upbuf, (char) NULL, SZ_FNAME);
     len = strlen(pathext);
@@ -324,6 +329,7 @@ fil_open(path, mode)
 	}
     }
     return (file);
+#endif				
 #endif				
 
 }
@@ -420,6 +426,65 @@ void
 muse_check_path(path)
     char *path;
 {
+#ifdef unix
+    char tpath[SZ_FNAME];
+    char *tp = tpath, *pp1 = path, *pp2;
+    DIR *dir;
+    struct dirent *de;
+
+    /*fprintf(stderr, "muse_check_path: \"%s\"\n", path);*/
+    while (*pp1) {
+        if (*pp1 == '/' || *pp1 == '\\') {
+            pp1++;
+            if (tp >= tpath + SZ_FNAME)
+                return;
+            *tp++ = FILE_SEP;
+            continue;
+        }
+        pp2 = pp1 + 1;
+        while (*pp2 && *pp2 != '/' && *pp2 != '\\')
+            pp2++;
+        if (tp >= tpath + SZ_FNAME)
+            return;
+        *tp = 0;
+	/*fprintf(stderr, "muse_check_path: directory \"%s\" \"%.*s\"\n", tpath, (int)(pp2 - pp1), pp1);*/
+        dir = opendir(tpath);
+        if (!dir) {
+	    /*fprintf(stderr, "muse_check_path: directory \"%s\" does not exist\n", tpath);*/
+            return;
+	}
+        while ((de = readdir(dir))) {
+	    /*fprintf(stderr, "muse_check_path: name \"%s\"\n", de->d_name);*/
+            if (strncasecmp(de->d_name, pp1, pp2 - pp1))
+                continue;
+            if (!de->d_name[pp2 - pp1])
+                break;
+            if (de->d_name[pp2 - pp1] == '.' && !de->d_name[pp2 - pp1 + 1])
+                break;
+            if (de->d_name[pp2 - pp1] == ';' && de->d_name[pp2 - pp1 + 1] == '1' && !de->d_name[pp2 - pp1 + 2])
+                break;
+            if (de->d_name[pp2 - pp1] == '.' && de->d_name[pp2 - pp1 + 1] == ';' && de->d_name[pp2 - pp1 + 2] == '1' &&
+		!de->d_name[pp2 - pp1 + 3])
+                break;
+        }
+        if (de) {
+            strncpy(tp, de->d_name, tpath + SZ_FNAME - tp);
+	    tp = memchr(tp, 0, tpath + SZ_FNAME - tp);
+	    if (!tp)
+		tp = tpath + SZ_FNAME;
+	    /*fprintf(stderr, "muse_check_path: new name \"%s\"\n", tpath);*/
+        }
+        closedir(dir);
+        if (!de)
+            return;
+	pp1 = pp2;
+    }
+    if (tp >= tpath + SZ_FNAME)
+	return;
+    *tp = 0;
+    strncpy(path, tpath, SZ_FNAME);
+    /*fprintf(stderr, "muse_check_path: returning \"%s\"\n", path);*/
+#else
     int32            i, length;
 
     length = strlen(path);
@@ -428,5 +493,6 @@ muse_check_path(path)
 	if (path[i] == '\\')
 	    path[i] = FILE_SEP;
     return;
+#endif
 }
 
