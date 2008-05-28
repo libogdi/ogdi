@@ -2817,8 +2817,6 @@ _ACEOF
 
 
 
-CFLAGS=`echo "$CFLAGS " | sed "s/-O2 //"`
-
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
