@@ -1,3 +1,11 @@
+2016-06-27  Even Rouault <even.rouault@spatialys.com>
+
+    * Fix build against proj >= 4.9
+    * Grow some buffers in VRF driver (patch by Craig Bruce)
+    * Fix compiler warnings raised by GCC 4.4
+    * VPF: Fix off-by-one extra write in vpf_colum_name[] in
+      read_thematic_index_header(). Reported by clang
+
 2009-05-08  Frank Warmerdam  <warmerdam@pobox.com>
 
 	* ogdi/drivers/vrf/feature.c: fix count type to be int32 to avoid
