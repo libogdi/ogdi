@@ -17,7 +17,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.17  2009-05-08 04:15:50  warmerda
+ * Revision 1.18  2016-06-27 20:05:12  erouault
+ * Grow some buffers in VRF driver (patch by Craig Bruce)
+ *
+ * Revision 1.17  2009/05/08 04:15:50  warmerda
  * fixed count type in VRF driver for 64bit systems (#2787502)
  *
  * Revision 1.16  2007/05/09 20:46:28  cbalint
@@ -1359,7 +1362,7 @@ char *vrf_get_ObjAttributes(table, row_pos)
 
   row = read_row(row_pos,table);
 
-  lenght = 1;
+  lenght = 4;
   returnString = (char *) malloc(lenght);
   strcpy(returnString,"");
 

@@ -17,7 +17,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.9  2007-02-12 21:01:48  cbalint
+ * Revision 1.10  2016-06-27 20:05:12  erouault
+ * Grow some buffers in VRF driver (patch by Craig Bruce)
+ *
+ * Revision 1.9  2007/02/12 21:01:48  cbalint
  *      Fix win32 target. It build and works now. (tested with VC6)
  *
  * Revision 1.8  2007/02/12 16:09:06  cbalint
@@ -2625,7 +2628,7 @@ int ecs_ExtractRequestInformation(request,ExtractRequest,DriverType,InformationS
 
   /* Convert /SPACE/ to ' ' */
 
-  temp = malloc(strlen(request)+1);
+  temp = malloc(strlen(request)+4);
   if (temp == NULL) 
     return 5;
 
