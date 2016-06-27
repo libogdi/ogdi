@@ -920,6 +920,7 @@ _getObjectIdPoint(s,l,coord)
 
   firstobj = TRUE;
   index = 0;
+  distance = 0.0;
   
   position = -1;
       
@@ -1169,6 +1170,7 @@ _getObjectIdText(s,l,coord)
 
   firstobj = TRUE;
   index = 0;
+  distance = 0.0;
   
   position = -1;
       

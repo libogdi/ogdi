@@ -295,13 +295,13 @@ int32 *token_value;
    {
    register int32 i, stopflag;
 
-   *token_type = (int32)NULL;
+   *token_type = 0;
 
    /* Test for no expression (NULL) */
-   if (*expression == (int32)NULL)
+   if (*expression == '\0')
       {
       *token_type = FINISHED;
-      *token_value = (int32)NULL;
+      *token_value = 0;
       return expression;
       }
 
@@ -336,10 +336,10 @@ int32 *token_value;
    return_token (expression, token);
    expression += strlen(token);
 
-   if (*token == (int32)NULL)
+   if (*token == '\0')
       {
       *token_type = FINISHED;
-      *expression = (int32)NULL;
+      *expression = '\0';
       return expression;
       }
 
@@ -386,7 +386,7 @@ See http://sourceforge.net/bugs/?func=detailbug&bug_id=122597&group_id=11181
          token[i] = *expression;
          i++;
          expression++;
-         if (*expression == (int32)NULL)
+         if (*expression == '\0')
             {
             *token_type = ERRORTOKEN;
             *token_value = ERRORTOKEN;
@@ -427,7 +427,7 @@ See http://sourceforge.net/bugs/?func=detailbug&bug_id=122597&group_id=11181
       }
 
    *token_type = VALUE;
-   *token_value = (int32)NULL;
+   *token_value = '\0';
 
    return expression;
    }

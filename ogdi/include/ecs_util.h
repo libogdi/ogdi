@@ -19,7 +19,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.24  2008-05-28 01:47:03  cbalint
+ * Revision 1.25  2016-06-27 20:23:20  erouault
+ * Fix compiler warnings raised by GCC 4.4
+ *
+ * Revision 1.24  2008/05/28 01:47:03  cbalint
  *    * prepare 3.2.0.beta2
  *
  * Revision 1.23  2007/05/09 21:41:24  cbalint
@@ -209,8 +212,12 @@ typedef uint32_t uint32;
  */
 
 #ifndef DISABLE_CVSID
+#if defined(__GNUC__) && __GNUC__ >= 4
+#  define ECS_CVSID(string)     static const char ecs_cvsid[] __attribute__((used)) = string;
+#else
 #  define ECS_CVSID(string)	static char ecs_cvsid[] = string; \
 static char *cvsid_aw() { return( cvsid_aw() ? ((char *) NULL) : ecs_cvsid ); }
+#endif
 #else
 #  define ECS_CVSID(string)
 #endif

@@ -394,7 +394,7 @@ int32 parse_data_def (vpf_table_type *table)
       if (ddlen < 0)
 	{
 	  xvt_note ("parse_data_def: Bad VPF file.");
-	  return ((int32)NULL);
+	  return (0);
 	}
 
       /* header without first 4 bytes */
@@ -404,7 +404,7 @@ int32 parse_data_def (vpf_table_type *table)
       if (buf == NULL)
 	{
 	  xvt_note ("Parse_data_definition: malloc failed.");
-	  return ((int32)NULL);
+	  return (0);
 	}
 
       buf[0] = byte;		/* already have the first byte of the buffer */
@@ -419,7 +419,7 @@ int32 parse_data_def (vpf_table_type *table)
       if (buf == NULL)
 	{
 	  xvt_note ("Parse_data_definition: Malloc failed.");
-	  return ((int32)NULL);
+	  return (0);
 	}
 
       strncpy (buf, table->defstr, (size_t)ddlen);
@@ -478,7 +478,7 @@ int32 parse_data_def (vpf_table_type *table)
   if (table->header == NULL)
     {
       xvt_note ("Parse_data_definition: malloc failed.");
-      return ((int32)NULL);
+      return (0);
     }
 
   /* Loop the the number of fields in the record */
@@ -494,7 +494,7 @@ int32 parse_data_def (vpf_table_type *table)
 	    (strcmp (table->header[0].name, "id") != 0))
           {
 	    xvt_note ("parse_data_def: No 'ID' in header definition.");
-	    return ((int32)NULL);
+	    return (0);
           }
 
       /* Get the "type" field */
@@ -596,7 +596,7 @@ int32 parse_data_def (vpf_table_type *table)
         } /* switch type */
 
       if (status)
-        return ((int32)NULL);
+        return (0);
 
       /* Get "keytype" field */
       table->header[i].keytype  = parse_get_char (&p, buf);

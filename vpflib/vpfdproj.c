@@ -70,6 +70,7 @@ vpf_projection_type proj;
    vpf_projection_type dummy;
    NOREF (code);
    NOREF (extent);
+   memset(&dummy, 0, sizeof(dummy));
    return (dummy);
    }
 
@@ -81,6 +82,7 @@ vpf_projection_type proj;
 
    {
    vpf_projection_type dummy;
+   memset(&dummy, 0, sizeof(dummy));
    return (dummy);
    }
 
@@ -92,6 +94,7 @@ vpf_projection_type proj;
 
    {
    vpf_projection_type dummy;
+   memset(&dummy, 0, sizeof(dummy));
    return (dummy);
    }
 

@@ -403,14 +403,14 @@ vpf_table_type table;
            printf ("\nindex_length: error reading index.") ;
 #endif
 
-           len = (int32)NULL ;
+           len = 0 ;
          }
 
          if ( ! Read_Vpf_Int(&ulen,table.xfp,1) ) {
 #if 0
            printf ("\nindex_length: error reading index.");
 #endif
-           return (int32)NULL ;
+           return 0 ;
          }
          len = ulen;
          break;
@@ -422,7 +422,7 @@ vpf_table_type table;
            /* Just an error check, should never get here in writing */
            xvt_note ("index_length: error trying to access row %d",
                    (int) row_number ) ;
-           len = (int32)NULL;
+           len = 0;
         }
         break;
    }
@@ -485,7 +485,7 @@ vpf_table_type table;
 #endif
 {
    int32 recsize;
-   uint32 pos = (uint32) NULL;   /* Intergraph solution TR#GX323 */
+   uint32 pos = 0;   /* Intergraph solution TR#GX323 */
 
    STORAGE_BYTE_ORDER = table.byte_order;
 
@@ -503,7 +503,7 @@ vpf_table_type table;
 #if 0
            printf ("\nindex_length: error reading index.");
 #endif
-           pos = (int32)NULL ;
+           pos = 0 ;
          }
          break;
       case RAM:
@@ -514,7 +514,7 @@ vpf_table_type table;
            /* Just an error check, should never get here in writing */
            xvt_note ("index_length: error trying to access row %d",
                    (int) row_number ) ;
-           pos = (int32)NULL;
+           pos = 0;
          }
          break;
    }
