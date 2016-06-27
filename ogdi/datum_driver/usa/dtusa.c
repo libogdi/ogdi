@@ -124,7 +124,11 @@ int dyn_nad_init(privdata, table)
     strcat(pathfile,"/");  
     strcat(pathfile,table);  
 
+#if PJ_VERSION >= 490
+    ptr->dtptr = nad_init(pj_get_default_ctx(), pathfile);
+#else
     ptr->dtptr = nad_init(pathfile);
+#endif
     if (ptr->dtptr == NULL) {
       ptr->count--;
       return FALSE;
