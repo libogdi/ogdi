@@ -17,7 +17,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.9  2007-02-12 16:09:06  cbalint
+ * Revision 1.10  2016-06-27 22:01:46  erouault
+ * Fix memory leak in ADRG driver
+ *
+ * Revision 1.9  2007/02/12 16:09:06  cbalint
  *   *  Add hook macros for all GNU systems, hook fread,fwrite,read,fgets.
  *   *  Handle errors in those macro, if there are any.
  *   *  Fix some includes for GNU systems.
@@ -314,6 +317,8 @@ void _freelayerpriv(lpriv)
   if (lpriv != NULL) {
     if (lpriv->tilelist != NULL)
       free(lpriv->tilelist);
+    if (lpriv->buffertile != NULL)
+      free(lpriv->buffertile);
     if (lpriv->imgfile != NULL)
       fclose(lpriv->imgfile);
     
