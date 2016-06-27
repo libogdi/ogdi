@@ -7,6 +7,7 @@
  ******************************************************************************
  */
 #include <math.h>
+#include <stdlib.h>
 
 #include "ecs.h"
 #include "matrix.h"
@@ -91,9 +92,23 @@ void mat_mul_transposed (matrix_a, height_a, width_a, matrix_b, height_b, width_
 int mat_inverse (double **matrix,int n)
 {
     int i, j, k, l, ir=0, ic=0 ;
-    int ipivot[n], itemp[n][2];
-    double pivot[n], t;
-    double fabs();
+    int* ipivot;
+    int* itemp_0;
+    int* itemp_1;
+    double* pivot;
+    double t;
+    int ret = 1;
+
+    ipivot = (int*) malloc( n * sizeof(int) );
+    itemp_0 = (int*) malloc( n * sizeof(int) );
+    itemp_1 = (int*) malloc( n * sizeof(int) );
+    pivot = (double*) malloc( n * sizeof(double) );
+    if( ipivot == NULL || itemp_0 == NULL || itemp_1 == NULL || pivot == NULL )
+    {
+        fprintf(stderr, "Memory allocation failure in mat_inverse(). \n");
+        ret = -1;
+        goto end;
+    }
 
     /* initialization */
     for (i = 0; i < n; i++)
@@ -122,19 +137,22 @@ int mat_inverse (double **matrix,int n)
                         }
                         break;
                     case  1:
-                        return (-1);
+                        ret = -1;
+                        goto end;
                         break;
                     default: /* shouldn't get here */
-                        return (-1);
+                        ret = -1;
+                        goto end;
                         break;
                 }
         }
 
         ipivot[ic] += 1;
         if (ipivot[ic] > 1) /* check for dependency */
-                {
-            return (-1);
-                }
+        {
+            ret = -1;
+            goto end;
+        }
 
         /* interchange rows to put pivot element on diagonal */
         if (ir != ic)
@@ -145,15 +163,16 @@ int mat_inverse (double **matrix,int n)
                 matrix[ic][l] = t;
             }
 
-        itemp[i][0] = ir;
-        itemp[i][1] = ic;
+        itemp_0[i] = ir;
+        itemp_1[i] = ic;
         pivot[i] = matrix[ic][ic];
 
         /* check for zero pivot */
         if (fabs (pivot[i]) < EPSILON)
-                {
-            return (-1);
-                }
+        {
+            ret = -1;
+            goto end;
+        }
 
         /* divide pivot row by pivot element */
         matrix[ic][ic] = 1.0;
@@ -177,11 +196,11 @@ int mat_inverse (double **matrix,int n)
     for (i = 0; i < n; i++)
     {
         l = n - i - 1;
-        if (itemp[l][0] == itemp[l][1])
+        if (itemp_0[l] == itemp_1[l])
             continue;
 
-        ir = itemp[l][0];
-        ic = itemp[l][1];
+        ir = itemp_0[l];
+        ic = itemp_1[l];
 
         for (k = 0; k < n; k++)
         {
@@ -191,7 +210,12 @@ int mat_inverse (double **matrix,int n)
         }
     }
 
-    return 1;
+end:
+    free(ipivot);
+    free(itemp_0);
+    free(itemp_1);
+    free(pivot);
+    return ret;
 }
 
 /*

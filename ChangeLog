@@ -1,5 +1,9 @@
 2016-06-27  Even Rouault <even.rouault@spatialys.com>
 
+    * Fix mat_inverse() to not use variable length arrays (OGDI #65)
+
+2016-06-27  Even Rouault <even.rouault@spatialys.com>
+
     * Fix build against proj >= 4.9
     * Grow some buffers in VRF driver (patch by Craig Bruce)
     * Fix compiler warnings raised by GCC 4.4
