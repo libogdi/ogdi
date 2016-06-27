@@ -2427,9 +2427,9 @@ FILE *ifp;
   if ( ! Read_Vpf_Char ( &h->vpf_table_name, ifp, 12 ) )
     RWhimper() ;
   h->vpf_table_name[12] = '\0';
-  if ( ! Read_Vpf_Char ( &h->vpf_column_name, ifp, 25 ) )
+  if ( ! Read_Vpf_Char ( &h->vpf_column_name, ifp, 24 ) )
     RWhimper() ;
-  h->vpf_column_name[25] = '\0';
+  h->vpf_column_name[24] = '\0';
   if ( ! Read_Vpf_Char ( &h->sort, ifp, 1 ) )
     RWhimper() ;
   h->sort = (char)toupper(h->sort);
