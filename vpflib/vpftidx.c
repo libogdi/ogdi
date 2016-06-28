@@ -577,10 +577,9 @@ char *idx_set;
   d[loc].num_items = 0 ; }
 
 #define INCR_ID(loc,id) { \
-  int rtrn; \
-  rtrn = fwrite(&loc,sizeof(int32),1,tmpfp); \
+  UNUSED_RET(fwrite(&loc,sizeof(int32),1,tmpfp)); \
   j = d[loc].num_items; \
-  rtrn = fwrite(&j,sizeof(int32),1,tmpfp); \
+  UNUSED_RET(fwrite(&j,sizeof(int32),1,tmpfp)); \
   d[loc].num_items++ ; \
   if (d[loc].num_items == 1) \
     d[loc].start_offset = id; \
@@ -881,9 +880,8 @@ char *idx_set;
   qsort ((void*)d, (size_t)h.nbins, sizeof(ThematicIndexDirectory), bincmp);
 
   for ( j=1; j <= table.nrows; j++ ) {
-     int result;
-     result = fread(&bin,sizeof(bin),1,tmpfp);
-     result = fread(&binoff,sizeof(binoff),1,tmpfp);
+     UNUSED_RET(fread(&bin,sizeof(bin),1,tmpfp));
+     UNUSED_RET(fread(&binoff,sizeof(binoff),1,tmpfp));
      if (d[bin].num_items == 1) continue;
      if ( h.id_data_type == 'I' ) {
 	fseek(ifp, d[bin].start_offset + (binoff*sizeof(int32)), 0);

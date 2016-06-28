@@ -17,7 +17,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.7  2007-02-12 15:52:57  cbalint
+ * Revision 1.8  2016-06-28 14:32:45  erouault
+ * Fix all warnings about unused variables raised by GCC 4.8
+ *
+ * Revision 1.7  2007/02/12 15:52:57  cbalint
  *
  *    Preliminary cleanup.
  *    Get rif of unitialized variables, and unused ones.
@@ -54,7 +57,7 @@ void _getNextObjectRaster(s,l)
   ServerPrivateData *spriv = s->priv;
   ecs_Coordinate start, end;
   double pos_y;
-  double record_y;
+  /*double record_y;*/
 
   if (l->index >= l->nbfeature) {
     ecs_SetError(&(s->result),2,"End of selection");
@@ -65,7 +68,7 @@ void _getNextObjectRaster(s,l)
   pos_y = s->currentRegion.north - (l->index+0.5) * s->currentRegion.ns_res;  
 
   /* get the corresponding point from the global region's matrix */
-  record_y = (int) ((s->globalRegion.north-pos_y) / s->globalRegion.ns_res);
+  /*record_y = (int) ((s->globalRegion.north-pos_y) / s->globalRegion.ns_res);*/
   
   start.x=s->currentRegion.west;
   end.x=s->currentRegion.east;

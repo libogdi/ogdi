@@ -17,7 +17,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.6  2007-02-12 21:01:48  cbalint
+ * Revision 1.7  2016-06-28 14:32:45  erouault
+ * Fix all warnings about unused variables raised by GCC 4.8
+ *
+ * Revision 1.6  2007/02/12 21:01:48  cbalint
  *      Fix win32 target. It build and works now. (tested with VC6)
  *
  * Revision 1.5  2007/02/12 16:09:06  cbalint
@@ -485,7 +488,7 @@ dispatchno_1(rqstp, transp)
 
 void gltpd_svc_run()
 {
-  xdrproc_t xdr_argument, xdr_result;
+  xdrproc_t xdr_argument;
   struct timeval timeout;
 #ifdef FD_SETSIZE
   fd_set readfds;
@@ -525,7 +528,8 @@ void gltpd_svc_run()
   extern int errno;
   static int tsize = 0;
   struct timeval timeout;
-  xdrproc_t xdr_argument, xdr_result;
+  xdrproc_t xdr_argument;
+  /*xdrproc_t xdr_result;*/
   long currenttime;
   
   timeout.tv_sec = COMTIMEOUT;
@@ -546,7 +550,7 @@ void gltpd_svc_run()
 	time(&currenttime);
 	if (currenttime - timecount > COMTIMEOUT) {
 	  xdr_argument = (xdrproc_t) xdr_void;
-	  xdr_result = (xdrproc_t) xdr_ecs_Result;
+	  /*xdr_result = (xdrproc_t) xdr_ecs_Result;*/
 	  destroyserver_1_svc(xdr_argument,NULL);
 	  perror("gltpd_svc_run: - timeout");
 	  return;
@@ -558,7 +562,7 @@ void gltpd_svc_run()
       return;
     case 0:
       xdr_argument = (xdrproc_t) xdr_void;
-      xdr_result = (xdrproc_t) xdr_ecs_Result;
+      /*xdr_result = (xdrproc_t) xdr_ecs_Result;*/
       destroyserver_1_svc(xdr_argument,NULL);
       perror("gltpd_svc_run: - timeout");
       return;

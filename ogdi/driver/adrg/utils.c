@@ -17,7 +17,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.7  2007-02-12 16:09:06  cbalint
+ * Revision 1.8  2016-06-28 14:32:45  erouault
+ * Fix all warnings about unused variables raised by GCC 4.8
+ *
+ * Revision 1.7  2007/02/12 16:09:06  cbalint
  *   *  Add hook macros for all GNU systems, hook fread,fwrite,read,fgets.
  *   *  Handle errors in those macro, if there are any.
  *   *  Fix some includes for GNU systems.
@@ -270,7 +273,7 @@ int _read_overview(s)
   register ServerPrivateData *spriv = s->priv;
   register LayerPrivateData *lpriv = (LayerPrivateData *) &(spriv->overview);
   FILE *fichier;
-  int first;
+  /*int first;*/
   char c,sc[4];
   char buffer[20];
   int i,j,count;
@@ -291,7 +294,7 @@ int _read_overview(s)
     if (c==(char) 30) {
       ogdi_fread(sc,3,1,fichier);
       if(strncmp("OVV",sc,3) == 0) {
-	first = TRUE;
+	/*first = TRUE;*/
 
 	/* Jump ^^ et PRT */
 

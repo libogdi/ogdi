@@ -47,3 +47,4 @@ extern  void G_warning (char *msg);
 #define BOOLEAN unsigned char
 /* typedef unsigned char BOOLEAN; */
 
+#define UNUSED_RET(x) do { if(x) {} } while(0)

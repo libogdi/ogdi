@@ -17,7 +17,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.6  2007-02-12 16:09:06  cbalint
+ * Revision 1.7  2016-06-28 14:32:45  erouault
+ * Fix all warnings about unused variables raised by GCC 4.8
+ *
+ * Revision 1.6  2007/02/12 16:09:06  cbalint
  *   *  Add hook macros for all GNU systems, hook fread,fwrite,read,fgets.
  *   *  Handle errors in those macro, if there are any.
  *   *  Fix some includes for GNU systems.
@@ -199,7 +202,8 @@ void _getNextObjectRaster(s,l)
   char buffer[128];
   static int UseOverview;
 
-  int totalcol,totalrow;
+  int totalcol;
+  /*int totalrow;*/
   int value;
   double pos;
 
@@ -211,7 +215,7 @@ void _getNextObjectRaster(s,l)
   _LoadADRGTiles(s,l,&UseOverview);
 
   totalcol = (int) ((s->currentRegion.east - s->currentRegion.west)/s->currentRegion.ew_res);
-  totalrow = (int) ((s->currentRegion.north - s->currentRegion.south)/s->currentRegion.ns_res);
+  /*totalrow = (int) ((s->currentRegion.north - s->currentRegion.south)/s->currentRegion.ns_res);*/
   ecs_SetGeomMatrix(&(s->result),totalcol);
 
   if (s->rasterconversion.isProjEqual) {
@@ -253,7 +257,8 @@ _getObjectRaster(s,l,id)
 {
   int i,i2,j2;
   char buffer[128];
-  int totalcol,totalrow;
+  int totalcol;
+  /*int totalrow;*/
   int value;
   int index;
   double pos;
@@ -266,7 +271,7 @@ _getObjectRaster(s,l,id)
   }
 
   totalcol = (int) ((s->currentRegion.east - s->currentRegion.west)/s->currentRegion.ew_res);
-  totalrow = (int) ((s->currentRegion.north - s->currentRegion.south)/s->currentRegion.ns_res);
+  /*totalrow = (int) ((s->currentRegion.north - s->currentRegion.south)/s->currentRegion.ns_res);*/
   ecs_SetGeomMatrix(&(s->result),totalcol);
 
   if (s->rasterconversion.isProjEqual) {
@@ -485,7 +490,8 @@ void _getNextObjectImage(s,l)
   char buffer[128];
   static int UseOverview;
 
-  int totalcol,totalrow;
+  int totalcol;
+  /*int totalrow;*/
   int value;
   double pos;
 
@@ -497,7 +503,7 @@ void _getNextObjectImage(s,l)
   _LoadADRGTiles(s,l,&UseOverview);
 
   totalcol = (int) ((s->currentRegion.east - s->currentRegion.west)/s->currentRegion.ew_res);
-  totalrow = (int) ((s->currentRegion.north - s->currentRegion.south)/s->currentRegion.ns_res);
+  /*totalrow = (int) ((s->currentRegion.north - s->currentRegion.south)/s->currentRegion.ns_res);*/
   ecs_SetGeomImage(&(s->result),totalcol);
 
   if (s->rasterconversion.isProjEqual) {
@@ -539,7 +545,8 @@ _getObjectImage(s,l,id)
 {
   int i,i2,j2;
   char buffer[128];
-  int totalcol,totalrow;
+  int totalcol;
+  /*int totalrow;*/
   int value;
   int index;
   double pos;
@@ -552,7 +559,7 @@ _getObjectImage(s,l,id)
   }
 
   totalcol = (int) ((s->currentRegion.east - s->currentRegion.west)/s->currentRegion.ew_res);
-  totalrow = (int) ((s->currentRegion.north - s->currentRegion.south)/s->currentRegion.ns_res);
+  /*totalrow = (int) ((s->currentRegion.north - s->currentRegion.south)/s->currentRegion.ns_res);*/
   ecs_SetGeomImage(&(s->result),totalcol);
 
   if (s->rasterconversion.isProjEqual) {

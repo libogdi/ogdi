@@ -17,7 +17,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.18  2016-06-27 20:05:12  erouault
+ * Revision 1.19  2016-06-28 14:32:45  erouault
+ * Fix all warnings about unused variables raised by GCC 4.8
+ *
+ * Revision 1.18  2016/06/27 20:05:12  erouault
  * Grow some buffers in VRF driver (patch by Craig Bruce)
  *
  * Revision 1.17  2009/05/08 04:15:50  warmerda
@@ -755,7 +758,10 @@ int vrf_get_area_feature (s, layer, prim_id)
   vpf_table_type facetable, ringtable, edgetable;
   AREA_FEATURE area;
   double x,y;
-  int firstlength, max_rings;
+#ifdef notdef
+  int firstlength;
+#endif
+  int max_rings;
     
   /* 
      -----------------------------------------------------------
@@ -802,7 +808,9 @@ int vrf_get_area_feature (s, layer, prim_id)
     xvt_free ((char*)area.rings);
     return FALSE;
   }
+#ifdef notdef
   firstlength = area.rings[n]->nr_segs;
+#endif
   n++;
   
   /* 
@@ -946,8 +954,11 @@ int vrf_get_ring_coords (s,ring, face_id, start_edge, edgetable)
   vpf_projection_type proj;
   double_coordinate_type  dcoord;
   SEGMENT **temp;
-  long eqlface1=0L, eqlface2=0L;
-  long eqlnpts;
+  long eqlface1=0L;
+#ifdef notdef
+  long eqlface2=0L;
+#endif
+  /*long eqlnpts;*/
   long eqlleft_edge=0L, eqlright_edge=0L;
   long maxsegs;
   char buffer[120];
@@ -972,7 +983,7 @@ int vrf_get_ring_coords (s,ring, face_id, start_edge, edgetable)
   if ((edge_rec.right_face == face_id) && (edge_rec.left_face == face_id))
     {
       eqlface1 = 1L;
-      eqlnpts = edge_rec.npts;
+      /*eqlnpts = edge_rec.npts;*/
       eqlleft_edge = edge_rec.left_edge;
       eqlright_edge = edge_rec.right_edge;
       start_dir = edge_rec.dir;
@@ -1047,11 +1058,12 @@ int vrf_get_ring_coords (s,ring, face_id, start_edge, edgetable)
 	  }
 
 	  next_edge = vrf_next_face_edge( &edge_rec, &prevnode, face_id );
+#ifdef notdef
 	  if ((edge_rec.right_face == face_id) && (edge_rec.left_face ==face_id))
             eqlface2 = 1L;
 	  else
             eqlface2 = 0L;
-
+#endif
           /* 
            * This is to catch cases where there would appear to be a dangle
            * (so we set eqlface1), but when we go to repeat the start edge

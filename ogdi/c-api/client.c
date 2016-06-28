@@ -18,7 +18,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.16  2008-05-28 01:34:30  cbalint
+ * Revision 1.17  2016-06-28 14:32:45  erouault
+ * Fix all warnings about unused variables raised by GCC 4.8
+ *
+ * Revision 1.16  2008/05/28 01:34:30  cbalint
  *    * Convert this file to UTF-8
  *
  * Revision 1.15  2007/02/19 19:31:33  cbalint
@@ -2338,7 +2341,6 @@ PJ *cln_ProjInit(d)
      char *d;
 {
   int i,n;
-  int pos;
   char **tableau;
   char *l;
   int longueur;
@@ -2351,7 +2353,6 @@ PJ *cln_ProjInit(d)
   strcpy(c,d);
 
   n=0;
-  pos = 0;
   l = c;
 
   longueur = strlen(c);
@@ -2363,7 +2364,6 @@ PJ *cln_ProjInit(d)
     if (c[i] == ' ') {
       c[i]= '\0';
       tableau[n] = l;
-      pos = i;
       l = &c[i+1];
       if (strncmp(tableau[n],"+",1) == 0) 
 	tableau[n]++;

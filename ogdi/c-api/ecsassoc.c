@@ -18,7 +18,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.2  2001-04-09 15:04:34  warmerda
+ * Revision 1.3  2016-06-28 14:32:45  erouault
+ * Fix all warnings about unused variables raised by GCC 4.8
+ *
+ * Revision 1.2  2001/04/09 15:04:34  warmerda
  * applied new source headers
  *
  */
@@ -1460,12 +1463,10 @@ ecs_CopyResultFromUnion(source,copy)
      ecs_Result **copy;
 {
   int returncode;
-  ecs_Object *obj;
   ecs_Result *result;
 
   returncode = TRUE;
   if (source->type == Object) {
-    obj = &(source->ecs_ResultUnion_u.dob);
 
     /* Allocate the new object */
 

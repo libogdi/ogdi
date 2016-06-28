@@ -340,12 +340,9 @@ int32 tile_id;
    short int sval;
    row_type row;
    int32 KEY2_,TILE_;
-   char cval, *tval, path[255], *keystring, dir_separator[2];
+   char cval, *tval, path[255], *keystring;
    set_type idxset, tileset, searchset;
    id_triplet_type idtrip;
-
-   dir_separator[0] = DIR_SEPARATOR;
-   dir_separator[1] = '\0';
 
    if (strcmp(key2,"ID")==0) {
       memcpy( &rowid, keyval1, sizeof(rowid) );
@@ -560,11 +557,8 @@ int32 tile_id;
    short short_tile, sval;
    row_type row;
    int32 KEY2_, TILE_;
-   char cval, *tval, path[255], *keystring, dir_separator[2];
+   char cval, *tval, path[255], *keystring;
    id_triplet_type idtrip = {' ',0,0,0};
-
-   dir_separator[0] = DIR_SEPARATOR;
-   dir_separator[1] = '\0';
 
    rowlist = ll_init ();
 

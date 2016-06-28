@@ -17,7 +17,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.10  2016-06-27 20:05:12  erouault
+ * Revision 1.11  2016-06-28 14:32:45  erouault
+ * Fix all warnings about unused variables raised by GCC 4.8
+ *
+ * Revision 1.10  2016/06/27 20:05:12  erouault
  * Grow some buffers in VRF driver (patch by Craig Bruce)
  *
  * Revision 1.9  2007/02/12 21:01:48  cbalint
@@ -885,10 +888,8 @@ GetOneNextObjectAttributes(s, msg, isSelected)
   char *error;
   short objSelected;
   char *temp,*attributes;
-  ecs_Family family;
 
   *isSelected = FALSE;
-  family = s->layer[s->currentLayer].sel.F;
   attribute_qty = s->layer[s->currentLayer].SelectionAttributeListQty;
 
   /* 
@@ -2614,7 +2615,7 @@ int ecs_ExtractRequestInformation(request,ExtractRequest,DriverType,InformationS
      char **AutorizationDescription;
      char **SelectionRequest;
 {
-  int count,i,j;
+  int count,i;
   char *temp,*ptr;
   char character[2];
   int candlist[13];
@@ -2632,7 +2633,6 @@ int ecs_ExtractRequestInformation(request,ExtractRequest,DriverType,InformationS
   if (temp == NULL) 
     return 5;
 
-  j=0;
   strcpy(temp,"");
   for(i=0,ptr = request;i<(int) strlen(request);i++,ptr++) {
     if(strncmp(ptr,"/SPACE/",7) == 0) {
@@ -3044,10 +3044,8 @@ int ecs_ReleaseAttributeQuery(s,l,error)
      ecs_Layer *l;
      char **error;
 {
-  int code = 0;
-
   if (l->AttributeDriverHandle != NULL) {
-    code = (l->DeinitializeDBLinkFuncPtr)(s,l,error);
+    (l->DeinitializeDBLinkFuncPtr)(s,l,error);
     ecs_CloseDynamicLib(l->AttributeDriverHandle);
     l->AttributeDriverHandle = NULL;
   }
@@ -3394,5 +3392,5 @@ SetBindListForMatrixError:
       free(attribute_list[i]);
   free(attribute_list);
   *error = svr_messages[5];
-  return 1;
+  return code;
 }

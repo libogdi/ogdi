@@ -17,7 +17,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.7  2007-02-12 15:52:57  cbalint
+ * Revision 1.8  2016-06-28 14:32:45  erouault
+ * Fix all warnings about unused variables raised by GCC 4.8
+ *
+ * Revision 1.7  2007/02/12 15:52:57  cbalint
  *
  *    Preliminary cleanup.
  *    Get rif of unitialized variables, and unused ones.
@@ -429,14 +432,12 @@ _verifyLocation(s)
      ecs_Server *s;
 {
   int returnvalue;
-  int lenght;
   DIR *dirlist;
   FILE *test;
   ServerPrivateData *spriv = s->priv;
   char *ptr,*ptr1,*ptr2;
 
   returnvalue = FALSE;
-  lenght = strlen(spriv->pathname);
   /* Check if the path is valid */
   dirlist = opendir(spriv->pathname);
   if (dirlist != NULL) {

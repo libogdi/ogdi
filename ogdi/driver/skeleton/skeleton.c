@@ -383,7 +383,6 @@ ecs_Result *dyn_SelectLayer(s,sel)
      ecs_LayerSelection *sel;
 {
   int layer;
-  register LayerPrivateData *lpriv;
   char buffer[100];
 
   /* 
@@ -430,7 +429,6 @@ ecs_Result *dyn_SelectLayer(s,sel)
     ecs_SetError(&(s->result),1,"Not enough memory to allocate layer private data");
     return &(s->result);	
   }
-  lpriv = (LayerPrivateData *) s->layer[layer].priv;
 
   /* 
      At this point, you could prepare the information related to the

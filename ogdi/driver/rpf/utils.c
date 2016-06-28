@@ -17,7 +17,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.9  2007-02-12 16:09:06  cbalint
+ * Revision 1.10  2016-06-28 14:32:45  erouault
+ * Fix all warnings about unused variables raised by GCC 4.8
+ *
+ * Revision 1.9  2007/02/12 16:09:06  cbalint
  *   *  Add hook macros for all GNU systems, hook fread,fwrite,read,fgets.
  *   *  Handle errors in those macro, if there are any.
  *   *  Fix some includes for GNU systems.
@@ -435,8 +438,8 @@ int dyn_read_rpftile(s, l, tile_row, tile_col)
     int tile_row;
     int tile_col;
 {
-  double origin_lon, origin_lat;
-  double lat_spacing, lon_spacing;
+  /*double origin_lon, origin_lat;*/
+  /*double lat_spacing, lon_spacing;*/
   register LayerPrivateData *lpriv = (LayerPrivateData *) l->priv;
   int i,j,k;
   char *framefile;
@@ -522,10 +525,10 @@ int dyn_read_rpftile(s, l, tile_row, tile_col)
     return FALSE; 
   }
 
-  origin_lat = lpriv->ff->cover.nw_lat  - 1536.E0*lpriv->ff->cover.vert_interval;
-  origin_lon = lpriv->ff->cover.nw_long + 1536.E0*lpriv->ff->cover.horiz_interval;
-  lon_spacing = lpriv->ff->cover.horiz_interval;
-  lat_spacing = lpriv->ff->cover.vert_interval;
+  /*origin_lat = lpriv->ff->cover.nw_lat  - 1536.E0*lpriv->ff->cover.vert_interval;
+  origin_lon = lpriv->ff->cover.nw_long + 1536.E0*lpriv->ff->cover.horiz_interval;*/
+  /*lon_spacing = lpriv->ff->cover.horiz_interval;
+  lat_spacing = lpriv->ff->cover.vert_interval;*/
   
   lpriv->columns = 1536L;
   lpriv->rows = 1536L;
@@ -600,7 +603,6 @@ dyn_verifyLocation(s)
      ecs_Server *s;
 {
   int returnvalue;
-  int lenght;
   DIR *dirlist;
   FILE *test;
   register ServerPrivateData *spriv = s->priv;
@@ -608,7 +610,6 @@ dyn_verifyLocation(s)
 
   returnvalue = FALSE;
 
-  lenght = strlen(spriv->pathname);
   /* Check if the path is valid */
   dirlist = opendir(spriv->pathname);
   if (dirlist != NULL) {
@@ -2074,7 +2075,6 @@ uchar      blackpixel;
   uint  val;
   int  index;
   int  offset;
-  int  cc;
   char  string[256];
   register ServerPrivateData *spriv = (ServerPrivateData *) s->priv;
   
@@ -2110,17 +2110,19 @@ uchar      blackpixel;
  /* Seek to start of subframe */
 
   offset = file->loc_data + tno;
-  cc = fseek(fin, offset, SEEK_SET);
+  fseek(fin, offset, SEEK_SET);
 
  /* Read the subframe */
 
-  cc = fread(subframe, 1, 6144, fin);
+  if( fread(subframe, 1, 6144, fin) != 6144 )
+  {
+    fclose(fin);
+    free(subframe);
+    return FALSE;
+  }
   fclose(fin);
 
- /* This should never occur since all subframes should be present */
-
-  if ((ptr = subframe) == NULL)
-    return FALSE;
+  ptr = subframe;
 
  /* Decompress the tile */
 
