@@ -1,5 +1,10 @@
 2016-06-28  Even Rouault <even.rouault@spatialys.com>
 
+    * Actually fix build against proj >= 4.8 (assuming that projects.h is installed,
+    which is the case in Ubuntu 14.04 for example) (OGDI #71)
+
+2016-06-28  Even Rouault <even.rouault@spatialys.com>
+
     * Fix memory leak in ADRG driver
 
 2016-06-27  Even Rouault <even.rouault@spatialys.com>
