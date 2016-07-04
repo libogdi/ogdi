@@ -2,6 +2,9 @@
 
     * VPF: Avoid a missing fcs file in a coverage to prevent opening any
     coverage of the library (fix opening of DNC17/COA17A dataset)
+    * VPF: _getNextObject / _getObject functions: validate the value of the tile_id
+    to avoid a potential out-of-bounds read. Fix crash on dqyarea@dqy layer
+    of DNC17/H1708311.
 
 2016-06-28  Even Rouault <even.rouault@spatialys.com>
 

@@ -17,7 +17,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.9  2007-05-09 20:46:28  cbalint
+ * Revision 1.10  2016-07-04 14:34:40  erouault
+ * VPF: _getNextObject / _getObject functions: validate the value of the tile_id to avoid a potential out-of-bounds read. Fix crash on dqyarea@dqy layer of DNC17/H1708311
+ *
+ * Revision 1.9  2007/05/09 20:46:28  cbalint
  * From: Even Rouault <even.rouault@mines-paris.org>
  * Date: Friday 21:14:18
  *
@@ -469,7 +472,14 @@ _getNextObjectArea(s,l)
 	ecs_SetError(&(s->result), 1, "The join table is empty");
 	return;
       }
-
+      
+      if( lpriv->isTiled && (tile_id < 1 || tile_id > spriv->nbTile) )
+      {
+	/* Happens with dqyarea@dqy(*) coverage of DNC17/H1708311 */
+	fprintf(stderr, "Object index=%d/area_id=%d references incorrect tile_id=%d (nbTile=%d)\n",
+		l->index, area_id, tile_id, spriv->nbTile);
+      }
+      else
       if (lpriv->isTiled == 0 || spriv->tile[tile_id-1].isSelected) {
 	_selectTileArea(s,l,tile_id);
 	if (!vrf_get_area_mbr(l,fac_id,&xmin,&ymin,&xmax,&ymax)) {
@@ -525,6 +535,7 @@ _getObjectArea(s,l,id)
      ecs_Layer *l;
      char *id;
 {
+  ServerPrivateData *spriv = (ServerPrivateData *) s->priv;
   register LayerPrivateData *lpriv = (LayerPrivateData *) l->priv;
   int object_id;
   int32 area_id;
@@ -549,7 +560,16 @@ _getObjectArea(s,l,id)
     ecs_SetError(&(s->result), 1, "The join table is empty");
     return;
   }
-	
+
+  if( lpriv->isTiled && (tile_id < 1 || tile_id > spriv->nbTile) )
+  {
+	char szErrorMsg[128];
+	sprintf(szErrorMsg, "Object index=%d references incorrect tile_id=%d (nbTile=%d)",
+	    l->index, tile_id, spriv->nbTile);
+	ecs_SetError(&(s->result), 1, szErrorMsg);
+	return;
+  }
+
   _selectTileArea(s,l,tile_id);
 
   if (!vrf_get_area_feature(s,l,fac_id))
@@ -611,6 +631,12 @@ _getObjectIdArea(s,l,coord)
 	return;
       }
 
+      if( lpriv->isTiled && (tile_id < 1 || tile_id > spriv->nbTile) )
+      {
+	fprintf(stderr, "Object index=%d references incorrect tile_id=%d (nbTile=%d)\n",
+		l->index, tile_id, spriv->nbTile);
+      }
+      else
       if (!(lpriv->isTiled) || 
 	  ((coord->x > spriv->tile[tile_id-1].xmin) && 
 	   (coord->x < spriv->tile[tile_id-1].xmax) && 
@@ -1134,6 +1160,12 @@ _getNextObjectPoint(s,l)
 	return;
       }
 
+      if( lpriv->isTiled && (tile_id < 1 || tile_id > spriv->nbTile) )
+      {
+	fprintf(stderr, "Object index=%d references incorrect tile_id=%d (nbTile=%d)\n",
+		l->index, tile_id, spriv->nbTile);
+      }
+      else
       if (lpriv->isTiled == 0 || spriv->tile[tile_id-1].isSelected) {
 
 	_selectTilePoint(s,l,tile_id);
@@ -1192,6 +1224,7 @@ _getObjectPoint(s,l,id)
      ecs_Layer *l;
      char *id;
 {
+  ServerPrivateData *spriv = (ServerPrivateData *) s->priv;
   register LayerPrivateData *lpriv = (LayerPrivateData *) l->priv;
   int object_id;
   int32 point_id;
@@ -1216,6 +1249,14 @@ _getObjectPoint(s,l,id)
     return;
   }
 
+  if( lpriv->isTiled && (tile_id < 1 || tile_id > spriv->nbTile) )
+  {
+    char szErrorMsg[128];
+    sprintf(szErrorMsg, "Object index=%d references incorrect tile_id=%d (nbTile=%d)",
+            l->index, tile_id, spriv->nbTile);
+    ecs_SetError(&(s->result), 1, szErrorMsg);
+    return;
+  }
 
   _selectTilePoint(s,l,tile_id);
 
@@ -1270,6 +1311,12 @@ _getObjectIdPoint(s,l,coord)
 	return;
       }      
 
+      if( lpriv->isTiled && (tile_id < 1 || tile_id > spriv->nbTile) )
+      {
+	fprintf(stderr, "Object index=%d references incorrect tile_id=%d (nbTile=%d)\n",
+		l->index, tile_id, spriv->nbTile);
+      }
+      else
       if (!(lpriv->isTiled) || 
 	  ((coord->x > spriv->tile[tile_id-1].xmin) && 
 	   (coord->x < spriv->tile[tile_id-1].xmax) && 
@@ -1392,6 +1439,12 @@ _getNextObjectText(s,l)
 	return;
       }
 
+      if( lpriv->isTiled && (tile_id < 1 || tile_id > spriv->nbTile) )
+      {
+	fprintf(stderr, "Object index=%d references incorrect tile_id=%d (nbTile=%d)\n",
+		l->index, tile_id, spriv->nbTile);
+      }
+      else
       if (lpriv->isTiled == 0 || spriv->tile[tile_id-1].isSelected) {
 
 	_selectTileText(s,l,tile_id);
@@ -1451,6 +1504,7 @@ _getObjectText(s,l,id)
      ecs_Layer *l;
      char *id;
 {
+  ServerPrivateData *spriv = (ServerPrivateData *) s->priv;
   register LayerPrivateData *lpriv = (LayerPrivateData *) l->priv;
   int object_id;
   short tile_id;
@@ -1472,6 +1526,15 @@ _getObjectText(s,l,id)
   }
   if (tile_id == -2) {
     ecs_SetError(&(s->result), 1, "The join table is empty");
+    return;
+  }
+
+  if( lpriv->isTiled && (tile_id < 1 || tile_id > spriv->nbTile) )
+  {
+    char szErrorMsg[128];
+    sprintf(szErrorMsg, "Object index=%d references incorrect tile_id=%d (nbTile=%d)",
+            l->index, tile_id, spriv->nbTile);
+    ecs_SetError(&(s->result), 1, szErrorMsg);
     return;
   }
 
@@ -1528,6 +1591,12 @@ _getObjectIdText(s,l,coord)
 	return;
       }      
 
+      if( lpriv->isTiled && (tile_id < 1 || tile_id > spriv->nbTile) )
+      {
+	fprintf(stderr, "Object index=%d references incorrect tile_id=%d (nbTile=%d)\n",
+		l->index, tile_id, spriv->nbTile);
+      }
+      else
       if (!(lpriv->isTiled) || 
 	  ((coord->x > spriv->tile[tile_id-1].xmin) && 
 	   (coord->x < spriv->tile[tile_id-1].xmax) && 
