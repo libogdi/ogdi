@@ -153,3 +153,4 @@ EXPORTS
 	cln_LoadCapabilities
 	ecs_GetRGBFromPixel
 	ecs_GetPixelFromRGB
+	ecs_SetReportErrorFunction
