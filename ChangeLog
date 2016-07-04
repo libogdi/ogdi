@@ -1,7 +1,16 @@
 2016-07-04  Even Rouault <even.rouault@spatialys.com>
 
+    * Error handling: Add a ecs_SetErrorShouldStop() function that can be
+    used internally when the code is able to recover from an error. The user
+    may decide if he wants to be resilient on errors by defining OGDI_STOP_ON_ERROR=NO 
+    as environment variable (the default being YES: stop on error).
+    Add a ecs_SetReportErrorFunction() method to install a custom callback that
+    will be called when OGDI_STOP_ON_ERROR=YES so that the user code is still
+    aware of errors that occured. If not defined, the error will be logged in stderr.
     * VPF: Avoid a missing fcs file in a coverage to prevent opening any
-    coverage of the library (fix opening of DNC17/COA17A dataset)
+    coverage of the library (fix opening of DNC17/COA17A dataset) if
+    OGDI_STOP_ON_ERROR=NO is defined as environment variable, and otherwise
+    better report the error
     * VPF: _getNextObject / _getObject functions: validate the value of the tile_id
     to avoid a potential out-of-bounds read. Fix crash on dqyarea@dqy layer
     of DNC17/H1708311.

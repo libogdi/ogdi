@@ -19,7 +19,16 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.25  2016-06-27 20:23:20  erouault
+ * Revision 1.26  2016-07-04 17:03:12  erouault
+ * Error handling: Add a ecs_SetErrorShouldStop() function that can be
+ *     used internally when the code is able to recover from an error. The user
+ *     may decide if he wants to be resilient on errors by defining OGDI_STOP_ON_ERROR=NO
+ *     as environment variable (the default being YES: stop on error).
+ *     Add a ecs_SetReportErrorFunction() method to install a custom callback that
+ *     will be called when OGDI_STOP_ON_ERROR=YES so that the user code is still
+ *     aware of errors that occured. If not defined, the error will be logged in stderr.
+ *
+ * Revision 1.25  2016/06/27 20:23:20  erouault
  * Fix compiler warnings raised by GCC 4.4
  *
  * Revision 1.24  2008/05/28 01:47:03  cbalint
@@ -808,6 +817,13 @@ int ecs_GetDefaultInfo _ANSI_ARGS_((char* url, char* key, char** result));
 
 int ecs_SetError _ANSI_ARGS_((ecs_Result *r,
 			      int errorcode, char *error_message));
+
+/* Shoud return TRUE if processing must go on */
+typedef int (*ReportErrorType)(int errorcode, const char *error_message);
+ReportErrorType ecs_SetReportErrorFunction(ReportErrorType pfn);
+int ecs_SetErrorShouldStop _ANSI_ARGS_((ecs_Result *r,
+                              int errorcode, char *error_message));
+
 int ecs_SetSuccess _ANSI_ARGS_((ecs_Result *r));
 int ecs_AdjustResult _ANSI_ARGS_((ecs_Result *r));
 int ecs_SetGeoRegion _ANSI_ARGS_((ecs_Result *r,

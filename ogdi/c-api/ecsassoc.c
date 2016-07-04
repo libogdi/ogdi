@@ -18,7 +18,16 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.3  2016-06-28 14:32:45  erouault
+ * Revision 1.4  2016-07-04 17:03:12  erouault
+ * Error handling: Add a ecs_SetErrorShouldStop() function that can be
+ *     used internally when the code is able to recover from an error. The user
+ *     may decide if he wants to be resilient on errors by defining OGDI_STOP_ON_ERROR=NO
+ *     as environment variable (the default being YES: stop on error).
+ *     Add a ecs_SetReportErrorFunction() method to install a custom callback that
+ *     will be called when OGDI_STOP_ON_ERROR=YES so that the user code is still
+ *     aware of errors that occured. If not defined, the error will be logged in stderr.
+ *
+ * Revision 1.3  2016/06/28 14:32:45  erouault
  * Fix all warnings about unused variables raised by GCC 4.8
  *
  * Revision 1.2  2001/04/09 15:04:34  warmerda
@@ -109,6 +118,83 @@ int ecs_SetError (r,errorcode,error_message)
   ecs_AdjustResult(r);
 
   return TRUE;
+}
+
+/************************************************************************/
+/*                     ecs_ShouldStopOnError()                          */
+/************************************************************************/
+
+static int ecs_ShouldStopOnError()
+{
+    const char* pszStopOnError = getenv("OGDI_STOP_ON_ERROR");
+    if( pszStopOnError == NULL )
+        return TRUE;
+    if( strcmp(pszStopOnError, "yes") == 0 ||
+        strcmp(pszStopOnError, "YES") == 0 )
+    {
+         return TRUE;
+    }
+    else if( strcmp(pszStopOnError, "no") == 0 ||
+             strcmp(pszStopOnError, "NO") == 0 )
+    {
+         return FALSE;
+    }
+    else
+    {
+         fprintf(stderr, "Unhandled value for OGDI_STOP_ON_ERROR = %s. "
+                         "Considering it is YES\n",
+                         pszStopOnError);
+         return TRUE;
+    }
+}
+
+/************************************************************************/
+/*                     ecs_ShouldStopOnError()                            */
+/************************************************************************/
+
+static int ecs_DefaultReportError(int errorcode, const char *error_message)
+{
+    fprintf(stderr, "Error %d: %s\n", errorcode, error_message);
+    return FALSE; /* go on */
+}
+
+/************************************************************************/
+/*                   ecs_SetReportErrorFunction()                       */
+/************************************************************************/
+
+static ReportErrorType pfnReportError = ecs_DefaultReportError;
+
+/* Installs a custom error handler and returns the previous one */
+ReportErrorType ecs_SetReportErrorFunction(ReportErrorType pfn)
+{
+    ReportErrorType oldErrorFunc = pfnReportError;
+    pfnReportError = pfn;
+    return oldErrorFunc;
+}
+
+/************************************************************************/
+/*                       ecs_SetErrorShouldStop()                       */
+/************************************************************************/
+
+/* ecs_SetErrorShouldStop() is a variant of ecs_SetError() that can be used */
+/* when the error can be recovered. By default it will be considered as non */
+/* recoverable, and thus return TRUE, and regular ecs_SetError() will be used. */
+/* But the user may have  installed its own error handler with */
+/* ecs_SetReportErrorFunction() and decide of the appropriate behaviour */
+int ecs_SetErrorShouldStop (r,errorcode,error_message)
+     ecs_Result *r;
+     int errorcode;
+     char *error_message;
+{
+  if( ecs_ShouldStopOnError() )
+  {
+      ecs_SetError(r,errorcode,error_message);
+      return TRUE;
+  }
+  else
+  {
+      return pfnReportError(errorcode,error_message);
+  }
 }
 
 /*

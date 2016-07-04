@@ -17,7 +17,16 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.10  2016-07-04 14:34:40  erouault
+ * Revision 1.11  2016-07-04 17:03:12  erouault
+ * Error handling: Add a ecs_SetErrorShouldStop() function that can be
+ *     used internally when the code is able to recover from an error. The user
+ *     may decide if he wants to be resilient on errors by defining OGDI_STOP_ON_ERROR=NO
+ *     as environment variable (the default being YES: stop on error).
+ *     Add a ecs_SetReportErrorFunction() method to install a custom callback that
+ *     will be called when OGDI_STOP_ON_ERROR=YES so that the user code is still
+ *     aware of errors that occured. If not defined, the error will be logged in stderr.
+ *
+ * Revision 1.10  2016/07/04 14:34:40  erouault
  * VPF: _getNextObject / _getObject functions: validate the value of the tile_id to avoid a potential out-of-bounds read. Fix crash on dqyarea@dqy layer of DNC17/H1708311
  *
  * Revision 1.9  2007/05/09 20:46:28  cbalint
@@ -476,8 +485,11 @@ _getNextObjectArea(s,l)
       if( lpriv->isTiled && (tile_id < 1 || tile_id > spriv->nbTile) )
       {
 	/* Happens with dqyarea@dqy(*) coverage of DNC17/H1708311 */
-	fprintf(stderr, "Object index=%d/area_id=%d references incorrect tile_id=%d (nbTile=%d)\n",
-		l->index, area_id, tile_id, spriv->nbTile);
+	char szErrorMsg[128];
+	sprintf(szErrorMsg, "Object index=%d references incorrect tile_id=%d (nbTile=%d)",
+	    l->index, tile_id, spriv->nbTile);
+	if( ecs_SetErrorShouldStop(&(s->result), 1, szErrorMsg) )
+	    return;
       }
       else
       if (lpriv->isTiled == 0 || spriv->tile[tile_id-1].isSelected) {
@@ -563,11 +575,11 @@ _getObjectArea(s,l,id)
 
   if( lpriv->isTiled && (tile_id < 1 || tile_id > spriv->nbTile) )
   {
-	char szErrorMsg[128];
-	sprintf(szErrorMsg, "Object index=%d references incorrect tile_id=%d (nbTile=%d)",
-	    l->index, tile_id, spriv->nbTile);
-	ecs_SetError(&(s->result), 1, szErrorMsg);
-	return;
+    char szErrorMsg[128];
+    sprintf(szErrorMsg, "Object index=%d references incorrect tile_id=%d (nbTile=%d)",
+            l->index, tile_id, spriv->nbTile);
+    if( ecs_SetErrorShouldStop(&(s->result), 1, szErrorMsg) )
+      return;
   }
 
   _selectTileArea(s,l,tile_id);
@@ -633,8 +645,11 @@ _getObjectIdArea(s,l,coord)
 
       if( lpriv->isTiled && (tile_id < 1 || tile_id > spriv->nbTile) )
       {
-	fprintf(stderr, "Object index=%d references incorrect tile_id=%d (nbTile=%d)\n",
-		l->index, tile_id, spriv->nbTile);
+        char szErrorMsg[128];
+        sprintf(szErrorMsg, "Object index=%d references incorrect tile_id=%d (nbTile=%d)",
+                l->index, tile_id, spriv->nbTile);
+        if( ecs_SetErrorShouldStop(&(s->result), 1, szErrorMsg) )
+          return;
       }
       else
       if (!(lpriv->isTiled) || 
@@ -849,7 +864,15 @@ _getNextObjectLine(s,l)
 	return;
       }
 
-      if (lpriv->isTiled == 0 || spriv->tile[tile_id-1].isSelected) {
+      if( lpriv->isTiled && (tile_id < 1 || tile_id > spriv->nbTile) )
+      {
+        char szErrorMsg[128];
+        sprintf(szErrorMsg, "Object index=%d references incorrect tile_id=%d (nbTile=%d)",
+                l->index, tile_id, spriv->nbTile);
+        if( ecs_SetErrorShouldStop(&(s->result), 1, szErrorMsg) )
+          return;
+      }
+      else if (lpriv->isTiled == 0 || spriv->tile[tile_id-1].isSelected) {
 
 	_selectTileLine(s,l,tile_id);
 	if (!vrf_get_lines_mbr(l,primCount,primList,&xmin,&ymin,&xmax,&ymax)) {
@@ -1152,18 +1175,21 @@ _getNextObjectPoint(s,l)
     _getTileAndPrimId(s,l,l->index,&fpoint_id,&tile_id, &point_id);
     if (set_member(fpoint_id,lpriv->feature_rows)) {
       if (tile_id == -1) {
-	ecs_SetError(&(s->result), 1, "The VRF tiles are badly defined");
-	return;
+	if( ecs_SetErrorShouldStop(&(s->result), 1, "The VRF tiles are badly defined"))
+	    return;
       }
       if (tile_id == -2) {
-	ecs_SetError(&(s->result), 1, "The join table is empty");
-	return;
+	if( !ecs_SetError(&(s->result), 1, "The join table is empty") )
+	    return;
       }
 
       if( lpriv->isTiled && (tile_id < 1 || tile_id > spriv->nbTile) )
       {
-	fprintf(stderr, "Object index=%d references incorrect tile_id=%d (nbTile=%d)\n",
-		l->index, tile_id, spriv->nbTile);
+	char szErrorMsg[128];
+	sprintf(szErrorMsg, "Object index=%d references incorrect tile_id=%d (nbTile=%d)",
+	    l->index, tile_id, spriv->nbTile);
+	if( ecs_SetErrorShouldStop(&(s->result), 1, szErrorMsg) )
+	    return;
       }
       else
       if (lpriv->isTiled == 0 || spriv->tile[tile_id-1].isSelected) {
@@ -1254,8 +1280,8 @@ _getObjectPoint(s,l,id)
     char szErrorMsg[128];
     sprintf(szErrorMsg, "Object index=%d references incorrect tile_id=%d (nbTile=%d)",
             l->index, tile_id, spriv->nbTile);
-    ecs_SetError(&(s->result), 1, szErrorMsg);
-    return;
+    if( ecs_SetErrorShouldStop(&(s->result), 1, szErrorMsg) )
+      return;
   }
 
   _selectTilePoint(s,l,tile_id);
@@ -1313,8 +1339,11 @@ _getObjectIdPoint(s,l,coord)
 
       if( lpriv->isTiled && (tile_id < 1 || tile_id > spriv->nbTile) )
       {
-	fprintf(stderr, "Object index=%d references incorrect tile_id=%d (nbTile=%d)\n",
-		l->index, tile_id, spriv->nbTile);
+        char szErrorMsg[128];
+        sprintf(szErrorMsg, "Object index=%d references incorrect tile_id=%d (nbTile=%d)",
+                l->index, tile_id, spriv->nbTile);
+        if( ecs_SetErrorShouldStop(&(s->result), 1, szErrorMsg) )
+          return;
       }
       else
       if (!(lpriv->isTiled) || 
@@ -1441,8 +1470,11 @@ _getNextObjectText(s,l)
 
       if( lpriv->isTiled && (tile_id < 1 || tile_id > spriv->nbTile) )
       {
-	fprintf(stderr, "Object index=%d references incorrect tile_id=%d (nbTile=%d)\n",
-		l->index, tile_id, spriv->nbTile);
+        char szErrorMsg[128];
+        sprintf(szErrorMsg, "Object index=%d references incorrect tile_id=%d (nbTile=%d)",
+                l->index, tile_id, spriv->nbTile);
+        if( ecs_SetErrorShouldStop(&(s->result), 1, szErrorMsg) )
+          return;
       }
       else
       if (lpriv->isTiled == 0 || spriv->tile[tile_id-1].isSelected) {
@@ -1534,8 +1566,8 @@ _getObjectText(s,l,id)
     char szErrorMsg[128];
     sprintf(szErrorMsg, "Object index=%d references incorrect tile_id=%d (nbTile=%d)",
             l->index, tile_id, spriv->nbTile);
-    ecs_SetError(&(s->result), 1, szErrorMsg);
-    return;
+    if( ecs_SetErrorShouldStop(&(s->result), 1, szErrorMsg) )
+      return;
   }
 
   _selectTileText(s,l,tile_id);
@@ -1593,8 +1625,11 @@ _getObjectIdText(s,l,coord)
 
       if( lpriv->isTiled && (tile_id < 1 || tile_id > spriv->nbTile) )
       {
-	fprintf(stderr, "Object index=%d references incorrect tile_id=%d (nbTile=%d)\n",
-		l->index, tile_id, spriv->nbTile);
+        char szErrorMsg[128];
+        sprintf(szErrorMsg, "Object index=%d references incorrect tile_id=%d (nbTile=%d)",
+                l->index, tile_id, spriv->nbTile);
+        if( ecs_SetErrorShouldStop(&(s->result), 1, szErrorMsg) )
+          return;
       }
       else
       if (!(lpriv->isTiled) || 

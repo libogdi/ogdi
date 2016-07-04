@@ -17,7 +17,16 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.19  2016-07-04 12:49:56  erouault
+ * Revision 1.20  2016-07-04 17:03:12  erouault
+ * Error handling: Add a ecs_SetErrorShouldStop() function that can be
+ *     used internally when the code is able to recover from an error. The user
+ *     may decide if he wants to be resilient on errors by defining OGDI_STOP_ON_ERROR=NO
+ *     as environment variable (the default being YES: stop on error).
+ *     Add a ecs_SetReportErrorFunction() method to install a custom callback that
+ *     will be called when OGDI_STOP_ON_ERROR=YES so that the user code is still
+ *     aware of errors that occured. If not defined, the error will be logged in stderr.
+ *
+ * Revision 1.19  2016/07/04 12:49:56  erouault
  * VPF: Avoid a missing fcs file in a coverage to prevent opening any coverage of the library (fix opening of DNC17/COA17A dataset)
  *
  * Revision 1.18  2008/05/28 00:18:21  cbalint
@@ -1219,10 +1228,19 @@ vrf_GetMetadata(s)
 	/* missing. That happens for example with DNC17/COA17A/ENV */
 	if (spriv->fcsTable.path == NULL) 
 	  {
+            char szErrorMessage[128];
+            sprintf(szErrorMessage, "Can't open the FCS table of '%s', invalid VRF coverage",
+                    covname);
 	    rec_sprintf(spriv->metadatastring,"%s <ERROR>Cannot open %s/%s/fcs</ERROR>",
 			spriv->metadatastring,spriv->library,covname );
-	    /*ecs_SetError(&(s->result),1,"Can't open the FCS table, invalid VRF coverage");
-	    return 0;*/
+	    if( ecs_SetErrorShouldStop(&(s->result),1,szErrorMessage) )
+	    {
+                free(covname);
+                vpf_close_table(&(spriv->lhtTable));
+                vpf_close_table(&(spriv->fcaTable));
+                free_row(rowcat, spriv->catTable);
+		return 0;
+	    }
 	  }
 	  else
 	  {
