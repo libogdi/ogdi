@@ -1,3 +1,8 @@
+2016-07-04  Even Rouault <even.rouault@spatialys.com>
+
+    * VPF: Avoid a missing fcs file in a coverage to prevent opening any
+    coverage of the library (fix opening of DNC17/COA17A dataset)
+
 2016-06-28  Even Rouault <even.rouault@spatialys.com>
 
     * Fix all warnings about unused variables raised by GCC 4.8

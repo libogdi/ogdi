@@ -17,7 +17,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.18  2008-05-28 00:18:21  cbalint
+ * Revision 1.19  2016-07-04 12:49:56  erouault
+ * VPF: Avoid a missing fcs file in a coverage to prevent opening any coverage of the library (fix opening of DNC17/COA17A dataset)
+ *
+ * Revision 1.18  2008/05/28 00:18:21  cbalint
  *    * fix minor printf format gcc warnings.
  *
  * Revision 1.17  2007/05/09 20:46:28  cbalint
@@ -1191,7 +1194,7 @@ vrf_GetMetadata(s)
     /*ajoute description et debut du covinfo*/
     buf1 = justify( (char *) get_table_element(2, rowcat, spriv->catTable, NULL, &count));
 
-    rec_sprintf(spriv->metadatastring,"%s {%s} {<Grassland>displaymetadata {",spriv->metadatastring, buf1);
+    rec_sprintf(spriv->metadatastring,"%s {%s} {",spriv->metadatastring, buf1);
     free(buf1);
 
     /********/
@@ -1212,10 +1215,18 @@ vrf_GetMetadata(s)
 #endif
 	spriv->fcaTable = vpf_open_table(buffer, disk, "rb", NULL);
 		
+	/* We do not want to abort on a whole library because a FCS file is */
+	/* missing. That happens for example with DNC17/COA17A/ENV */
 	if (spriv->fcsTable.path == NULL) 
 	  {
-	    ecs_SetError(&(s->result),1,"Can't open the FCS table, invalid VRF coverage");
-	    return 0;
+	    rec_sprintf(spriv->metadatastring,"%s <ERROR>Cannot open %s/%s/fcs</ERROR>",
+			spriv->metadatastring,spriv->library,covname );
+	    /*ecs_SetError(&(s->result),1,"Can't open the FCS table, invalid VRF coverage");
+	    return 0;*/
+	  }
+	  else
+	  {
+	      rec_sprintf(spriv->metadatastring,"%s<Grassland>displaymetadata {",spriv->metadatastring);
 	  }
   
 	for (i = 1; i <= spriv->fcsTable.nrows; ++i) 
@@ -1260,10 +1271,19 @@ vrf_GetMetadata(s)
             free_row(row, spriv->fcsTable);
 	    free_row(rowcomp, spriv->fcsTable);
 	  }
+	
+	  if (spriv->fcsTable.path != NULL)  {
+		rec_sprintf(spriv->metadatastring,"%s }",spriv->metadatastring);
+	  }
+	
 	vpf_close_table(&(spriv->fcaTable));		
     }
-    
-    rec_sprintf(spriv->metadatastring,"%s } {",spriv->metadatastring);
+    else
+    {
+	rec_sprintf(spriv->metadatastring,"%s<Grassland>displaymetadata { }",spriv->metadatastring);
+    }
+
+    rec_sprintf(spriv->metadatastring,"%s {",spriv->metadatastring);
     vpf_close_table(&(spriv->fcsTable));
  
 
