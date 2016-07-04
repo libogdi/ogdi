@@ -18,7 +18,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.4  2016-07-04 17:03:12  erouault
+ * Revision 1.5  2016-07-04 17:33:49  erouault
+ * Also export ecs_ShouldStopOnError and ecs_SetErrorShouldStop on Windows
+ *
+ * Revision 1.4  2016/07/04 17:03:12  erouault
  * Error handling: Add a ecs_SetErrorShouldStop() function that can be
  *     used internally when the code is able to recover from an error. The user
  *     may decide if he wants to be resilient on errors by defining OGDI_STOP_ON_ERROR=NO
@@ -124,7 +127,7 @@ int ecs_SetError (r,errorcode,error_message)
 /*                     ecs_ShouldStopOnError()                          */
 /************************************************************************/
 
-static int ecs_ShouldStopOnError()
+int ecs_ShouldStopOnError()
 {
     const char* pszStopOnError = getenv("OGDI_STOP_ON_ERROR");
     if( pszStopOnError == NULL )
