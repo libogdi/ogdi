@@ -19,7 +19,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.27  2016-07-04 17:33:49  erouault
+ * Revision 1.28  2016-07-05 13:28:46  erouault
+ * ecs_util.h: update to 20160705 so that we have a way to know if ecs_SetReportErrorFunction() is available
+ *
+ * Revision 1.27  2016/07/04 17:33:49  erouault
  * Also export ecs_ShouldStopOnError and ecs_SetErrorShouldStop on Windows
  *
  * Revision 1.26  2016/07/04 17:03:12  erouault
@@ -100,7 +103,7 @@
 #define ECS_UTIL 1
 
 #define OGDI_VERSION     320
-#define OGDI_RELEASEDATE 20080528
+#define OGDI_RELEASEDATE 20160705
 
 #include <stdio.h>
 #include <stdlib.h>
