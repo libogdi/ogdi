@@ -1001,6 +1001,13 @@ vpf_table_type vpf_open_table (char *tablename, storage_type storage,
 	{
 	  Read_Vpf_Int (&(table.nrows), table.xfp, 1L);
 	  Read_Vpf_Int (&ulval, table.xfp, 1L);
+          if( (unsigned int)table.nrows > 100 * 1024 * 1024 )
+          {
+            xvt_note ("vpf_open_table: <%s> : table.nrows = %d\n",tablepath, table.nrows);
+            fclose(table.xfp);
+            table.nrows = 0;
+            return table;
+          }
 	  idxsize = table.nrows * sizeof (index_cell) + 10L;
 
 	  /* Load the index into RAM */
