@@ -17,7 +17,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.19  2016-06-28 14:32:45  erouault
+ * Revision 1.20  2016-07-06 09:00:14  erouault
+ * add heuristics in vrf_get_ring_coords() to detect cycling topology of edges that lead to endless looping and eventually crashes. Be robust to memory allocation failures in various places, and properly cleanup allocated structures when returning
+ *
+ * Revision 1.19  2016/06/28 14:32:45  erouault
  * Fix all warnings about unused variables raised by GCC 4.8
  *
  * Revision 1.18  2016/06/27 20:05:12  erouault
@@ -269,7 +272,14 @@ int vrf_get_merged_line_feature (s, layer, primCount, primList)
     {
         if( !vrf_get_line_feature( s, layer, primList[iPrim],
                                    primResults+iPrim ) )
-            return FALSE; /* is it worth cleaning up? */
+        {
+            for( ; iPrim >=0; iPrim-- )
+                ecs_CleanUp( primResults + iPrim );
+
+            free( primResults );
+            ecs_SetError(&(s->result), 1,"Error in vrf_get_merged_line_feature");
+            return FALSE;
+        }
 
         maxVertCount += ECSGEOM((primResults+iPrim)).line.c.c_len;
     }
@@ -434,6 +444,8 @@ int vrf_get_line_feature (s, layer, prim_id, result)
     break;
   default:
     ecs_SetError(result, 2, "Undefined VRF table type");
+    free_row(row,lpriv->l.line.edgeTable);
+    return FALSE;
   }
 
   free_row(row,lpriv->l.line.edgeTable);
@@ -462,6 +474,11 @@ int vrf_get_line_feature (s, layer, prim_id, result)
     {
       if ((count == 1) && (ptr1 == (coordinate_type*)NULL)) {
 	ecs_SetError(result, 2, "Only one coordinate found for a line");
+        xvt_free ((char*)ptr1);
+        return FALSE;
+      } else if( ptr1 == NULL ) {
+        ecs_SetError(result, 1, "ptr1 == NULL");
+        return FALSE;
       } else {
 	for (i=0; i<count; i++) {
          ECS_SETGEOMLINECOORD((result),i,
@@ -477,6 +494,11 @@ int vrf_get_line_feature (s, layer, prim_id, result)
     {
       if ((count == 1) && (ptr2 == (tri_coordinate_type*)NULL)) {
 	ecs_SetError(result, 2, "Only one coordinate found for a line");
+        xvt_free ((char*)ptr2);
+        return FALSE;
+      } else if( ptr2 == NULL ) {
+        ecs_SetError(result, 1, "ptr2 == NULL");
+        return FALSE;
       } else {
 	for (i=0; i<count; i++) {
 	  ECS_SETGEOMLINECOORD((result),i,((double) ptr2[i].x),((double) ptr2[i].y))
@@ -490,6 +512,11 @@ int vrf_get_line_feature (s, layer, prim_id, result)
     {
       if ((count == 1) && (ptr3 == (double_coordinate_type*)NULL)) {
 	ecs_SetError(result, 2, "Only one coordinate found for a line");
+        xvt_free ((char*)ptr3);
+        return FALSE;
+      } else if( ptr3 == NULL ) {
+        ecs_SetError(result, 1, "ptr3 == NULL");
+        return FALSE;
       } else {
 	for (i=0; i<count; i++) {
 	  ECS_SETGEOMLINECOORD((result),i,((double) ptr3[i].x),((double) ptr3[i].y))
@@ -503,6 +530,11 @@ int vrf_get_line_feature (s, layer, prim_id, result)
     {
       if ((count == 1) && (ptr4 == (double_tri_coordinate_type*)NULL)) {
 	ecs_SetError(result, 2, "Only one coordinate found for a line");
+        xvt_free ((char*)ptr4);
+        return FALSE;
+      } else if( ptr4 == NULL ) {
+        ecs_SetError(result, 1, "ptr4 == NULL");
+        return FALSE;
       } else {
 	for (i=0; i<count; i++) {
 	  ECS_SETGEOMLINECOORD((result),i,((double) ptr4[i].x),((double) ptr4[i].y))
@@ -528,14 +560,21 @@ static int vrf_get_mbr (table, prim_id, xmin, ymin, xmax, ymax)
      double *ymax;
 {
   int32 count;
-  float temp;
+  float temp = 0.0f;
   row_type row;
+
+  *xmin = 0;
+  *ymin = 0;
+  *xmax = 0;
+  *ymax = 0;
 
   if (table.fp == NULL) {
     return FALSE;
   }
 
   row = read_row (prim_id, table);
+  if( !row )
+    return FALSE;
 
   /* The 'DBVMAP2I' VMAP2i product has FBR tables with columns of type double instead of float */
   /* so we must check for the type */
@@ -677,6 +716,11 @@ int vrf_get_text_feature (s, layer, prim_id)
   PrivData = (LayerPrivateData *) layer->priv; /* casting the private data for a VPF Point layer from */
   table = PrivData->l.text.textTable;	       /* our interest here is the primitive table 	      */
   row = read_row (prim_id, table);	       /* Read the prim_id row from the text primitive table */
+  if( row == NULL )
+  {
+    ecs_SetError(&(s->result), 1, "Unable to get row");
+    return FALSE;
+  }
 
   pos = table_pos ("STRING", table);	       /* find the position in the primitive table */
   desc = (char *) get_table_element (pos, row, table, NULL, &count); /* get the text string   */
@@ -845,14 +889,30 @@ int vrf_get_area_feature (s, layer, prim_id)
     if (ring_rec.face == prim_id) {
       if( n == max_rings )
       {
+          RING** newrings;
           max_rings *= 2;
-          area.rings = (RING **) xvt_realloc(area.rings, 
+          newrings = (RING **) xvt_realloc(area.rings, 
                                              sizeof(RING *) * max_rings);
+          if( newrings == NULL )
+          {
+            for(i=0;i<n;i++) {
+              for(j=0;j<area.rings[i]->nr_segs;j++) {
+                xvt_free((char*) area.rings[i]->segs[j]->coords);
+                xvt_free((char*) area.rings[i]->segs[j]);
+              }
+              xvt_free((char*)area.rings[i]->segs);
+              xvt_free((char*)area.rings[i]);
+            }
+            xvt_free ((char*)area.rings);
+            ecs_SetError(&(s->result), 2, "No enough memory");
+            return FALSE;
+          }
+          area.rings = newrings;
       }
 
       area.rings[n] = (RING*)xvt_zmalloc (sizeof (RING));
       if (area.rings[n] == NULL) {
-	for(i=0;i<n-1;i++) {
+	for(i=0;i<n;i++) {
 	  for(j=0;j<area.rings[i]->nr_segs;j++) {
 	    xvt_free((char*) area.rings[i]->segs[j]->coords);
 	    xvt_free((char*) area.rings[i]->segs[j]);
@@ -868,7 +928,7 @@ int vrf_get_area_feature (s, layer, prim_id)
       area.rings[n]->id = n+1;
       
       if (!vrf_get_ring_coords (s,area.rings[n], prim_id, ring_rec.edge, edgetable)) {
-	for(i=0;i<n-1;i++) {
+	for(i=0;i<n;i++) {
 	  for(j=0;j<area.rings[i]->nr_segs;j++) {
 	    xvt_free((char*) area.rings[i]->segs[j]->coords);
 	    xvt_free((char*) area.rings[i]->segs[j]);
@@ -876,6 +936,7 @@ int vrf_get_area_feature (s, layer, prim_id)
 	  xvt_free((char*)area.rings[i]->segs);
 	  xvt_free((char*)area.rings[i]);
 	}
+	xvt_free((char*)area.rings[n]);
 	xvt_free ((char*)area.rings);
 	ecs_SetError(&(s->result), 2, "No enough memory");
 	return FALSE;
@@ -993,14 +1054,46 @@ int vrf_get_ring_coords (s,ring, face_id, start_edge, edgetable)
    
   /* Allocate plenty of space for array of segment addresses */
   ring->segs = (SEGMENT**)xvt_zmalloc (maxsegs * sizeof (SEGMENT*));
+  if( ring->segs == NULL )
+  {
+    if (edge_rec.coords)
+      xvt_free ((char*)edge_rec.coords);
+    sprintf(buffer,"Unable to allocate memory in vrf_get_ring_coords() for face %d",
+            (int) face_id);
+    ecs_SetError(&(s->result), 1,buffer);
+    return FALSE;
+  }
 
   /* Load the first segment of the ring */
   ring->segs[n] = (SEGMENT*)xvt_zmalloc (sizeof (SEGMENT));
+  if( ring->segs[n] == NULL )
+  {
+    xvt_free((char*)ring->segs);
+    ring->segs = NULL;
+    if (edge_rec.coords)
+      xvt_free ((char*)edge_rec.coords);
+    sprintf(buffer,"Unable to allocate memory in vrf_get_ring_coords() for face %d",
+            (int) face_id);
+    ecs_SetError(&(s->result), 1,buffer);
+    return FALSE;
+  }
   ring->segs[n]->nr_coords = edge_rec.npts;
   ring->segs[n]->id = n+1;
 
   /* Allocate space for the coordinates of the first segment */
   ring->segs[n]->coords = (COORDINATE*)xvt_zmalloc ((size_t)ring->segs[n]->nr_coords * sizeof (COORDINATE));
+  if( ring->segs[n]->coords == NULL )
+  {
+    xvt_free((char*)ring->segs[n]);
+    xvt_free((char*)ring->segs);
+    ring->segs = NULL;
+    if (edge_rec.coords)
+      xvt_free ((char*)edge_rec.coords);
+    sprintf(buffer,"Unable to allocate memory in vrf_get_ring_coords() for face %d",
+            (int) face_id);
+    ecs_SetError(&(s->result), 1,buffer);
+    return FALSE;
+  }
                                                 
   /* If the direction is - load in reverse order */
   if (edge_rec.dir == '-')
@@ -1025,6 +1118,24 @@ int vrf_get_ring_coords (s,ring, face_id, start_edge, edgetable)
 
   while (!done)
     {
+      /* This is a temptative way to detect cycles in the chaining of edges: */
+      /* There is no reason that a sane ring might follow each edges more than */
+      /* twice */
+      if( n > edgetable.nrows * 2 )
+      {
+        sprintf(buffer,"Cycle detected in the edges of face %d",
+               (int) face_id);
+        for( --n;  n >= 0; --n )
+        {
+            xvt_free((char*) ring->segs[n]->coords);
+            xvt_free((char*) ring->segs[n]);
+        }
+        xvt_free(ring->segs);
+        ring->segs = NULL;
+        ecs_SetError(&(s->result), 1,buffer);
+        return FALSE;
+      }
+
       if (next_edge < 0)
 	{
 	  done = TRUE;
@@ -1051,10 +1162,17 @@ int vrf_get_ring_coords (s,ring, face_id, start_edge, edgetable)
 	{
 	  edge_rec = read_edge( next_edge, edgetable, (long)proj.inverse_proj);
 	  if (edge_rec.npts == 0) {
-	    sprintf(buffer,"Unable to read the edge %d in the face %d",
-		    (int) next_edge, (int) face_id);
-	    ecs_SetError(&(s->result), 1,buffer);
-	    return FALSE;
+            sprintf(buffer,"Unable to read the edge %d in the face %d, segment %d",
+                    (int) next_edge, (int) face_id, n);
+            for( --n;  n >= 0; --n )
+            {
+                xvt_free((char*) ring->segs[n]->coords);
+                xvt_free((char*) ring->segs[n]);
+            }
+            xvt_free(ring->segs);
+            ring->segs = NULL;
+            ecs_SetError(&(s->result), 1,buffer);
+            return FALSE;
 	  }
 
 	  next_edge = vrf_next_face_edge( &edge_rec, &prevnode, face_id );
@@ -1076,6 +1194,7 @@ int vrf_get_ring_coords (s,ring, face_id, start_edge, edgetable)
           {
               if (edge_rec.coords)
                   xvt_free ((char*)edge_rec.coords);
+              edge_rec.coords = NULL;
               done = TRUE;
               continue;
           }
@@ -1088,17 +1207,67 @@ int vrf_get_ring_coords (s,ring, face_id, start_edge, edgetable)
 
           if( n == maxsegs )
           {
+              SEGMENT** newsegs;
               maxsegs *= 2;
-              ring->segs = (SEGMENT**)
+              newsegs = (SEGMENT**)
                   xvt_realloc(ring->segs, maxsegs * sizeof (SEGMENT*));
+              if( newsegs == NULL )
+              {
+                  sprintf(buffer,"Line %d: Memory allocation failure for segment %d in the face %d",
+                          __LINE__, n, (int) face_id);
+                  for( --n;  n >= 0; --n )
+                  {
+                      xvt_free((char*) ring->segs[n]->coords);
+                      xvt_free((char*) ring->segs[n]);
+                  }
+                  xvt_free(ring->segs);
+                  ring->segs = NULL;
+                  if (edge_rec.coords)
+                    xvt_free ((char*)edge_rec.coords);
+                  ecs_SetError(&(s->result), 1,buffer);
+                  return FALSE;
+              }
+              ring->segs = newsegs;
           }
 
 	  ring->segs[n] = (SEGMENT*)xvt_zmalloc (sizeof (SEGMENT));
+	  if( ring->segs[n] == NULL )
+	  {
+              sprintf(buffer,"Line %d: Memory allocation failure for segment %d in the face %d",
+                          __LINE__, n, (int) face_id);
+	      for( ;  n >= 0; --n )
+	      {
+		  xvt_free((char*) ring->segs[n]->coords);
+		  xvt_free((char*) ring->segs[n]);
+	      }
+	      xvt_free(ring->segs);
+              ring->segs = NULL;
+              if (edge_rec.coords)
+                xvt_free ((char*)edge_rec.coords);
+              ecs_SetError(&(s->result), 1,buffer);
+	      return FALSE;
+	  }
 	  ring->segs[n]->nr_coords = edge_rec.npts;
 	  ring->segs[n]->id = n+1;
          
 	  /* Allocate space for the segment coordinates */
 	  ring->segs[n]->coords = (COORDINATE*)xvt_zmalloc ((size_t)ring->segs[n]->nr_coords * sizeof (COORDINATE));
+          if( ring->segs[n]->coords == NULL )
+          {
+              sprintf(buffer,"Line %d: Memory allocation failure for segment %d in the face %d",
+                          __LINE__, n, (int) face_id);
+              for( ;  n >= 0; --n )
+              {
+                  xvt_free((char*) ring->segs[n]->coords);
+                  xvt_free((char*) ring->segs[n]);
+              }
+              xvt_free(ring->segs);
+              ring->segs = NULL;
+              if (edge_rec.coords)
+                xvt_free ((char*)edge_rec.coords);
+              ecs_SetError(&(s->result), 1,buffer);
+              return FALSE;
+          }
 
 	  /* If the direction is - load in reverse order */
 	  if (edge_rec.dir == '-')
@@ -1122,6 +1291,7 @@ int vrf_get_ring_coords (s,ring, face_id, start_edge, edgetable)
 	  n++;
 	  if (edge_rec.coords)
             xvt_free ((char*)edge_rec.coords);
+          edge_rec.coords = NULL;
 
 	} /* if (!done) */
     } /* while */              
@@ -1129,10 +1299,9 @@ int vrf_get_ring_coords (s,ring, face_id, start_edge, edgetable)
   assert( ring->nr_segs <= maxsegs );
 
   /* Realloc the segs array to free unused memory */
-  temp = (SEGMENT**)xvt_zmalloc (ring->nr_segs * sizeof (SEGMENT*));
-  memcpy ((char*)temp, (char*)ring->segs, (ring->nr_segs * sizeof (SEGMENT*)));
-  xvt_free ((char*)ring->segs);
-  ring->segs = temp;
+  temp = (SEGMENT**)xvt_realloc(ring->segs, ring->nr_segs * sizeof (SEGMENT*));
+  if( temp )
+      ring->segs = temp;
 
   return TRUE;
 } 
@@ -1260,7 +1429,7 @@ int vrf_get_xy (table, row, pos, x, y)
      double         *x;
      double         *y;
 {
-  int32 count;
+  int32 count = 0;
   coordinate_type temp1, *ptr1;
   tri_coordinate_type temp2, *ptr2;
   double_coordinate_type temp3, *ptr3;
@@ -1274,6 +1443,8 @@ int vrf_get_xy (table, row, pos, x, y)
       if ((count == 1) && (ptr1 == (coordinate_type*)NULL)) {
 	*x = (double) temp1.x;
 	*y = (double) temp1.y;
+      } else if( ptr1 == NULL ) {
+        return FALSE;
       } else {
 	*x = (double) ptr1->x;
 	*y = (double) ptr1->y;
@@ -1288,6 +1459,8 @@ int vrf_get_xy (table, row, pos, x, y)
       if ((count == 1) && (ptr2 == (tri_coordinate_type*)NULL)) {
 	*x = temp2.x;
 	*y = temp2.y;
+      } else if( ptr2 == NULL ) {
+        return FALSE;
       } else {
 	*x = (double) ptr2[0].x;
 	*y = (double) ptr2[0].y;
@@ -1302,6 +1475,8 @@ int vrf_get_xy (table, row, pos, x, y)
       if ((count == 1) && (ptr3 == (double_coordinate_type*)NULL)) {
 	*x = (double) temp3.x;
 	*y = (double) temp3.y;
+      } else if( ptr3 == NULL ) {
+        return FALSE;
       } else {
 	*x = (double) ptr3[0].x;
 	*y = (double) ptr3[0].y;
@@ -1316,6 +1491,8 @@ int vrf_get_xy (table, row, pos, x, y)
       if ((count == 1) && (ptr4 == (double_tri_coordinate_type*)NULL)) {
 	*x = (double) temp4.x;
 	*y = (double) temp4.y;
+      } else if( ptr4 == NULL ) {
+        return FALSE;
       } else {
 	*x = (double) ptr4[0].x;
 	*y = (double) ptr4[0].y;
