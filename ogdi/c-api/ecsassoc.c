@@ -18,7 +18,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.5  2016-07-04 17:33:49  erouault
+ * Revision 1.6  2016-07-06 08:59:46  erouault
+ * ecs_SetError(): display error message on stderr if memory allocation fails
+ *
+ * Revision 1.5  2016/07/04 17:33:49  erouault
  * Also export ecs_ShouldStopOnError and ecs_SetErrorShouldStop on Windows
  *
  * Revision 1.4  2016/07/04 17:03:12  erouault
@@ -114,7 +117,10 @@ int ecs_SetError (r,errorcode,error_message)
   } else {
     r->message = (char *) malloc(strlen(error_message)+1);
     if (r->message == NULL)
+    {
+      fprintf(stderr, "Not enough memory in ecs_SetError(): %s\n", error_message); 
       return FALSE;
+    }
     strcpy(r->message,error_message);
   }
 
