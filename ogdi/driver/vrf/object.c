@@ -17,7 +17,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.11  2016-07-04 17:03:12  erouault
+ * Revision 1.12  2016-07-06 09:00:39  erouault
+ * VRF: implement ecs_SetErrorShouldStop() logic in the various _getNext.... methods
+ *
+ * Revision 1.11  2016/07/04 17:03:12  erouault
  * Error handling: Add a ecs_SetErrorShouldStop() function that can be
  *     used internally when the code is able to recover from an error. The user
  *     may decide if he wants to be resilient on errors by defining OGDI_STOP_ON_ERROR=NO
@@ -375,8 +378,19 @@ void _getPrimList( ecs_Server *s,
 
         if( *primCount == maxCount )
         {
+            int32* newPrimList;
             maxCount += 100;
-            *primList = (int32*) realloc(*primList, sizeof(int32) * maxCount);
+            newPrimList = (int32*) realloc(*primList, sizeof(int32) * maxCount);
+            if( newPrimList == NULL )
+            {
+                /* Should probably error out loudly */
+                free( *primList );
+                *primList = NULL;
+                *primCount = 0;
+                object_id++;
+                break;
+            }
+            *primList = newPrimList;
         }
 
         (*primList)[*primCount] = edg_id;
@@ -457,7 +471,7 @@ _getNextObjectArea(s,l)
   char *temp;
   double xmin, xmax, ymin, ymax;
 
-
+retry:
   while(!found && l->index < l->nbfeature) {    
     _getTileAndPrimId(s,l,l->index,&area_id,&tile_id, &fac_id);
 
@@ -473,13 +487,17 @@ _getNextObjectArea(s,l)
 
     if (set_member(area_id,lpriv->feature_rows)) {
       if (tile_id == -1) {
-	ecs_SetError(&(s->result), 1, "The VRF tiles are badly defined");
-	return;
+	if( ecs_SetErrorShouldStop(&(s->result), 1, "The VRF tiles are badly defined") )
+          return;
+        l->index++;
+        continue;
       }
 
       if (tile_id == -2) {
-	ecs_SetError(&(s->result), 1, "The join table is empty");
-	return;
+	if( ecs_SetErrorShouldStop(&(s->result), 1, "The join table is empty") )
+          return;
+        l->index++;
+        continue;
       }
       
       if( lpriv->isTiled && (tile_id < 1 || tile_id > spriv->nbTile) )
@@ -490,13 +508,17 @@ _getNextObjectArea(s,l)
 	    l->index, tile_id, spriv->nbTile);
 	if( ecs_SetErrorShouldStop(&(s->result), 1, szErrorMsg) )
 	    return;
+        l->index++;
+        continue;
       }
       else
       if (lpriv->isTiled == 0 || spriv->tile[tile_id-1].isSelected) {
 	_selectTileArea(s,l,tile_id);
 	if (!vrf_get_area_mbr(l,fac_id,&xmin,&ymin,&xmax,&ymax)) {
-	  ecs_SetError(&(s->result), 1, "VRF table mbr not open");
-	  return;
+	  if( ecs_SetErrorShouldStop(&(s->result), 1, "VRF table mbr not open") )
+            return;
+          l->index++;
+          continue;
 	}
 	if (!vrf_IsOutsideRegion(ymax,ymin,xmax,xmin,
 			      &(s->currentRegion))) {
@@ -512,7 +534,23 @@ _getNextObjectArea(s,l)
 
   if (found) {
     if (!vrf_get_area_feature(s,l,fac_id)) 
-      return;
+    {
+        if( !ecs_ShouldStopOnError() )
+        {
+            char* message= strdup(s->result.message);
+            int should_stop;
+            ecs_CleanUp(&(s->result));
+            should_stop = ecs_SetErrorShouldStop(&(s->result),1,message);
+            free(message);
+            if( !should_stop )
+            {
+                found = 0;
+                l->index++;
+                goto retry;
+            }
+        }
+        return;
+    }
     l->index++;
   } else {
     ecs_SetError(&(s->result),2,"End of selection");
@@ -843,6 +881,7 @@ _getNextObjectLine(s,l)
   else
       edgeCount = l->nbfeature;
 
+retry:
   while(!found && l->index < edgeCount) {
 
     if( primList != NULL )
@@ -856,17 +895,25 @@ _getNextObjectLine(s,l)
     
     if (set_member(line_id,lpriv->feature_rows)) {      
       if (tile_id == -1) {
-	ecs_SetError(&(s->result), 1, "The VRF tiles are badly defined");
-	return;
+        free( primList );
+        primList = NULL;
+	if( ecs_SetErrorShouldStop(&(s->result), 1, "The VRF tiles are badly defined") )
+          return;
+        continue;
       }
       if (tile_id == -2) {
-	ecs_SetError(&(s->result), 1, "The join table is empty");
-	return;
+        free( primList );
+        primList = NULL;
+	if( ecs_SetErrorShouldStop(&(s->result), 1, "The join table is empty") )
+          return;
+        continue;
       }
 
       if( lpriv->isTiled && (tile_id < 1 || tile_id > spriv->nbTile) )
       {
         char szErrorMsg[128];
+        free( primList );
+        primList = NULL;
         sprintf(szErrorMsg, "Object index=%d references incorrect tile_id=%d (nbTile=%d)",
                 l->index, tile_id, spriv->nbTile);
         if( ecs_SetErrorShouldStop(&(s->result), 1, szErrorMsg) )
@@ -876,8 +923,11 @@ _getNextObjectLine(s,l)
 
 	_selectTileLine(s,l,tile_id);
 	if (!vrf_get_lines_mbr(l,primCount,primList,&xmin,&ymin,&xmax,&ymax)) {
-	  ecs_SetError(&(s->result),1,"Unable to open mbr");
-	  return;
+          free( primList );
+          primList = NULL;
+	  if( ecs_SetErrorShouldStop(&(s->result),1,"Unable to open mbr") )
+            return;
+          continue;
 	}
 	if (!vrf_IsOutsideRegion(ymax,ymin,xmax,xmin,
 			      &(s->currentRegion))) { 
@@ -894,6 +944,20 @@ _getNextObjectLine(s,l)
     if( !vrf_get_merged_line_feature(s,l,primCount,primList) )
     {
         free( primList );
+        primList = NULL;
+        if( !ecs_ShouldStopOnError() )
+        {
+            char* message= strdup(s->result.message);
+            int should_stop;
+            ecs_CleanUp(&(s->result));
+            should_stop = ecs_SetErrorShouldStop(&(s->result),1,message);
+            free(message);
+            if( !should_stop )
+            {
+                found = 0;
+                goto retry;
+            }
+        }
         return;
     }
 
@@ -1177,10 +1241,14 @@ _getNextObjectPoint(s,l)
       if (tile_id == -1) {
 	if( ecs_SetErrorShouldStop(&(s->result), 1, "The VRF tiles are badly defined"))
 	    return;
+        l->index++;
+        continue;
       }
       if (tile_id == -2) {
-	if( !ecs_SetError(&(s->result), 1, "The join table is empty") )
+	if( !ecs_SetErrorShouldStop(&(s->result), 1, "The join table is empty") )
 	    return;
+        l->index++;
+        continue;
       }
 
       if( lpriv->isTiled && (tile_id < 1 || tile_id > spriv->nbTile) )
@@ -1190,13 +1258,35 @@ _getNextObjectPoint(s,l)
 	    l->index, tile_id, spriv->nbTile);
 	if( ecs_SetErrorShouldStop(&(s->result), 1, szErrorMsg) )
 	    return;
+        l->index++;
+        continue;
       }
       else
       if (lpriv->isTiled == 0 || spriv->tile[tile_id-1].isSelected) {
 
 	_selectTilePoint(s,l,tile_id);
 	if (!vrf_get_point_feature(s,l,point_id)) 
-	  return;
+        {
+          if( !ecs_ShouldStopOnError() )
+          {
+              char* message= strdup(s->result.message);
+              int should_stop;
+              ecs_CleanUp(&(s->result));
+              should_stop = ecs_SetErrorShouldStop(&(s->result),1,message);
+              free(message);
+              if( should_stop )
+                  return;
+              else
+              {
+                  l->index++;
+                  continue;
+              }
+          }
+          else
+          {
+              return;
+          }
+        }
 	if ((ECSGEOM((&(s->result))).point.c.x>s->currentRegion.west) && 
 	    (ECSGEOM((&(s->result))).point.c.x<s->currentRegion.east) &&
 	    (ECSGEOM((&(s->result))).point.c.y>s->currentRegion.south) && 
@@ -1460,12 +1550,16 @@ _getNextObjectText(s,l)
     _getTileAndPrimId(s,l,l->index,&text_id,&tile_id, &prim_id);
     if (set_member(text_id,lpriv->feature_rows)) {
       if (tile_id == -1) {
-	ecs_SetError(&(s->result), 1, "The VRF tiles are badly defined");
-	return;
+	if( ecs_SetErrorShouldStop(&(s->result), 1, "The VRF tiles are badly defined") )
+          return;
+        l->index ++;
+        continue;
       }
       if (tile_id == -2) {
-	ecs_SetError(&(s->result), 1, "The join table is empty");
-	return;
+	if( ecs_SetErrorShouldStop(&(s->result), 1, "The join table is empty") )
+          return;
+        l->index ++;
+        continue;
       }
 
       if( lpriv->isTiled && (tile_id < 1 || tile_id > spriv->nbTile) )
@@ -1475,13 +1569,35 @@ _getNextObjectText(s,l)
                 l->index, tile_id, spriv->nbTile);
         if( ecs_SetErrorShouldStop(&(s->result), 1, szErrorMsg) )
           return;
+        l->index ++;
+        continue;
       }
       else
       if (lpriv->isTiled == 0 || spriv->tile[tile_id-1].isSelected) {
 
 	_selectTileText(s,l,tile_id);
 	if (!vrf_get_text_feature(s,l,prim_id)) 
-	  return;
+        {
+          if( !ecs_ShouldStopOnError() )
+          {
+              char* message= strdup(s->result.message);
+              int should_stop;
+              ecs_CleanUp(&(s->result));
+              should_stop = ecs_SetErrorShouldStop(&(s->result),1,message);
+              free(message);
+              if( should_stop )
+                  return;
+              else
+              {
+                  l->index ++;
+                  continue;
+              }
+          }
+          else
+          {
+              return;
+          }
+        }
 	if ((ECSGEOM((&(s->result))).text.c.x>s->currentRegion.west) && 
 	    (ECSGEOM((&(s->result))).text.c.x<s->currentRegion.east) &&
 	    (ECSGEOM((&(s->result))).text.c.y>s->currentRegion.south) && 
@@ -1499,6 +1615,7 @@ _getNextObjectText(s,l)
   if (found) {
     l->index++;
   } else {
+    ecs_CleanUp(&(s->result));
     ecs_SetError(&(s->result),2,"End of selection");
     return;
   }
