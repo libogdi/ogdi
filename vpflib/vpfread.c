@@ -489,8 +489,14 @@ vpf_table_type table;
 
    STORAGE_BYTE_ORDER = table.byte_order;
 
-   if (row_number < 1) row_number = 1;
-   if (row_number > table.nrows) row_number = table.nrows;
+   /* ERO: previously clamped row_number to [1, table.nrows] but does not */
+   /* seam to be sane, especially if table.nrows = 0 */
+   if (row_number < 1 || row_number > table.nrows)
+   {
+     xvt_note ("index_pos: error trying to access row %d/%d in table %s\n",
+                   (int) row_number, table.nrows, table.path ) ;
+     return 0;
+   }
 
    switch (table.xstorage) {
       case COMPUTE:
@@ -512,7 +518,7 @@ vpf_table_type table;
       default:
          if ( table.mode == Write && table.nrows != row_number ) {
            /* Just an error check, should never get here in writing */
-           xvt_note ("index_length: error trying to access row %d",
+           xvt_note ("index_pos: error trying to access row %d",
                    (int) row_number ) ;
            pos = 0;
          }
@@ -760,6 +766,7 @@ vpf_table_type table;
   row_type row;
   id_triplet_type * keys;
   coordinate_type dummycoord;
+  int32 id = -1;
 
   if (feof(table.fp))
     {
@@ -769,6 +776,11 @@ vpf_table_type table;
   STORAGE_BYTE_ORDER = table.byte_order;
 
   row = (row_type)xvt_zmalloc (((size_t)table.nfields+1) * sizeof(column_type));
+  if( row == NULL )
+  {
+      xvt_note ("Out of memory in read_next_row()\n");
+      return NULL;
+  }
 
   for (i=0;i<table.nfields;i++) row[i].ptr = NULL;
 
@@ -780,6 +792,14 @@ vpf_table_type table;
 	  Read_Vpf_Int (&count, table.fp, 1);
 
 	  if ((unsigned int) count > 2000000) {
+            char szMessage[256];
+            if( strlen(table.path) < 128 )
+                sprintf(szMessage, "Repeat count for field %d of record %d of table %s is %d\n",
+                        i, id, table.path, (unsigned int)count);
+            else
+                sprintf(szMessage, "Repeat count for field %d of record %d of table %s is %d\n",
+                        i, id, table.path + strlen(table.path) - 128, (unsigned int)count);
+            xvt_note ("%s", szMessage);
 	    free_row ( row, table ) ;
 	    return (row_type) NULL;
 	  }	 
@@ -796,38 +816,83 @@ vpf_table_type table;
       case 'L':
 	if (count == 1) {
 	  row[i].ptr = (char *)xvt_zmalloc(sizeof(char));
+          if( row[i].ptr == NULL )
+          {
+              xvt_note ("Out of memory in read_next_row()\n");
+              free_row ( row, table ) ;
+              return (row_type) NULL;
+          }
 	  Read_Vpf_Char(row[i].ptr, table.fp, 1) ;
 	} else {
 	  size = count*sizeof(char);
 	  row[i].ptr = (char*) xvt_zmalloc((size_t)size+2);
 	  tptr = (char*)xvt_zmalloc ((size_t)size+2);
+          if( row[i].ptr == NULL || tptr == NULL )
+          {
+              xvt_note ("Out of memory in read_next_row()\n");
+              xvt_free(tptr);
+              free_row ( row, table ) ;
+              return (row_type) NULL;
+          }
 	  Read_Vpf_Char(tptr,table.fp,count) ;
 	  tptr[count] = '\0';
 	  strcpy(row[i].ptr,tptr);
-	  if(tptr != (char *)NULL)
-	    {xvt_free(tptr);tptr = (char *)NULL;}
+	  xvt_free(tptr);
+          tptr = (char *)NULL;
 	}
 	break;
       case 'I':
 	row[i].ptr = (int32*)xvt_zmalloc((size_t)count * sizeof (int32));
-	Read_Vpf_Int (row[i].ptr, table.fp, count ) ;
+	if( row[i].ptr == NULL )
+        {
+            xvt_note ("Out of memory in read_next_row()\n");
+            free_row ( row, table ) ;
+            return (row_type) NULL;
+        }
+        Read_Vpf_Int (row[i].ptr, table.fp, count ) ;
+        if( i == 0 && count == 1 )
+            id = ((int32*)row[i].ptr)[0];
 	break;
       case 'S':
 	row[i].ptr = (short*)xvt_zmalloc ((size_t)count * sizeof (short));
-	Read_Vpf_Short (row[i].ptr, table.fp, count ) ;
+	if( row[i].ptr == NULL )
+        {
+            xvt_note ("Out of memory in read_next_row()\n");
+            free_row ( row, table ) ;
+            return (row_type) NULL;
+        }
+        Read_Vpf_Short (row[i].ptr, table.fp, count ) ;
 	break;
       case 'F':
 	row[i].ptr = (float*)xvt_zmalloc ((size_t)count * sizeof (float));
-	Read_Vpf_Float (row[i].ptr, table.fp, count ) ;
+	if( row[i].ptr == NULL )
+        {
+            xvt_note ("Out of memory in read_next_row()\n");
+            free_row ( row, table ) ;
+            return (row_type) NULL;
+        }
+        Read_Vpf_Float (row[i].ptr, table.fp, count ) ;
 	break;
       case 'R':
 	row[i].ptr = (double*)xvt_zmalloc ((size_t)count * sizeof (double));
-	Read_Vpf_Double (row[i].ptr, table.fp, count ) ;
+	if( row[i].ptr == NULL )
+        {
+            xvt_note ("Out of memory in read_next_row()\n");
+            free_row ( row, table ) ;
+            return (row_type) NULL;
+        }
+        Read_Vpf_Double (row[i].ptr, table.fp, count ) ;
 	break;
       case 'D':
 	row[i].ptr = (date_type*)xvt_zmalloc ((size_t)count *
 					      sizeof (date_type));
-	Read_Vpf_Date (row[i].ptr, table.fp, count ) ;
+	if( row[i].ptr == NULL )
+        {
+            xvt_note ("Out of memory in read_next_row()\n");
+            free_row ( row, table ) ;
+            return (row_type) NULL;
+        }
+        Read_Vpf_Date (row[i].ptr, table.fp, count ) ;
 	break;
       case 'C':
 	/* Coordinate strings may be quite large.          */
@@ -836,7 +901,13 @@ vpf_table_type table;
 	/* coordinate at a time in higher level functions. */
 	row[i].ptr = (coordinate_type*)xvt_zmalloc ((size_t)count *
 						    sizeof(coordinate_type));
-	if (row[i].ptr)
+	if( row[i].ptr == NULL )
+        {
+            xvt_note ("Out of memory in read_next_row()\n");
+            free_row ( row, table ) ;
+            return (row_type) NULL;
+        }
+        if (row[i].ptr)
 	  Read_Vpf_Coordinate(row[i].ptr,table.fp,count);
 	else
 	  for (j=0;j<count;j++)
@@ -845,16 +916,34 @@ vpf_table_type table;
       case 'Z':
 	row[i].ptr = (tri_coordinate_type*)xvt_zmalloc ((size_t)count *
 							sizeof (tri_coordinate_type));
+        if( row[i].ptr == NULL )
+        {
+            xvt_note ("Out of memory in read_next_row()\n");
+            free_row ( row, table ) ;
+            return (row_type) NULL;
+        }
 	Read_Vpf_CoordinateZ(row[i].ptr,table.fp,count);
 	break;
       case 'B':
 	row[i].ptr = (double_coordinate_type*)xvt_zmalloc ((size_t)count *
 							   sizeof (double_coordinate_type));
-	Read_Vpf_DoubleCoordinate(row[i].ptr,table.fp,count);
+	if( row[i].ptr == NULL )
+        {
+            xvt_note ("Out of memory in read_next_row()\n");
+            free_row ( row, table ) ;
+            return (row_type) NULL;
+        }
+        Read_Vpf_DoubleCoordinate(row[i].ptr,table.fp,count);
 	break;
       case 'Y':
 	row[i].ptr = (double_tri_coordinate_type*)xvt_zmalloc ((size_t)count *
 							       sizeof (double_tri_coordinate_type));
+        if( row[i].ptr == NULL )
+        {
+            xvt_note ("Out of memory in read_next_row()\n");
+            free_row ( row, table ) ;
+            return (row_type) NULL;
+        }
 	Read_Vpf_DoubleCoordinateZ(row[i].ptr,table.fp,count);
 	break;
       case 'K':   /* ID Triplet */
@@ -862,13 +951,20 @@ vpf_table_type table;
                                                     sizeof (id_triplet_type));
 	keys = (id_triplet_type*)xvt_zmalloc ((size_t)count *
 					      sizeof (id_triplet_type));
+        if( row[i].ptr == NULL || keys == NULL )
+        {
+            xvt_note ("Out of memory in read_next_row()\n");
+            xvt_free ((char*)keys);
+            free_row ( row, table ) ;
+            return (row_type) NULL;
+        }
 	for (j=0;j<count;j++) {
 	  keys[j] = read_key(table);
 	}
 	memcpy (row[i].ptr, keys, (size_t)count *
 		sizeof(id_triplet_type));
-	if(keys != (id_triplet_type*)NULL)
-	  {xvt_free ((char*)keys);keys = (id_triplet_type*)NULL;}
+	xvt_free ((char*)keys);
+        keys = (id_triplet_type*)NULL;
 	break;
       case 'X':
 	row[i].ptr = NULL;
