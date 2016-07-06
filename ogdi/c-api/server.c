@@ -17,7 +17,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.11  2016-06-28 14:32:45  erouault
+ * Revision 1.12  2016-07-06 08:59:20  erouault
+ * fix memory leaks in error code paths of svr_CreateServer()
+ *
+ * Revision 1.11  2016/06/28 14:32:45  erouault
  * Fix all warnings about unused variables raised by GCC 4.8
  *
  * Revision 1.10  2016/06/27 20:05:12  erouault
@@ -246,14 +249,19 @@ ecs_Result *svr_CreateServer(s,url,isLocal)
 
   /* if the script driver is not found, then return error message */
   if (s->handle == NULL) {
-    res = &svr_dummy_result;
     sprintf(buffer,"Could not find the dynamic library \"%s\"",s->server_type);
+    svr_DestroyServer(s);
+
+    res = &svr_dummy_result;
     ecs_SetError(res,1,buffer);
+
     return res;
   }
 
   s->createserver = (dynfunc *) ecs_GetDynamicLibFunction(s->handle,"dyn_CreateServer");
   if (s->createserver == NULL) {
+    svr_DestroyServer(s);
+
     res = &svr_dummy_result;
     ecs_SetError(res,1,svr_messages[4]);
     return res;
@@ -291,14 +299,18 @@ ecs_Result *svr_CreateServer(s,url,isLocal)
     return res;
     }
   if (res->error) {
+    char* saved_message = res->message;
+    res->message = NULL;
+    svr_DestroyServer(s);
     msg = &svr_dummy_result;
-    ecs_SetError(msg,1,res->message);
+    ecs_SetError(msg,1,saved_message);
+    free(saved_message);
 
 /*    if (s->isRemote || (s->hostname == NULL))
       ecs_CloseDynamicLib(s->handle);
 */
 
-    ecs_freeSplitURL(&(s->hostname),&(s->server_type),&(s->pathname));
+    /*ecs_freeSplitURL(&(s->hostname),&(s->server_type),&(s->pathname));*/
     return msg;
   }
 
@@ -363,6 +375,7 @@ ecs_Result *svr_DestroyServer(s)
   ecs_SetSuccess(msg);
 
   s->priv = NULL;
+  s->url = NULL;
   s->projection = NULL;
   s->hostname = NULL;
   s->server_type = NULL;
@@ -404,6 +417,7 @@ ecs_Result *svr_DestroyServer(s)
 
   if (s->rasterconversion.coef.coef_val != NULL)
     free(s->rasterconversion.coef.coef_val);
+  s->rasterconversion.coef.coef_val = NULL;
   
   if (s->layer != NULL) {
     free(s->layer);
@@ -1977,7 +1991,11 @@ void ecs_FreeLayer(s,layer)
       free(s->layer);
       s->layer = NULL;
     } else {
-      s->layer = realloc(s->layer,sizeof(ecs_Layer)*s->layer_tablesize);
+      ecs_Layer* newlayer = realloc(s->layer,sizeof(ecs_Layer)*s->layer_tablesize);
+      if( newlayer != NULL )
+      {
+        s->layer = newlayer;
+      }
     }
   }
 
