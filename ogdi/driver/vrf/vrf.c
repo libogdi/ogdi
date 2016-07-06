@@ -17,7 +17,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.20  2007-05-09 21:29:50  cbalint
+ * Revision 1.21  2016-07-06 09:01:30  erouault
+ * VRF: fix memory leaks in error code paths of dyn_SelectLayer()
+ *
+ * Revision 1.20  2007/05/09 21:29:50  cbalint
  * fix is to increase of 1 the size of smallint (5 -> 6)
  *
  * Revision 1.19  2007/05/09 20:46:28  cbalint
@@ -471,6 +474,12 @@ ecs_Result *dyn_SelectLayer(s,sel)
     free( lpriv->coverage );
     free( lpriv->fclass );
     free( lpriv->expression );
+    free( lpriv->featureTableName );
+    free( lpriv->featureTablePrimIdName );
+    free( lpriv->joinTableName );
+    free( lpriv->joinTableForeignKeyName );
+    free( lpriv->joinTableFeatureIdName );
+    free( lpriv->primitiveTableName );
     free(s->layer[layer].priv);
     ecs_FreeLayer(s,layer);   
     return &(s->result);
@@ -532,9 +541,12 @@ ecs_Result *dyn_SelectLayer(s,sel)
     free( lpriv->coverage );
     free( lpriv->fclass );
     free( lpriv->expression );
-    free(lpriv->featureTableName);
-    free(lpriv->primitiveTableName);
-    free(lpriv->featureTablePrimIdName);
+    free( lpriv->featureTableName );
+    free( lpriv->featureTablePrimIdName );
+    free( lpriv->joinTableName );
+    free( lpriv->joinTableForeignKeyName );
+    free( lpriv->joinTableFeatureIdName );
+    free( lpriv->primitiveTableName );
     free(s->layer[layer].priv);
     ecs_FreeLayer(s,layer);
     ecs_SetError(&(s->result),1,"Can't open this feature class");
