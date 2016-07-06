@@ -1,3 +1,21 @@
+2016-07-06  Even Rouault <even.rouault@spatialys.com>
+
+    * ogdi/include/ecs_util.h: upgrade OGDI_RELEASEDATE to 20160705
+    * ogdi/c-api/server.c: fix memory leaks in error code paths of svr_CreateServer()
+    * ogdi/c-api/ecsassoc.c: ecs_SetError(): display error message on stderr if memory
+    allocation fails.
+    * ogdi/driver/vrf/feature.c: add heuristics in vrf_get_ring_coords() to
+    detect cycling topology of edges that lead to endless looping and eventually
+    crashes. Be robust to memory allocation failures in various places, and
+    properly cleanup allocated structures when returning.
+    * ogdi/driver/vrf/object.c: implement ecs_SetErrorShouldStop() logic in
+    the various _getNext.... methods
+    * ogdi/driver/vrf/vrf.c: fix memory leaks in error code paths
+    * vpflib/vpfread.c: index_pos(): no longer clamp index values to [1,table.nrows] but
+    error out. read_new_row(): be robust to memory allocation failures.
+    * vpflib/vpftable.c: vpf_open_table(): be robust to wrong nrows values for
+    memory tables.
+
 2016-07-04  Even Rouault <even.rouault@spatialys.com>
 
     * Error handling: Add a ecs_SetErrorShouldStop() function that can be
