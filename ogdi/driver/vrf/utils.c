@@ -17,7 +17,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.20  2016-07-04 17:03:12  erouault
+ * Revision 1.21  2016-07-07 15:50:15  erouault
+ * fix stack buffer overflow in vrf_GetMetadata() when reading the level in CAT files. Found by GCC 5.2 -faddress=sanitize
+ *
+ * Revision 1.20  2016/07/04 17:03:12  erouault
  * Error handling: Add a ecs_SetErrorShouldStop() function that can be
  *     used internally when the code is able to recover from an error. The user
  *     may decide if he wants to be resilient on errors by defining OGDI_STOP_ON_ERROR=NO
@@ -614,7 +617,6 @@ vrf_GetMetadata(s)
   row_type rowcomp;
   row_type rowfca;
   float buffloat;
-  short buffint;
   register ServerPrivateData *spriv = s->priv;
   char buffer[256];
   char tab[3][7]={"char","float","int"};
@@ -870,6 +872,9 @@ vrf_GetMetadata(s)
   rec_sprintf (spriv->metadatastring,"%s\n\n\nCOVERAGE ATTRIBUTE TABLE(CAT):\n\n",spriv->metadatastring);	
 
   for (i = 1; i <= spriv->catTable.nrows; ++i) {
+    int buffint = 0;
+    short buffshort = 0;
+
     row = get_row(i, spriv->catTable);
     buf1 = justify( (char *) get_table_element(1, row, spriv->catTable, NULL, &count));
     rec_sprintf(spriv->metadatastring,"%sCoverage_name: %s\n",spriv->metadatastring,buf1);
@@ -877,7 +882,15 @@ vrf_GetMetadata(s)
     buf1 = justify( (char *) get_table_element(2, row, spriv->catTable, NULL, &count));
     rec_sprintf(spriv->metadatastring,"%sDescription: %s\n",spriv->metadatastring,buf1);
     free(buf1);
-    get_table_element(3, row, spriv->catTable, &buffint, &count);
+    if( spriv->catTable.header[3].type == 'I' )
+    {
+      get_table_element(3, row, spriv->catTable, &buffint, &count);
+    }
+    else if( spriv->catTable.header[3].type == 'S' )
+    {
+      get_table_element(3, row, spriv->catTable, &buffshort, &count);
+      buffint = buffshort;
+    }
     rec_sprintf(spriv->metadatastring,"%sLevel: %d\n",spriv->metadatastring,buffint);
     free_row(row, spriv->catTable); 		
   }

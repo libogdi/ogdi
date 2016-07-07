@@ -1,3 +1,8 @@
+2016-07-07  Even Rouault <even.rouault@spatialys.com>
+
+    * ogdi/driver/vrf/utils.c: fix stack buffer overflow in vrf_GetMetadata()
+    when reading the level in CAT files. Found by GCC 5.2 -faddress=sanitize
+
 2016-07-06  Even Rouault <even.rouault@spatialys.com>
 
     * ogdi/include/ecs_util.h: upgrade OGDI_RELEASEDATE to 20160705
@@ -10,7 +15,7 @@
     properly cleanup allocated structures when returning.
     * ogdi/driver/vrf/object.c: implement ecs_SetErrorShouldStop() logic in
     the various _getNext.... methods
-    * ogdi/driver/vrf/vrf.c: fix memory leaks in error code paths
+    * ogdi/driver/vrf/vrf.c: fix memory leaks in error code paths of dyn_SelectLayer()
     * vpflib/vpfread.c: index_pos(): no longer clamp index values to [1,table.nrows] but
     error out. read_new_row(): be robust to memory allocation failures.
     * vpflib/vpftable.c: vpf_open_table(): be robust to wrong nrows values for
