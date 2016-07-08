@@ -35,8 +35,13 @@ typedef struct
 typedef int32_t int32;
 typedef uint32_t uint32;
 #else
+#ifdef _MSC_VER
+typedef signed int int32;
+typedef unsigned int uint32;
+#else
 typedef int32_t int32;
 typedef uint32_t uint32;
+#endif
 #endif
 #endif
 

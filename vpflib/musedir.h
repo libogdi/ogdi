@@ -67,11 +67,7 @@ ERRSTATUS dir_current();
 ERRSTATUS file_spec_to_string ();
 FILE *muse_file_open ();
 int muse_access ();
-#ifdef _ALPHA
-int32_t muse_filelength ();
-#else
-int32_t muse_filelength ();
-#endif
+int muse_filelength ();
 void muse_check_path ();
 #endif
 

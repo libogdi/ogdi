@@ -1,3 +1,7 @@
+2016-07-08  Even Rouault <even.rouault@spatialys.com>
+
+    Fix various compilation problems on Windows (contributed by Jerome Siot)
+
 2016-07-07  Even Rouault <even.rouault@spatialys.com>
 
     * ogdi/driver/vrf/utils.c: fix stack buffer overflow in vrf_GetMetadata()

@@ -19,7 +19,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.28  2016-07-05 13:28:46  erouault
+ * Revision 1.29  2016-07-08 10:22:55  erouault
+ * Fix various compilation problems on Windows (contributed by Jerome Siot)
+ *
+ * Revision 1.28  2016/07/05 13:28:46  erouault
  * ecs_util.h: update to 20160705 so that we have a way to know if ecs_SetReportErrorFunction() is available
  *
  * Revision 1.27  2016/07/04 17:33:49  erouault
@@ -148,8 +151,13 @@
 typedef int32_t int32;
 typedef uint32_t uint32;
 #else
+#ifdef _MSC_VER
+typedef signed int int32;
+typedef unsigned int uint32;
+#else
 typedef int32_t int32;
 typedef uint32_t uint32;
+#endif
 #endif
 #endif
 
