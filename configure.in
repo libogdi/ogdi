@@ -30,6 +30,8 @@ dnl CFLAGS="$CFLAGS -I/usr/local/include"
 
 dnl Checks for libraries.
 AC_CHECK_LIB(dl,dlopen,,,)
+AC_CHECK_LIB(c,iconv_open,HAVE_ICONV=yes,,,)
+AC_SUBST(HAVE_ICONV,$HAVE_ICONV)
 
 dnl check for various compiler flags.
 AC_COMPILER_WFLAGS

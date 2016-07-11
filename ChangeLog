@@ -2,6 +2,7 @@
 
     * ogdi/c-api/ecs_dyna.c: fix ecs_OpenDynamicLib on 64 bit Windows (OGDI #72)
     * external/rpc_win32/LIBRPC/xdr_floa.c: recognize _AMD64_
+    * Make iconv dependency optional and detect it in configure
 
 2016-07-08  Even Rouault <even.rouault@spatialys.com>
 

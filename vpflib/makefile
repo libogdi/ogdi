@@ -35,6 +35,10 @@ CFLAGS 	= $(INCLUDES) $(COMMON_CFLAGS) $(UNIX_DEFINE) \
 
 include $(TOPDIR)/config/common.mak
 
+ifeq ($(HAVE_ICONV),yes)
+CFLAGS := $(CFLAGS) -DHAVE_ICONV
+endif
+
 all: MKOBJECTDIR 
 	$(MAKE) --directory $(OBJDIR) -f ../makefile PASS='depend' $(TARGETGEN)
 

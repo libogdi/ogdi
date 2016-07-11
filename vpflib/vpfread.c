@@ -58,7 +58,9 @@
 #include <dos.h>
 #endif
 
+#ifdef HAVE_ICONV
 #include <iconv.h>
+#endif
 
 #ifdef _UNIX
 #include <sys/stat.h>
@@ -1470,6 +1472,7 @@ int32  *count;
    int32   col;
    char     * tptr;
    void     * retvalue;
+#ifdef HAVE_ICONV
    static int do_iconv = -1;
    static iconv_t iconvd = (iconv_t)-1;
 
@@ -1481,6 +1484,7 @@ int32  *count;
        iconvd = iconv_open("UTF-8", "ISO-8859-1");
      }
    }
+#endif
 
    retvalue = NULL;
    col = field_number;
@@ -1521,6 +1525,9 @@ int32  *count;
                 break;
               }
             }
+#ifndef HAVE_ICONV
+            strcpy((char *)retvalue,tptr);
+#else
             if (ascii == 1 || iconvd == (iconv_t)-1)
               strcpy((char *)retvalue,tptr);
             else
@@ -1544,6 +1551,7 @@ int32  *count;
                 //fprintf(stderr, "UTF-8 text : '%s'\n", (char*)retvalue);
               }
             }
+#endif
             if(tptr != (char *)NULL)
               {xvt_free(tptr);tptr = (char *)NULL;}
          }
