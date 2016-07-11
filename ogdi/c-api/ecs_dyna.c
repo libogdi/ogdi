@@ -17,7 +17,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.5  2007-02-12 18:06:31  cbalint
+ * Revision 1.6  2016-07-11 09:15:53  erouault
+ * fix ecs_OpenDynamicLib on 64 bit Windows (OGDI #72)
+ *
+ * Revision 1.5  2007/02/12 18:06:31  cbalint
  *         Hide plugins from system libs path.
  *         Release versioning using sonames.
  *
@@ -61,7 +64,7 @@ void *ecs_OpenDynamicLib(libname)
   static HINSTANCE handle;
 
   handle = LoadLibrary(libname);
-  if ((int) handle <= (int) HINSTANCE_ERROR) {
+  if (handle == NULL) {
     /* Try with the .dll extension */
 
     if ((temp = (char *) malloc(strlen(libname)+5)) == NULL)
@@ -71,7 +74,7 @@ void *ecs_OpenDynamicLib(libname)
         
     handle = LoadLibrary(temp);
     free(temp);
-    if ((int) handle <= (int) HINSTANCE_ERROR) {
+    if (handle == NULL) {
       return NULL;
     } else {
       return (void *) handle;
