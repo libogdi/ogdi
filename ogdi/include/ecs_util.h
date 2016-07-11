@@ -19,7 +19,10 @@
  ******************************************************************************
  *
  * $Log$
- * Revision 1.29  2016-07-08 10:22:55  erouault
+ * Revision 1.30  2016-07-11 09:13:29  erouault
+ * Really fix Windows compilation issue due to int32/uint32
+ *
+ * Revision 1.29  2016/07/08 10:22:55  erouault
  * Fix various compilation problems on Windows (contributed by Jerome Siot)
  *
  * Revision 1.28  2016/07/05 13:28:46  erouault
@@ -147,17 +150,15 @@
 
 #ifndef __INT32DEF__
 #define __INT32DEF__
-#ifdef _ALPHA
-typedef int32_t int32;
-typedef uint32_t uint32;
-#else
 #ifdef _MSC_VER
 typedef signed int int32;
 typedef unsigned int uint32;
+#elif defined(_ALPHA)
+typedef int32_t int32;
+typedef uint32_t uint32;
 #else
 typedef int32_t int32;
 typedef uint32_t uint32;
-#endif
 #endif
 #endif
 
