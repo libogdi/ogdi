@@ -56,6 +56,10 @@ static char sccsid[] = "@(#)xdr_float.c 1.12 87/08/11 Copyr 1984 Sun Micro";
 #include <rpc/types.h>
 #include <rpc/xdr.h>
 
+#if defined(_M_IX86) || defined(_M_X64)
+#define _X86_
+#endif
+
 /*
  * NB: Not portable.
  * This routine works on Suns (Sky / 68000's) and Vaxen.

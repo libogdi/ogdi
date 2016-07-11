@@ -1,8 +1,10 @@
 2016-07-11  Even Rouault <even.rouault@spatialys.com>
 
     * ogdi/c-api/ecs_dyna.c: fix ecs_OpenDynamicLib on 64 bit Windows (OGDI #72)
-    * external/rpc_win32/LIBRPC/xdr_floa.c: recognize _AMD64_
+    * external/rpc_win32/LIBRPC/xdr_floa.c: make it work on AMD64
     * Make iconv dependency optional and detect it in configure
+    * makefile: if TARGET=win32, create config/common.mak from config/common.mak.in
+    * config/win32: remove FLAGS_X86DEF = /D_X86_ no longer needed
 
 2016-07-08  Even Rouault <even.rouault@spatialys.com>
 

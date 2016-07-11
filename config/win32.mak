@@ -148,7 +148,8 @@ COMMON_CFLAGS = /D_WINDOWS /DWIN32 /D_MBCS \
 	$(OPTIMIZATION) \
 	/W3 /YX /MD /c /Fpheaders.pch
 
-FLAGS_X86DEF = /D_X86_
+# Disabled since it causes issue on 64bit build, and no longer needed
+# FLAGS_X86DEF = /D_X86_
 
 $(subst :,\:,$(ARCHGEN)): $(OBJECTS)
 	@echo Making archive file: $@

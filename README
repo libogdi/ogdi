@@ -52,11 +52,15 @@ Windows works similarly, but a preset configuration is used instead of
 building one with configure.
 
 Requirements:
-  o Cygwin (build shell) from http://www.cygwin.com/
-  o Microsoft Visual C++ 6.x (make sure it works at the commandline from bash,
-    run VCVARS32.BAT if not).
+  o Cygwin (build shell) from http://www.cygwin.com/ with the GNU Make utility
+  o Microsoft Visual C++ (make sure it works at the commandline from bash,
+    run VCVARS32.BAT / VCVARSALL.BAT if not). Make sure that the link.exe command
+    that comes with Cygwin does not override the link.exe of Visual Studio. You
+    may need to alter the PATH to make sure Visual Studio binaries come first, or
+    rename the link.exe in Cygwin
 
-1) Set TOPDIR to point to the home directory of the OGDI source tree. 
+1) Set TOPDIR to point to the home directory of the OGDI source tree.
+   (Do not use /cygdrive/c/ syntax)
 
    eg. 
    TOPDIR=c:/ogdi-3.1.3
