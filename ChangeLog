@@ -1,6 +1,7 @@
 2016-07-11  Even Rouault <even.rouault@spatialys.com>
 
     * ogdi/c-api/ecs_dyna.c: fix ecs_OpenDynamicLib on 64 bit Windows (OGDI #72)
+    * external/rpc_win32/LIBRPC/xdr_floa.c: recognize _AMD64_
 
 2016-07-08  Even Rouault <even.rouault@spatialys.com>
 
