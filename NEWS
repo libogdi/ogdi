@@ -4,6 +4,20 @@
 View the ChangeLog file for detailed, file by file notes on changes.  The
 NEWS file is just used to sumarize major changes, and new features. 
 
+3.2.0
+=====
+
+ o  Fix Windows build issues
+
+ o  Harding of VRF driver regarding corrupted datasets
+
+ o  Extra fixes for buffer overflows and 64 bit issues.
+
+ o  Compiler warning fixes
+
+ o  PROJ >= 4.8 support
+
+
 3.2.0beta2
 ==========
 

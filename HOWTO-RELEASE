@@ -2,7 +2,7 @@
 	=========================================
 
 1) Ensure the OGDI_VERSION and OGDI_RELEASEDATE values are up to date in
-   ogdi/include/ecs_utils.h.
+   ogdi/include/ecs_util.h.
 
 2) Update OGDI_MINOR OGDI_MAJOR and OGDI_VERSION in configure.in for
    proper soname versioning of libraries. Run autoconf to regenerate

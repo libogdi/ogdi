@@ -1,3 +1,7 @@
+2016-07-19  Even Rouault <even.rouault@spatialys.com>
+
+        * New 3.2.0 release
+
 2016-07-11  Even Rouault <even.rouault@spatialys.com>
 
     * ogdi/c-api/ecs_dyna.c: fix ecs_OpenDynamicLib on 64 bit Windows (OGDI #72)
