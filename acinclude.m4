@@ -1,4 +1,4 @@
-AC_DEFUN(AC_COMPILER_WFLAGS,
+AC_DEFUN([AC_COMPILER_WFLAGS],
 [
 	# Remove -g from compile flags, we will add via CFG variable if
 	# we need it.
@@ -8,17 +8,17 @@ AC_DEFUN(AC_COMPILER_WFLAGS,
 	# check for GNU compiler, and use -Wall
 	if test "$GCC" = "yes"; then
 		C_WFLAGS="-Wall"
-		AC_DEFINE(USE_GNUCC)
+		AC_DEFINE([USE_GNUCC])
 	fi
 	if test "$GXX" = "yes"; then
 		CXX_WFLAGS="-Wall"
-		AC_DEFINE(USE_GNUCC)
+		AC_DEFINE([USE_GNUCC])
 	fi
-	AC_SUBST(CXX_WFLAGS,$CXX_WFLAGS)
-	AC_SUBST(C_WFLAGS,$C_WFLAGS)
+	AC_SUBST([CXX_WFLAGS],$CXX_WFLAGS)
+	AC_SUBST([C_WFLAGS],$C_WFLAGS)
 ])
 
-AC_DEFUN(AC_COMPILER_PIC,
+AC_DEFUN([AC_COMPILER_PIC],
 [
 	echo 'void f(){}' > conftest.c
 	if test -z "`${CC-cc} -fPIC -c conftest.c 2>&1`"; then
@@ -33,8 +33,8 @@ AC_DEFUN(AC_COMPILER_PIC,
 	fi
 	rm -f conftest*
 
-	AC_SUBST(CXX_PIC,$CXX_PIC)
-	AC_SUBST(C_PIC,$C_PIC)
+	AC_SUBST([CXX_PIC],$CXX_PIC)
+	AC_SUBST([C_PIC],$C_PIC)
 ])
 
 dnl
@@ -42,7 +42,7 @@ dnl Try to find something to link shared libraries with.  Use "c++ -shared"
 dnl in preference to "ld -shared" because it will link in required c++
 dnl run time support for us. 
 dnl
-AC_DEFUN(AC_LD_SHARED,
+AC_DEFUN([AC_LD_SHARED],
 [
   echo 'void g(); int main(){ g(); return 0; }' > conftest1.c
 
@@ -88,7 +88,7 @@ AC_DEFUN(AC_LD_SHARED,
   fi
   rm -f conftest* libconftest* 
 
-  AC_SUBST(LD_SHARED,$LD_SHARED)
+  AC_SUBST([LD_SHARED],$LD_SHARED)
 ])
 
 
