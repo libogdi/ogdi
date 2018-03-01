@@ -73,7 +73,9 @@ LIBDIR		= $(TOPDIR)/lib/$(TARGET)
 #
 #	Final OS installation location.
 #
+ifndef prefix
 prefix		= /usr/local
+endif
 exec_prefix 	= ${prefix}
 INST_INCLUDE	= ${prefix}/include
 INST_LIB	= ${exec_prefix}/lib

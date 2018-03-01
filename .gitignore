@@ -4,6 +4,8 @@ config.status
 config/Linux.mak
 config/common.mak
 OBJ.Linux
+OBJ.win32
+OBJ.win64
 lib/Linux
 ogdi-config
 ogdi.pc

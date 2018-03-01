@@ -26,6 +26,40 @@
   ********************************************************************/
 
 #include "ecs.h"
+
+#ifdef DUMMY_NAD_CVT
+
+int dyn_nad_init(privdata, table) 
+     void **privdata;
+     char *table;
+{
+    return TRUE;
+}
+
+int dyn_nad_close(privdata)
+     void *privdata;
+{
+    return TRUE;
+}
+
+int dyn_nad_forward(privdata,x,y)
+     void *privdata;
+     double *x;
+     double *y;
+{
+  return TRUE;
+}
+
+int dyn_nad_reverse(privdata,x,y)
+     void *privdata;
+     double *x;
+     double *y;
+{
+  return TRUE;
+}
+
+#else /* DUMMY_NAD_CVT */
+    
 #include "projects.h"
 
 typedef struct {
@@ -356,3 +390,5 @@ DllMain( HINSTANCE  hinstDLL,   // handle of DLL module
   return TRUE;
 }
 #endif
+
+#endif /* DUMMY_NAD_CVT */

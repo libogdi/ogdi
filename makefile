@@ -12,8 +12,10 @@
 
 EXTRA_INSTALL_TARGETS	=	mk_nonlocal_install_dirs
 
+ifneq ($(OVERRIDE_COMMON_MAK),no)
 ifeq ($(TARGET),win32)
 IGNORE := $(shell sed "s/@OGDI_MAJOR@/3/" < $(TOPDIR)/config/common.mak.in | sed "s/@OGDI_MINOR@/2/" > $(TOPDIR)/config/common.mak)
+endif
 endif
 include $(TOPDIR)/config/common.mak
  

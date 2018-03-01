@@ -182,11 +182,7 @@ void dyn_freelayerpriv(lpriv)
       lpriv->buffertile = NULL;
     }
     
-#ifdef notdef
-   /* FIXME? ecs_TileDeleteAllLines does not exist */
-   /* empty tilestruct */
    ecs_TileDeleteAllLines (&(lpriv->tilestruct));
-#endif
     
     if (lpriv->ff != NULL) 
       free(lpriv->ff);

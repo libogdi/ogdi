@@ -156,3 +156,4 @@ EXPORTS
 	ecs_SetReportErrorFunction
 	ecs_ShouldStopOnError
 	ecs_SetErrorShouldStop
+    ecs_TileDeleteAllLines
