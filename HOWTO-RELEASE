@@ -27,10 +27,8 @@
 
 8) Create the source distributions using the mkogdidist.sh script.  The
    version name should include subrelease name components as appropriate.
-   Hit enter when prompted for a CVS password.
 
    ie. 
-   cd devdir
    mkogdidist.sh 3.1beta2
 
 9) Publish the resulting files.  For public (ie. final) releases they should
