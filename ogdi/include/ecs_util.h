@@ -108,8 +108,8 @@
 #ifndef ECS_UTIL
 #define ECS_UTIL 1
 
-#define OGDI_VERSION     320
-#define OGDI_RELEASEDATE 20160705
+#define OGDI_VERSION     321
+#define OGDI_RELEASEDATE 20180301
 
 #include <stdio.h>
 #include <stdlib.h>

@@ -4,6 +4,15 @@
 View the ChangeLog file for detailed, file by file notes on changes.  The
 NEWS file is just used to sumarize major changes, and new features. 
 
+3.2.1
+=====
+
+ o  MSVC 2015 related fixes
+
+ o  Win64 target
+
+ o  VRF: fixes for some linear features in DNC products
+
 3.2.0
 =====
 

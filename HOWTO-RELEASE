@@ -13,7 +13,7 @@
 
 4) Run testsuite on these platforms. 
 
-5) Add release notice in devdir/ChangeLog.
+5) Add release notice in ChangeLog.
 
 6) Update the NEWS file based on a digested form of the ChangeLog file.
 
@@ -23,8 +23,7 @@
 
    ie. 
 
-   cd devdir
-   cvs tag ogdi_3_1_0
+   git tag -a ogdi_3_2_1
 
 8) Create the source distributions using the mkogdidist.sh script.  The
    version name should include subrelease name components as appropriate.
