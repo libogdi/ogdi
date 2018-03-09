@@ -528,8 +528,8 @@ int ecs_SplitURL _ANSI_ARGS_((char *url,char **machine,char **server,char **path
 /* ecs_list.c declarations */
 
 char ecs_Backslash _ANSI_ARGS_((char *src, int *readPtr));
-int ecs_FindElement _ANSI_ARGS_((register char *list,char **elementPtr, char **nextPtr, int *sizePtr, int *bracePtr));
-void ecs_CopyAndCollapse _ANSI_ARGS_((int count,register char *src,register char *dst));
+int ecs_FindElement _ANSI_ARGS_((char *list,char **elementPtr, char **nextPtr, int *sizePtr, int *bracePtr));
+void ecs_CopyAndCollapse _ANSI_ARGS_((int count,char *src,char *dst));
 int ecs_SplitList _ANSI_ARGS_((char *list,int *argcPtr,char ***argvPtr));
 
 /***********************************************************************/
