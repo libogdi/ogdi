@@ -3689,7 +3689,7 @@ else
 	RPC_LIBS=$pkg_cv_RPC_LIBS
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
-
+	CPPFLAGS="$CPPFLAGS $RPC_CFLAGS"
 fi
 fi
 
