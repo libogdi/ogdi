@@ -46,6 +46,8 @@ OGDI_VERSION      = $(OGDI_MAJOR)$(OGDI_MINOR)
 # Default definitions
 #
 
+AUTOCONF_CC = @CC@
+
 ifndef CFG
 CFG = release
 endif

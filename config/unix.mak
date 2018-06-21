@@ -22,9 +22,9 @@ UNIX_DEFINE	= -Dunix
 #
 # Standard tools
 #
-CC		= gcc
-LD		= gcc
-SHLIB_LD	= gcc
+CC		= ${AUTOCONF_CC}
+LD		= ${AUTOCONF_CC}
+SHLIB_LD	= ${AUTOCONF_CC}
 AR		= ar cr
 RM		= rm
 RMALL		= rm -rf
