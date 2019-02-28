@@ -1,0 +1,31 @@
+compiler: gcc
+language: cpp
+
+cache:
+    apt: true
+    directories:
+        - $HOME/.ccache
+
+before_install:
+  - sudo add-apt-repository -y ppa:ubuntugis/ubuntugis-unstable
+  - sudo apt-get update
+  - sudo apt install libz-dev libexpat-dev libproj-dev ccache
+
+install:
+  - export TOPDIR=$PWD
+  - CC="ccache gcc" ./configure --with-zlib --with-expat --with-proj --prefix=$HOME/install-ogdi
+  - make
+  - make install -j3
+
+script:
+  - echo "done"
+
+notifications:
+  #email:
+  #  recipients:
+  #    - gdal-commits@lists.osgeo.org
+
+  irc:
+    channels:
+      - "irc.freenode.org#gdal"
+    use_notice: true
