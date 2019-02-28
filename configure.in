@@ -23,6 +23,7 @@ fi
 
 dnl Checks for programs.
 AC_PROG_CC
+PKG_PROG_PKG_CONFIG
 
 dnl We always want to check /usr/local for stuff.
 dnl LIBS="$LIBS -L/usr/local/lib"
@@ -38,6 +39,11 @@ AC_COMPILER_WFLAGS
 AC_COMPILER_PIC
 AC_LD_SHARED
 
+dnl ---------------------------------------------------------------------------
+dnl	Do we have rpc/rpc.h
+dnl ---------------------------------------------------------------------------
+AC_CHECK_HEADERS([rpc/rpc.h],,
+	[PKG_CHECK_MODULES([RPC], [libtirpc], [CPPFLAGS="$CPPFLAGS $RPC_CFLAGS"])])
 
 dnl ---------------------------------------------------------------------------
 dnl	Do we have rpc/pmap_clnt.h, float.h, dlfcn.h?
