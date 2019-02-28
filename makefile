@@ -24,10 +24,6 @@ include $(TOPDIR)/config/common.mak
 #
 subdirs	= external vpflib ogdi contrib
 
-ifneq ($(PROJ_SETTING),external)
-subdirs := proj $(subdirs) 
-endif
-
 #
 # Default target to build everything in all sub-directories
 #

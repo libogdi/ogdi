@@ -187,7 +187,6 @@ ecs_Result *svr_CreateServer(s,url,isLocal)
   s->getserverprojection = NULL;
   s->getglobalbound = NULL;
   s->setserverlanguage = NULL;
-  s->setserverprojection = NULL;
   s->setrasterconversion = NULL;
   s->isRemote = FALSE;
   s->localClient = isLocal;
@@ -281,7 +280,6 @@ ecs_Result *svr_CreateServer(s,url,isLocal)
   s->getserverprojection =  (dynfunc *) ecs_GetDynamicLibFunction(s->handle,"dyn_GetServerProjection");
   s->getglobalbound =  (dynfunc *) ecs_GetDynamicLibFunction(s->handle,"dyn_GetGlobalBound");
   s->setserverlanguage =  (dynfunc *) ecs_GetDynamicLibFunction(s->handle,"dyn_SetServerLanguage");
-  s->setserverprojection =  (dynfunc *) ecs_GetDynamicLibFunction(s->handle,"dyn_SetServerProjection");
   s->setrasterconversion =  (dynfunc *) ecs_GetDynamicLibFunction(s->handle,"dyn_SetRasterConversion");
   s->setcompression =  (dynfunc *) ecs_GetDynamicLibFunction(s->handle,"dyn_SetCompression");
 
@@ -396,7 +394,6 @@ ecs_Result *svr_DestroyServer(s)
   s->getserverprojection = NULL;
   s->getglobalbound = NULL;
   s->setserverlanguage = NULL;
-  s->setserverprojection = NULL;
   s->setrasterconversion = NULL;
   s->setcompression = NULL;
 
@@ -1742,48 +1739,6 @@ ecs_Result *svr_SetServerLanguage(s,language)
 
   return msg;
 }
-     
-
-/****************************************************************/
-
-ecs_Result *svr_SetServerProjection(s,projection)
-     ecs_Server *s;
-     char *projection;
-{
-  ecs_Result *msg;
-
-#ifdef TESTOGDIINTERFACE
-  if (testfile == NULL) {
-    testfile = fopen("testinterface.txt","a");
-  }
-  if (testfile != NULL) {
-    fprintf(testfile,"svr_SetServerProjection %s %s\n",s->url,projection);
-    fclose(testfile);
-    testfile = NULL;
-  }
-#endif
-
-  ecs_CleanUp(&(s->result));
-  
-  if (s->handle != NULL && s->setserverprojection != NULL) {
-    msg = s->setserverprojection(s,projection);
-  } else {
-    msg = &svr_dummy_result;
-
-    if (s->projection != NULL) {
-      free(s->projection);
-    }
-    s->projection = (char *) malloc(strlen(projection)+1);
-    if (s->projection == NULL) {
-      ecs_SetError(msg,1,svr_messages[5]);    
-    } else {
-      strcpy(s->projection,projection);
-      ecs_SetSuccess(msg);
-    }
-  }
-  return msg;
-}
-     
 
 /****************************************************************/
 
@@ -1826,7 +1781,6 @@ ecs_Result *svr_SetRasterConversion(s,rc)
 	s->rasterconversion.coef.coef_val[i] = rc->coef.coef_val[i];
       }
     }
-    s->rasterconversion.isProjEqual = rc->isProjEqual;
     s->rasterconversion.r_method = rc->r_method;
     s->rasterconversion.t_method = rc->t_method;
   }

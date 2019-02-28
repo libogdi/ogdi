@@ -701,8 +701,10 @@ ecs_Result *dyn_SelectRegion(s,gr)
   
   s->currentRegion.north = gr->north;
   s->currentRegion.south = gr->south;
-  s->currentRegion.east = gr->east;			
-  s->currentRegion.west = gr->west;
+  /* GDAL < 2.5 passed swapped values of east/west. This used to work */
+  /* because of the reprojection code that has now ben removed */
+  s->currentRegion.east = gr->east >= gr->west ? gr->east : gr->west;			
+  s->currentRegion.west = gr->west <= gr->east ? gr->west : gr->east;
   s->currentRegion.ns_res = gr->ns_res;
   s->currentRegion.ew_res = gr->ew_res;
   
