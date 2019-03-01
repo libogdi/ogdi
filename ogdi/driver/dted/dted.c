@@ -569,7 +569,7 @@ ecs_Result *dyn_UpdateDictionary(s,info)
   {
       ecs_AddText(&(s->result),
                   "<?xml version=\"1.0\" ?>\n"
-                  "<OGDI_Capabilities version=\"3.1\">\n"
+                  "<OGDI_Capabilities version=\"4.0\">\n"
                   "</OGDI_Capabilities>\n" );
       ecs_SetSuccess(&(s->result));
   }
@@ -580,7 +580,7 @@ ecs_Result *dyn_UpdateDictionary(s,info)
 
       ecs_AddText(&(s->result),
                   "<?xml version=\"1.0\" ?>\n"
-                  "<OGDI_Capabilities version=\"3.1\">\n" );
+                  "<OGDI_Capabilities version=\"4.0\">\n" );
       ecs_AddText(&(s->result),
                   "   <FeatureTypeList>\n"
                   "      <Operations>\n"

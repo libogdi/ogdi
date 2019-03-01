@@ -2118,7 +2118,7 @@ int vrf_build_capabilities(ecs_Server *s, const char *request)
     
     ecs_AddText(&(s->result),
                 "<?xml version=\"1.0\" ?>\n"
-                "<OGDI_Capabilities version=\"3.1\">\n"
+                "<OGDI_Capabilities version=\"4.0\">\n"
                 "  <Capability>\n"
                 "    <Extension>ogdi_unique_identity</Extension>\n"
                 "  </Capability>\n" );

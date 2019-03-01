@@ -286,8 +286,8 @@ int cln_AllocClient(URL, error_code)
     cln->sourcedatum = nodatum;
     strcpy(cln->datumtable,"");
     cln->mask = NULL;
-    strcpy( cln->server_version_str, "3.0" );
-    cln->server_version = 3000;
+    strcpy( cln->server_version_str, "4.0" );
+    cln->server_version = 4000;
   }
 
   if ((cln == NULL) || (cln->url == NULL)) {
@@ -2756,8 +2756,8 @@ ecs_Result *cln_LoadCapabilities(int ClientID, const char *arg,
       ecs_SetSuccess(&cln_dummy_result);
       
       cln->have_server_capabilities = TRUE;
-      strcpy( cln->server_version_str, "3.0" );
-      cln->server_version = 3000;
+      strcpy( cln->server_version_str, "4.0" );
+      cln->server_version = 4000;
       
       cln->have_capabilities = TRUE;
 

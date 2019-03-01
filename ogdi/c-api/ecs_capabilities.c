@@ -517,7 +517,7 @@ void ecs_ParseCapabilities( ecs_Client *cln, const char *cap_doc,
         if( pi.version != NULL )
             strcpy( cln->server_version_str, pi.version );
         else
-            strcpy( cln->server_version_str, "3.0" );
+            strcpy( cln->server_version_str, "4.0" );
 
         cln->server_version = (int) (atof(cln->server_version_str)*1000 + 0.5);
 
