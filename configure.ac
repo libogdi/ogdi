@@ -9,6 +9,8 @@ AC_SUBST(OGDI_VERSION)
 AC_SUBST(OGDI_MAJOR)
 AC_SUBST(OGDI_MINOR)
 
+AC_CONFIG_MACRO_DIR(m4)
+
 dnl ---------------------------------------------------------------------------
 dnl	Check if we have a doomed configuration.
 dnl ---------------------------------------------------------------------------
@@ -74,81 +76,6 @@ else
   BIG_ENDIAN=0
 fi
 AC_SUBST(BIG_ENDIAN,$BIG_ENDIAN)
-  
-dnl ---------------------------------------------------------------------------
-dnl Check for libproj override.
-dnl ---------------------------------------------------------------------------
-
-PROJ_SETTING=internal
-PROJ_INCLUDE=
-PROJ_LIB=
-export PROJ_LIB PROJ_INCLUDE PROJ_SETTING
-
-AC_ARG_WITH(proj,[  --with-proj[=ARG]       Utilize external PROJ.4 support],,)
-
-if test "$with_proj" = "yes" ; then
-
-  AC_CHECK_LIB(proj,pj_init,PROJ_SETTING=external,PROJ_SETTING=missing,)
-  AC_CHECK_HEADERS(projects.h)
-
-  if test $PROJ_SETTING = missing ; then
-    AC_MSG_ERROR([Unable to find external PROJ.4 library, give path or use default internal library.])
-  fi
-  if test "$ac_cv_header_projects_h" = no ; then
-    AC_MSG_ERROR([Unable to find external PROJ.4 projects.h file, give path or use default internal library.])
-  fi
-
-  PROJ_SETTING=external
-  PROJ_LIB=-lproj
-
-elif test "$with_proj" != "no" -a "$with_proj" != "" ; then
-  
-  if test -r $with_proj/include/projects.h ; then
-    echo "checking for $with_proj/include/projects.h ... found"
-    PROJ_INCLUDE=-I$with_proj/include
-  else
-    AC_MSG_ERROR([Unable to find $with_proj/include/projects.h])
-  fi
-
-  if test -r $with_proj/lib/libproj.so ; then
-    PROJ_LIB=$with_proj/lib/libproj.so
-    echo "checking for $PROJ_LIB ... found"
-
-  elif test -r $with_proj/lib/libproj.a ; then
-    PROJ_LIB=$with_proj/lib/libproj.a
-    echo "checking for $PROJ_LIB ... found"
-
-  else
-    AC_MSG_ERROR([Unable to find $with_proj/lib/libproj.{so,a}])
-  fi
-
-  PROJ_SETTING=external
-  
-fi
-
-AC_ARG_WITH(projlib,[  --with-projlib=path     Select PROJ.4 library],,)
-
-if test "$with_projlib" != "" ; then
-  PROJ_LIB=$with_projlib
-  PROJ_SETTING=external
-  echo "Using PROJ_LIB=$PROJ_LIB for PROJ.4 library."
-fi
-
-AC_ARG_WITH(projinc,[  --with-projinc=path     Select PROJ.4 include directory],,)
-
-if test "$with_projinc" != "" ; then
-  PROJ_INCLUDE=-I${with_projinc}
-  PROJ_SETTING=external
-  echo "Using PROJ_INCLUDE=$PROJ_INCLUDE for PROJ.4 includes."
-fi
-
-if test "$PROJ_SETTING" = "internal" ; then
-  echo "Using internal PROJ.4 implementation." 
-fi
-
-AC_SUBST(PROJ_SETTING,$PROJ_SETTING)
-AC_SUBST(PROJ_INCLUDE,$PROJ_INCLUDE)
-AC_SUBST(PROJ_LIB,$PROJ_LIB)
 
 dnl ---------------------------------------------------------------------------
 dnl Check for zlib override.

@@ -16,7 +16,6 @@
 #include <dlfcn.h>
 #endif
 
-#include "projects.h"
 #include "ecs.h"
 
 #ifdef _SCO
@@ -157,7 +156,6 @@ typedef struct {
   dynfunc *getserverprojection;
   dynfunc *getglobalbound;
   dynfunc *setserverlanguage;
-  dynfunc *setserverprojection;
   dynfunc *setrasterconversion;
 } ecs_Server;
 
@@ -179,7 +177,6 @@ ecs_Result *svr_UpdateDictionary _ANSI_ARGS_((ecs_Server *s, char *info));
 ecs_Result *svr_GetServerProjection _ANSI_ARGS_((ecs_Server *s));
 ecs_Result *svr_GetGlobalBound _ANSI_ARGS_((ecs_Server *s));
 ecs_Result *svr_SetServerLanguage _ANSI_ARGS_((ecs_Server *s, u_int language));
-ecs_Result *svr_SetServerProjection _ANSI_ARGS_((ecs_Server *s, char *projection));
 ecs_Result *svr_SetRasterConversion _ANSI_ARGS_((ecs_Server *s,
 						 ecs_RasterConversion *rc));
 
@@ -553,7 +550,6 @@ ecs_Result *dyn_UpdateDictionary _ANSI_ARGS_((ecs_Server *s, char *info));
 ecs_Result *dyn_GetServerProjection _ANSI_ARGS_((ecs_Server *s));
 ecs_Result *dyn_GetGlobalBound _ANSI_ARGS_((ecs_Server *s));
 ecs_Result *dyn_SetServerLanguage _ANSI_ARGS_((ecs_Server *s, u_int language));
-ecs_Result *dyn_SetServerProjection _ANSI_ARGS_((ecs_Server *s, char *projection));
 ecs_Result *dyn_SetRasterConversion _ANSI_ARGS_((ecs_Server *s,
 						 ecs_RasterConversion *rc));
 
@@ -615,11 +611,6 @@ typedef struct {
 
   char *tclprocname;      /* attribute callback procedure for tcl */
 
-  PJ *target;             /* source and target projection descriptors */
-  PJ *source;
-  int isSourceLL;         /* flags to avoid unnecessary computation */
-  int isTargetLL;
-  int isProjEqual;
   int isCurrentRegionSet;
 
   ecs_Server s;
@@ -651,26 +642,12 @@ ecs_Result *cln_UpdateDictionary     _ANSI_ARGS_((int ClientID, char *info));
 ecs_Result *cln_GetGlobalBound       _ANSI_ARGS_((int ClientID));
 ecs_Result *cln_SetServerLanguage    _ANSI_ARGS_((int ClientID, u_int language));
 ecs_Result *cln_GetServerProjection  _ANSI_ARGS_((int ClientID));
-ecs_Result *cln_SetServerProjection  _ANSI_ARGS_((int ClientID, char *projection));
-ecs_Result *cln_SetClientProjection  _ANSI_ARGS_((int ClientID, char *projection));
 void cln_SetTclProc                  _ANSI_ARGS_((int ClientID, char *tclproc));
 char *cln_GetTclProc                 _ANSI_ARGS_((int ClientID));
 
 /* Projection conversion functions */
 
-PJ *cln_ProjInit                     _ANSI_ARGS_((char *d));
-int cln_CompareProjections           _ANSI_ARGS_((int ClientID));
 int cln_UpdateMaxRegion              _ANSI_ARGS_((int ClientID, double x, double y, ecs_Region *gr, int sens, int first));
-int cln_ConvRegion                   _ANSI_ARGS_((int ClientID, ecs_Region *gr, int sens));
-int cln_ConvTtoS                     _ANSI_ARGS_((int ClientID, double *X, double *Y));
-int cln_ConvStoT                     _ANSI_ARGS_((int ClientID, double *X, double *Y));
-int cln_ChangeProjection             _ANSI_ARGS_((int ClientID, ecs_Object *obj));
-int cln_ChangeProjectionArea         _ANSI_ARGS_((int ClientID, ecs_Area *obj));
-int cln_ChangeProjectionLine         _ANSI_ARGS_((int ClientID, ecs_Line *obj));
-int cln_ChangeProjectionPoint        _ANSI_ARGS_((int ClientID, ecs_Point *obj));
-int cln_ChangeProjectionMatrix       _ANSI_ARGS_((int ClientID, ecs_Matrix *obj));
-int cln_ChangeProjectionImage        _ANSI_ARGS_((int ClientID, ecs_Image *obj));
-int cln_ChangeProjectionText         _ANSI_ARGS_((int ClientID, ecs_Text *obj));
 int cln_PointValid                   _ANSI_ARGS_((int ClientID, double x, double y));
 
 /* Matrix conversion functions */
@@ -730,6 +707,5 @@ double ecs_Qbar _ANSI_ARGS_((double x));
 double ecs_planimetric_polygon_area _ANSI_ARGS_((int n,ecs_Coordinate *coord));
 double ecs_ellipsoid_polygon_area _ANSI_ARGS_((int n,ecs_Coordinate *coord));
 double ecs_geodesic_distance _ANSI_ARGS_((double lon1, double lat1, double lon2, double lat2));
-double ecs_distance_meters _ANSI_ARGS_((char *projection, double X1, double Y1, double X2, double Y2));
 int ecs_CalculateCentroid _ANSI_ARGS_((int nb_segment, ecs_Coordinate *coord,ecs_Coordinate *centroid));
 

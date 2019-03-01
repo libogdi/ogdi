@@ -129,13 +129,6 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#include "projects.h"
-
-/* Ensure we are compatible with PROJ.4.4.x and PROJ.4.3.x */
-#ifndef USE_PROJUV
-#  define projUV UV
-#endif
-
 #include "ecs.h"
 
 #ifdef _SCO
@@ -403,7 +396,6 @@ typedef struct {
      dynfunc *getserverprojection: Pointer to the function dyn_GetServerProjection
      dynfunc *getglobalbound: Pointer to the function dyn_GetGlobalBound
      dynfunc *setserverlanguage: Pointer to the function dyn_SetServerLanguage
-     dynfunc *setserverprojection: Pointer to the function dyn_SetServerProjection
      dynfunc *setrasterconversion: Pointer to the function dyn_SetRasterConversion
   END_ATTRIBUTES
 
@@ -479,7 +471,6 @@ typedef struct {
   dynfunc *getserverprojection;
   dynfunc *getglobalbound;
   dynfunc *setserverlanguage;
-  dynfunc *setserverprojection;
   dynfunc *setrasterconversion;
   dynfunc *setcompression;
 
@@ -506,7 +497,6 @@ ecs_Result *svr_GetServerProjection _ANSI_ARGS_((ecs_Server *s));
 ecs_Result *svr_GetGlobalBound _ANSI_ARGS_((ecs_Server *s));
 ecs_Result *svr_SetServerLanguage _ANSI_ARGS_((ecs_Server *s, u_int language));
 ecs_Result *svr_SetCompression _ANSI_ARGS_((ecs_Server *s, ecs_Compression *compression));
-ecs_Result *svr_SetServerProjection _ANSI_ARGS_((ecs_Server *s, char *projection));
 ecs_Result *svr_SetRasterConversion _ANSI_ARGS_((ecs_Server *s,
 						 ecs_RasterConversion *rc));
 
@@ -929,7 +919,6 @@ ecs_Result *dyn_UpdateDictionary _ANSI_ARGS_((ecs_Server *s, char *info));
 ecs_Result *dyn_GetServerProjection _ANSI_ARGS_((ecs_Server *s));
 ecs_Result *dyn_GetGlobalBound _ANSI_ARGS_((ecs_Server *s));
 ecs_Result *dyn_SetServerLanguage _ANSI_ARGS_((ecs_Server *s, u_int language));
-ecs_Result *dyn_SetServerProjection _ANSI_ARGS_((ecs_Server *s, char *projection));
 ecs_Result *dyn_SetRasterConversion _ANSI_ARGS_((ecs_Server *s,
 						 ecs_RasterConversion *rc));
 ecs_Result *dyn_SetCompression _ANSI_ARGS_((ecs_Server *s, ecs_Compression *compression));
@@ -944,15 +933,6 @@ int dyn_GetColumnsInfo _ANSI_ARGS_((ecs_Server *s, ecs_Layer *l, int *columns_qt
 int dyn_SelectAttributes _ANSI_ARGS_((ecs_Server *s, ecs_Layer *l, int attribute_qty, char **attribute_list, char **error));
 int dyn_IsSelected _ANSI_ARGS_((ecs_Server *s, ecs_Layer *l, short *isSelected, char **error));
 int dyn_GetSelectedAttributes _ANSI_ARGS_((ecs_Server *s, ecs_Layer *l, char **attributes, char **error));
-
-/***********************************************************************/
-
-/* dynamic library attribute driver declarations */
-
-int dyn_nad_init _ANSI_ARGS_((void **privtableinfo, char *table));
-int dyn_nad_close _ANSI_ARGS_((void *privtableinfo));
-int dyn_nad_forward _ANSI_ARGS_((void *privtableinfo, double *x, double *y));
-int dyn_nad_reverse _ANSI_ARGS_((void *privtableinfo, double *x, double *y));
 
 /***********************************************************************/
 
@@ -1092,21 +1072,10 @@ typedef struct {
      ecs_Region currentRegion: mbr of current region
      ecs_Family currentSelectionFamily: Current layer selection type
      char *tclprocname: attribute callback procedure for tcl
-     char *target_proj: Projection descriptor
-     PJ *target: target (c interface) projection descriptors
-     PJ *source: source (driver) projection descriptors
      ecs_Datum targetdatum: target datum information
      ecs_Datum sourcedatum: source datum information
-     void *dthandle: Handle to the datum driver
      void *privdatuminfo: The private datum information pointer. Used to specify the object.
-     dtfunc *nad_init: Pointer to the nad_init function in the datum driver
-     dtfunc *nad_forward: Pointer to the nad_forward function in the datum driver
-     dtfunc *nad_reverse: Pointer to the nad_reverse function in the datum driver
-     dtfunc *nad_close: Pointer to the nad_close function in the datum driver
      char datumtable[10]: Datum table name
-     int isSourceLL: Indicate if the source is a longlat projection
-     int isTargetLL: Indicate if the target is a longlat projection
-     int isProjEqual: Indicate if the projections are the same
      int isCurrentRegionSet: Indicate if the current region is set
      double target_azimuth: The azimuth angle to apply to the target projection
      double sinazimuth: The azimuth sinus
@@ -1130,12 +1099,6 @@ typedef struct {
   ecs_Region currentRegion; /* mbr of current region */
   ecs_Family currentSelectionFamily; /* Current layer selection type */
   char *tclprocname;      /* attribute callback procedure for tcl */
-  char *target_proj;
-  PJ *target;             /* source and target projection descriptors */
-  PJ *source;
-  int isSourceLL;         /* flags to avoid unnecessary computation */
-  int isTargetLL;
-  int isProjEqual;
   int isCurrentRegionSet;
   double target_azimuth;
   double sinazimuth;
@@ -1144,11 +1107,6 @@ typedef struct {
   ecs_Datum sourcedatum;
   char datumtable[10];
   void *privdatuminfo;
-  void *dthandle;
-  dtfunc *nad_init;
-  dtfunc *nad_forward;
-  dtfunc *nad_reverse;
-  dtfunc *nad_close;
 
   ecs_Server s;
 
@@ -1196,27 +1154,13 @@ ecs_Result *cln_GetGlobalBound       _ANSI_ARGS_((int ClientID));
 ecs_Result *cln_SetServerLanguage    _ANSI_ARGS_((int ClientID, u_int language));
 ecs_Result *cln_SetCompression       _ANSI_ARGS_((int ClientID, ecs_Compression *compression));
 ecs_Result *cln_GetServerProjection  _ANSI_ARGS_((int ClientID));
-ecs_Result *cln_SetServerProjection  _ANSI_ARGS_((int ClientID, char *projection));
-ecs_Result *cln_SetClientProjection  _ANSI_ARGS_((int ClientID, char *projection));
 void cln_SetTclProc                  _ANSI_ARGS_((int ClientID, char *tclproc));
 char *cln_GetTclProc                 _ANSI_ARGS_((int ClientID));
 
 
 /* Projection conversion functions */
 
-PJ *cln_ProjInit                     _ANSI_ARGS_((char *d));
-int cln_CompareProjections           _ANSI_ARGS_((int ClientID));
 int cln_UpdateMaxRegion              _ANSI_ARGS_((int ClientID, double x, double y, ecs_Region *gr, int sens, int first));
-int cln_ConvRegion                   _ANSI_ARGS_((int ClientID, ecs_Region *gr, int sens));
-int cln_ConvTtoS                     _ANSI_ARGS_((int ClientID, double *X, double *Y));
-int cln_ConvStoT                     _ANSI_ARGS_((int ClientID, double *X, double *Y));
-int cln_ChangeProjection             _ANSI_ARGS_((int ClientID, ecs_Object *obj));
-int cln_ChangeProjectionArea         _ANSI_ARGS_((int ClientID, ecs_Area *obj));
-int cln_ChangeProjectionLine         _ANSI_ARGS_((int ClientID, ecs_Line *obj));
-int cln_ChangeProjectionPoint        _ANSI_ARGS_((int ClientID, ecs_Point *obj));
-int cln_ChangeProjectionMatrix       _ANSI_ARGS_((int ClientID, ecs_Matrix *obj));
-int cln_ChangeProjectionImage        _ANSI_ARGS_((int ClientID, ecs_Image *obj));
-int cln_ChangeProjectionText         _ANSI_ARGS_((int ClientID, ecs_Text *obj));
 int cln_PointValid                   _ANSI_ARGS_((int ClientID, double x, double y));
 ecs_Datum cln_GetDatumInfo           _ANSI_ARGS_((char *projection));
 
@@ -1285,7 +1229,6 @@ double ecs_Qbar _ANSI_ARGS_((double x));
 double ecs_planimetric_polygon_area _ANSI_ARGS_((int n,ecs_Coordinate *coord));
 double ecs_ellipsoid_polygon_area _ANSI_ARGS_((int n,ecs_Coordinate *coord));
 double ecs_geodesic_distance _ANSI_ARGS_((double lon1, double lat1, double lon2, double lat2));
-double ecs_distance_meters _ANSI_ARGS_((char *projection, double X1, double Y1, double X2, double Y2));
 int ecs_CalculateCentroid _ANSI_ARGS_((int nb_segment, ecs_Coordinate *coord,ecs_Coordinate *centroid));
 
 

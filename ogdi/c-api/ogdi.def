@@ -17,8 +17,6 @@ EXPORTS
 	cln_GetGlobalBound
 	cln_SetServerLanguage
 	cln_GetServerProjection
-	cln_SetServerProjection
-	cln_SetClientProjection
 	cln_SetTclProc
 	cln_GetTclProc
 	cln_GetClientIdFromURL
@@ -83,7 +81,6 @@ EXPORTS
 	svr_GetServerProjection
 	svr_GetGlobalBound
 	svr_SetServerLanguage
-	svr_SetServerProjection
 	svr_SetRasterConversion
 	svr_CloseLayer
 	svr_BroadCloseLayers
@@ -125,7 +122,6 @@ EXPORTS
 	ecs_planimetric_polygon_area
 	ecs_ellipsoid_polygon_area
 	ecs_geodesic_distance
-	ecs_distance_meters
 	ecs_CalculateCentroid
 	ecs_CopyObject
 	ecs_CopyResult

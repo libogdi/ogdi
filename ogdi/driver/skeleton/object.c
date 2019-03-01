@@ -1293,7 +1293,7 @@ _getNextObjectMatrix(s,l)
      ecs_Server *s;
      ecs_Layer *l;
 {
-  int i,i2,j2;
+  int i;
   char buffer[128];
   register LayerPrivateData *lpriv = (LayerPrivateData *) l->priv;
   int totalcol,totalrow;
@@ -1313,20 +1313,10 @@ _getNextObjectMatrix(s,l)
 
   ecs_SetGeomMatrix(&(s->result),totalcol);
 
-  if (s->rasterconversion.isProjEqual) {
     for (i=0; i<totalcol; i++) {
       value = _calcPosValue(s,l,i,l->index);
       ECS_SETGEOMMATRIXVALUE((&(s->result)),i,value);
     }
-  } else {
-    for (i=0; i<totalcol; i++) {
-      i2 = ECSGETI(s,((double) l->index),((double)i));
-      j2 = ECSGETJ(s,((double) l->index),((double)i));
-      value = _calcPosValue(s,l,j2,i2);
-      
-      ECS_SETGEOMMATRIXVALUE((&(s->result)),i,value);
-    }
-  }
   
   sprintf(buffer,"%d",l->index);
   if (!ecs_SetObjectId(&(s->result),buffer)) {
@@ -1376,7 +1366,7 @@ _getObjectMatrix(s,l,id)
      char *id;
 {
   int index;
-  int i,i2,j2;
+  int i;
   char buffer[128];
   register LayerPrivateData *lpriv = (LayerPrivateData *) l->priv;
   int totalcol,totalrow;
@@ -1398,20 +1388,10 @@ _getObjectMatrix(s,l,id)
 
   ecs_SetGeomMatrix(&(s->result),totalcol);
 
-  if (s->rasterconversion.isProjEqual) {
     for (i=0; i<totalcol; i++) {
       value = _calcPosValue(s,l,i,index);
       ECS_SETGEOMMATRIXVALUE((&(s->result)),i,value);
     }
-  } else {
-    for (i=0; i<totalcol; i++) {
-      i2 = ECSGETI(s,((double) index),((double)i));
-      j2 = ECSGETJ(s,((double) index),((double)i));
-      value = _calcPosValue(s,l,j2,i2);
-      
-      ECS_SETGEOMMATRIXVALUE((&(s->result)),i,value);
-    }
-  }
   
   sprintf(buffer,"%d",index);
   if (!ecs_SetObjectId(&(s->result),buffer)) {

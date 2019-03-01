@@ -69,17 +69,6 @@ RPC_LINKLIB	=	@LIBS@ @RPC_LIBS@
 BIG_ENDIAN          = @BIG_ENDIAN@
 
 #
-# Handle internal/external PROJ.4 library usage.
-#
-
-PROJ_SETTING=@PROJ_SETTING@
-
-ifeq ($(PROJ_SETTING),external)
-PROJ_INCLUDE :=	@PROJ_INCLUDE@
-PROJ_STATICLIB := @PROJ_LIB@
-endif
-
-#
 # Handle internal/external ZLIB library usage.
 #
 

@@ -629,9 +629,6 @@ EXPAT_SETTING
 ZLIB_LIB
 ZLIB_INCLUDE
 ZLIB_SETTING
-PROJ_LIB
-PROJ_INCLUDE
-PROJ_SETTING
 BIG_ENDIAN
 RPC_INCLUDES
 RPC_LIBS
@@ -700,9 +697,6 @@ SHELL'
 ac_subst_files=''
 ac_user_opts='
 enable_option_checking
-with_proj
-with_projlib
-with_projinc
 with_zlib
 with_zliblib
 with_zlibinc
@@ -1343,9 +1337,6 @@ if test -n "$ac_init_help"; then
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
-  --with-proj=ARG       Utilize external PROJ.4 support
-  --with-projlib=path     Select PROJ.4 library
-  --with-projinc=path     Select PROJ.4 include directory
   --with-zlib=ARG       Utilize external ZLIB support
   --with-zliblib=path     Select ZLIB library
   --with-zlibinc=path     Select ZLIB include directory
@@ -2090,6 +2081,8 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 OGDI_VERSION=3.2.1
 OGDI_MAJOR=3
 OGDI_MINOR=2
+
+
 
 
 
@@ -3602,8 +3595,8 @@ _ACEOF
 else
 
 pkg_failed=no
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for libtirpc" >&5
-$as_echo_n "checking for libtirpc... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for RPC" >&5
+$as_echo_n "checking for RPC... " >&6; }
 
 if test -n "$RPC_CFLAGS"; then
     pkg_cv_RPC_CFLAGS="$RPC_CFLAGS"
@@ -3643,7 +3636,7 @@ fi
 
 
 if test $pkg_failed = yes; then
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+   	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 
 if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
@@ -3670,7 +3663,7 @@ Alternatively, you may set the environment variables RPC_CFLAGS
 and RPC_LIBS to avoid the need to call pkg-config.
 See the pkg-config man page for more details." "$LINENO" 5
 elif test $pkg_failed = untried; then
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+     	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 	{ { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
 $as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
@@ -3955,148 +3948,6 @@ else
   BIG_ENDIAN=0
 fi
 BIG_ENDIAN=$BIG_ENDIAN
-
-
-
-PROJ_SETTING=internal
-PROJ_INCLUDE=
-PROJ_LIB=
-export PROJ_LIB PROJ_INCLUDE PROJ_SETTING
-
-
-# Check whether --with-proj was given.
-if test "${with_proj+set}" = set; then :
-  withval=$with_proj;
-fi
-
-
-if test "$with_proj" = "yes" ; then
-
-  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for pj_init in -lproj" >&5
-$as_echo_n "checking for pj_init in -lproj... " >&6; }
-if ${ac_cv_lib_proj_pj_init+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lproj  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char pj_init ();
-int
-main ()
-{
-return pj_init ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_link "$LINENO"; then :
-  ac_cv_lib_proj_pj_init=yes
-else
-  ac_cv_lib_proj_pj_init=no
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_proj_pj_init" >&5
-$as_echo "$ac_cv_lib_proj_pj_init" >&6; }
-if test "x$ac_cv_lib_proj_pj_init" = xyes; then :
-  PROJ_SETTING=external
-else
-  PROJ_SETTING=missing
-fi
-
-  for ac_header in projects.h
-do :
-  ac_fn_c_check_header_mongrel "$LINENO" "projects.h" "ac_cv_header_projects_h" "$ac_includes_default"
-if test "x$ac_cv_header_projects_h" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_PROJECTS_H 1
-_ACEOF
-
-fi
-
-done
-
-
-  if test $PROJ_SETTING = missing ; then
-    as_fn_error $? "Unable to find external PROJ.4 library, give path or use default internal library." "$LINENO" 5
-  fi
-  if test "$ac_cv_header_projects_h" = no ; then
-    as_fn_error $? "Unable to find external PROJ.4 projects.h file, give path or use default internal library." "$LINENO" 5
-  fi
-
-  PROJ_SETTING=external
-  PROJ_LIB=-lproj
-
-elif test "$with_proj" != "no" -a "$with_proj" != "" ; then
-
-  if test -r $with_proj/include/projects.h ; then
-    echo "checking for $with_proj/include/projects.h ... found"
-    PROJ_INCLUDE=-I$with_proj/include
-  else
-    as_fn_error $? "Unable to find $with_proj/include/projects.h" "$LINENO" 5
-  fi
-
-  if test -r $with_proj/lib/libproj.so ; then
-    PROJ_LIB=$with_proj/lib/libproj.so
-    echo "checking for $PROJ_LIB ... found"
-
-  elif test -r $with_proj/lib/libproj.a ; then
-    PROJ_LIB=$with_proj/lib/libproj.a
-    echo "checking for $PROJ_LIB ... found"
-
-  else
-    as_fn_error $? "Unable to find $with_proj/lib/libproj.{so,a}" "$LINENO" 5
-  fi
-
-  PROJ_SETTING=external
-
-fi
-
-
-# Check whether --with-projlib was given.
-if test "${with_projlib+set}" = set; then :
-  withval=$with_projlib;
-fi
-
-
-if test "$with_projlib" != "" ; then
-  PROJ_LIB=$with_projlib
-  PROJ_SETTING=external
-  echo "Using PROJ_LIB=$PROJ_LIB for PROJ.4 library."
-fi
-
-
-# Check whether --with-projinc was given.
-if test "${with_projinc+set}" = set; then :
-  withval=$with_projinc;
-fi
-
-
-if test "$with_projinc" != "" ; then
-  PROJ_INCLUDE=-I${with_projinc}
-  PROJ_SETTING=external
-  echo "Using PROJ_INCLUDE=$PROJ_INCLUDE for PROJ.4 includes."
-fi
-
-if test "$PROJ_SETTING" = "internal" ; then
-  echo "Using internal PROJ.4 implementation."
-fi
-
-PROJ_SETTING=$PROJ_SETTING
-
-PROJ_INCLUDE=$PROJ_INCLUDE
-
-PROJ_LIB=$PROJ_LIB
 
 
 
