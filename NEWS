@@ -1,8 +1,52 @@
-	OGDI 3.x Core News
-	==================
+	OGDI Core News
+	==============
 
 View the ChangeLog file for detailed, file by file notes on changes.  The
 NEWS file is just used to sumarize major changes, and new features. 
+
+
+4.0.0
+=====
+
+ o  Remove PROJ.4 dependency, functionality and related API
+
+    With PROJ 6 being released and removing completely projects.h old API,
+    a major upgrade would have been needed. I'd rater choose to completely
+    cut off PROJ related functionality from OGDI.
+    For the VRF case, projection support can be done through the GDAL/OGR
+    OGDI driver.
+
+    The dtusa and dtcanada drivers are removed.
+
+    The following functions are removed from ecs_util.h:
+    cln_SetServerProjection
+    cln_SetClientProjection
+    cln_ProjInit
+    cln_CompareProjections
+    cln_ConvRegion
+    cln_ConvTtoS
+    cln_ConvStoT
+    cln_ChangeProjection
+    cln_ChangeProjectionArea
+    cln_ChangeProjectionLine
+    cln_ChangeProjectionPoint
+    cln_ChangeProjectionMatrix
+    cln_ChangeProjectionImage
+    cln_ChangeProjectionText
+    ecs_distance_meters
+
+ o  Update server version to 4.0 to reflect removal of SetServerProjection
+    capability
+
+ o  Build: add -fPIC when required
+
+ o  Rename aclocal.m4 to acinclude.m4 and apply stricter quoting
+
+ o  Respect LDFLAGS provided to ./configure
+
+ o  Fall back to libtirpc if libc does not provide rpc/rpc.h
+
+ o  Don't hardcode compiler to fix cross compilation.
 
 3.2.1
 =====
