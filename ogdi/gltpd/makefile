@@ -25,7 +25,8 @@ LINK_LIBS= $(OGDI_LINKLIB) $(ZLIB_LINKLIB) $(RPC_LINKLIB) \
            $(MATH_LINKLIB) \
 	   $(LIBC_LINKLIB) $(UCB_STATICLIB) $(DL_LINKLIB) \
 	   $(WIN_LINKLIB) $(X11_LINKLIB) $(LXLIB_LINKLIB) \
-	   $(TK_LINKLIB) $(TCL_LINKLIB) 
+	   $(TK_LINKLIB) $(TCL_LINKLIB) \
+	   -L/usr/lib/x86_64-linux-gnu -lexpat
 
 include $(TOPDIR)/config/common.mak
 
