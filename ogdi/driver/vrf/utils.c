@@ -109,6 +109,8 @@
  */
 
 #include <stdarg.h>
+#include <string.h>
+
 #include "ecs.h"
 #include "vrf.h"
 #include "vpfprop.h"
@@ -145,8 +147,6 @@ int vrf_parsePath(s,lpriv,sel)
  * ----------------------------------------------------------------------
  */
 
-static ecs_regexp *reg = NULL;
-
 int vrf_parsePathValue(s,request,fclass,coverage,expression)
      ecs_Server *s;
      char *request;
@@ -156,6 +156,7 @@ int vrf_parsePathValue(s,request,fclass,coverage,expression)
 {
   char buffer[512],*temp;
   int i,pos;
+  const char* arobase;
 
   /* Found the first "(" */
 
@@ -189,12 +190,9 @@ int vrf_parsePathValue(s,request,fclass,coverage,expression)
     ecs_SetError(&(s->result),1,"no expressions set in this request");
     return 0;
   }
-
-  if ( reg == NULL ) {
-    reg = EcsRegComp("(.*)@(.*)");
-  }
-
-  if (!EcsRegExec(reg,temp,NULL)) {
+  
+  arobase = strchr(temp, '@');
+  if( !arobase ) {
     sprintf(buffer,SYNTAXERRORMESSAGE,request);
     ecs_SetError(&(s->result),1,buffer);
     free(temp);
@@ -202,24 +200,16 @@ int vrf_parsePathValue(s,request,fclass,coverage,expression)
     return 0;
   }
 
-  if (!ecs_GetRegex(reg,1,fclass)) {
-    ecs_SetError(&(s->result),1,"Not enough memory to allocate server");  
-    free(temp);
-    free(*expression);
-    return 0;
-  }
+  *fclass = malloc(arobase - temp + 1);
+  memcpy(*fclass, temp, arobase - temp);
+  (*fclass)[arobase - temp] = 0;
+
+  *coverage = malloc(strlen(arobase+1) + 1);
+  strcpy(*coverage, arobase + 1);
 
   if (strlen(*fclass) == 0) {
     sprintf(buffer,SYNTAXERRORMESSAGE,s->pathname);
     ecs_SetError(&(s->result),1,buffer);
-    free(temp);
-    free(*expression);
-    return 0;
-  }
-
-
-  if (!ecs_GetRegex(reg,2,coverage)) {
-    ecs_SetError(&(s->result),1,"Not enough memory to allocate server");  
     free(temp);
     free(*expression);
     return 0;
@@ -247,11 +237,6 @@ int vrf_parsePathValue(s,request,fclass,coverage,expression)
 void vrf_freePathRegex()
 
 {
-    if( reg != NULL )
-    {
-        free( reg );
-        reg = NULL;
-    }
 }
 
 /* 

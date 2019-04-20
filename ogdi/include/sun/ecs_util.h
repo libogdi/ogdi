@@ -496,8 +496,7 @@ int ecs_CalcObjectMBR _ANSI_ARGS_((ecs_Server *r, ecs_Result *e));
 /* ecs_split.c declarations */
 
 void ecs_freeSplitURL _ANSI_ARGS_((char **type,char **machine,char **path));
-int ecs_GetRegex _ANSI_ARGS_((ecs_regexp *reg,int index,char **chaine));
-int ecs_SplitURL _ANSI_ARGS_((char *url,char **machine,char **server,char **path));
+int ecs_SplitURL _ANSI_ARGS_((const char *url,char **machine,char **server,char **path));
 
 
 /***********************************************************************/
