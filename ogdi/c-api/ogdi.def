@@ -131,12 +131,6 @@ EXPORTS
 	pj_inv
 	pj_fwd
         rtodms
-	ecs_InitHashTable
-	ecs_DeleteHashEntry
-	ecs_DeleteHashTable
-	ecs_FirstHashEntry
-	ecs_NextHashEntry
-	ecs_HashStats
         set_rtodms
 	ecs_TileInitialize
 	ecs_TileGetLine

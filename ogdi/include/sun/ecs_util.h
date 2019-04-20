@@ -197,26 +197,6 @@ void ecs_CloseDynamicLib _ANSI_ARGS_((void *handle));
 
 /***********************************************************************/
 
-/* ecsregex.c declarations */
-
-#define NSUBEXP  50
-typedef struct ecs_regexp {
-	char *startp[NSUBEXP];
-	char *endp[NSUBEXP];
-	char regstart;		/* Internal use only. */
-	char reganch;		/* Internal use only. */
-	char *regmust;		/* Internal use only. */
-	int regmlen;		/* Internal use only. */
-	char program[1];	/* Unwarranted chumminess with compiler. */
-} ecs_regexp;
-
-ecs_regexp *EcsRegComp _ANSI_ARGS_((char *exp));
-int EcsRegExec _ANSI_ARGS_((ecs_regexp *prog, char *string, char *start));
-void EcsRegError _ANSI_ARGS_((char *msg));
-char *EcsGetRegError _ANSI_ARGS_((void));
-
-/***********************************************************************/
-
 /* ecsdist.c declarations */
 
 

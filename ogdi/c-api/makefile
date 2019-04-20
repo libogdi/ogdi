@@ -20,7 +20,7 @@ TARGETGEN=$(DYNAGEN)
 endif
 
 SOURCES = ecs_dyna.c ecsregex.c ecssplit.c \
-          ecsassoc.c ecshash.c ecstile.c server.c ecsdist.c \
+          ecsassoc.c ecstile.c server.c ecsdist.c \
           ecslist.c ecsinfo.c ecsgeo.c ecs_xdr.c ecs_xdrz.c\
           matrix.c client.c ecs_capabilities.c
 
