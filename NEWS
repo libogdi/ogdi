@@ -1,9 +1,15 @@
 	OGDI Core News
 	==============
 
-View the ChangeLog file for detailed, file by file notes on changes.  The
-NEWS file is just used to sumarize major changes, and new features. 
+The NEWS file is just used to sumarize major changes, and new features. 
 
+4.1.0
+=====
+
+ o  Remove DTED driver that used the ecsrregex.c functionality removed in the
+    below bullet.
+ o  Remove ogdi/c-api/ecshash.c and ogdi/c-api/ecsregex.c, which were considered
+    incompatible of DFSG & OSD (https://github.com/libogdi/ogdi/issues/13)
 
 4.0.0
 =====
