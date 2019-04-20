@@ -25,10 +25,6 @@ EXPORTS
 	cln_LoadCache
 	cln_ReleaseCache
 	cln_SetCompression
-	EcsRegComp
-	EcsRegExec
-	EcsRegError
-	EcsGetRegError
 	ecs_DistanceObject
 	ecs_DistanceObjectWithTolerance
 	ecs_SetTolerance
@@ -60,7 +56,6 @@ EXPORTS
 	ecs_ResultInit
 	ecs_CalcObjectMBR
 	ecs_freeSplitURL
-	ecs_GetRegex
 	ecs_SplitURL
 	ecs_Backslash
 	ecs_FindElement
@@ -131,12 +126,6 @@ EXPORTS
 	pj_inv
 	pj_fwd
         rtodms
-	ecs_InitHashTable
-	ecs_DeleteHashEntry
-	ecs_DeleteHashTable
-	ecs_FirstHashEntry
-	ecs_NextHashEntry
-	ecs_HashStats
         set_rtodms
 	ecs_TileInitialize
 	ecs_TileGetLine

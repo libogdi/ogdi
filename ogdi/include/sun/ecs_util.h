@@ -197,26 +197,6 @@ void ecs_CloseDynamicLib _ANSI_ARGS_((void *handle));
 
 /***********************************************************************/
 
-/* ecsregex.c declarations */
-
-#define NSUBEXP  50
-typedef struct ecs_regexp {
-	char *startp[NSUBEXP];
-	char *endp[NSUBEXP];
-	char regstart;		/* Internal use only. */
-	char reganch;		/* Internal use only. */
-	char *regmust;		/* Internal use only. */
-	int regmlen;		/* Internal use only. */
-	char program[1];	/* Unwarranted chumminess with compiler. */
-} ecs_regexp;
-
-ecs_regexp *EcsRegComp _ANSI_ARGS_((char *exp));
-int EcsRegExec _ANSI_ARGS_((ecs_regexp *prog, char *string, char *start));
-void EcsRegError _ANSI_ARGS_((char *msg));
-char *EcsGetRegError _ANSI_ARGS_((void));
-
-/***********************************************************************/
-
 /* ecsdist.c declarations */
 
 
@@ -516,8 +496,7 @@ int ecs_CalcObjectMBR _ANSI_ARGS_((ecs_Server *r, ecs_Result *e));
 /* ecs_split.c declarations */
 
 void ecs_freeSplitURL _ANSI_ARGS_((char **type,char **machine,char **path));
-int ecs_GetRegex _ANSI_ARGS_((ecs_regexp *reg,int index,char **chaine));
-int ecs_SplitURL _ANSI_ARGS_((char *url,char **machine,char **server,char **path));
+int ecs_SplitURL _ANSI_ARGS_((const char *url,char **machine,char **server,char **path));
 
 
 /***********************************************************************/
