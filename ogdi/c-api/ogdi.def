@@ -121,12 +121,6 @@ EXPORTS
 	ecs_CopyObject
 	ecs_CopyResult
 	ecs_FreeObject
-	pj_free
-	pj_init
-	pj_inv
-	pj_fwd
-        rtodms
-        set_rtodms
 	ecs_TileInitialize
 	ecs_TileGetLine
 	ecs_TileClearBuffer
