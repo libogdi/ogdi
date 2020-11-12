@@ -287,4 +287,7 @@ target=`uname`
 if test "$target" = "GNU/kFreeBSD" ; then
   target=Linux
 fi
+if test "$target" = "GNU" ; then
+  target=Linux
+fi
 mv config/generic.mak config/$target.mak

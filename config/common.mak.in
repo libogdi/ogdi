@@ -57,6 +57,9 @@ TARGET = $(shell uname)
 ifeq ($(TARGET), GNU/kFreeBSD)
 TARGET = Linux
 endif
+ifeq ($(TARGET), GNU)
+TARGET = Linux
+endif
 endif
 
 #
