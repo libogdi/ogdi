@@ -88,19 +88,19 @@ $(ARCHGEN): $(OBJECTS)
 
 $(PROGGEN): $(OBJECTS)
 	@echo Making executable: $@
-	$(LD) $(COMMON_LDFLAGS) $(COMMON_CFLAGS) -o $@ $^ $(LINK_LIBS)
+	$(LD) $(COMMON_LDFLAGS) $(LDFLAGS) $(COMMON_CFLAGS) -o $@ $^ $(LINK_LIBS)
 	@echo $@ made successfully ...
 
 $(SHRDGEN): $(OBJECTS)
 	@echo Making shared library: $@
-	$(SHLIB_LD) $(SHLIB_LDFLAGS) $(COMMON_LDFLAGS) $(COMMON_CFLAGS) -Wl,-soname,$(LIB_PREFIX)$(TOBEGEN).$(SHLIB_EXT).$(OGDI_MAJOR) -o $@ $^ $(LINK_LIBS) 
+	$(SHLIB_LD) $(SHLIB_LDFLAGS) $(COMMON_LDFLAGS) $(LDFLAGS) $(COMMON_CFLAGS) -Wl,-soname,$(LIB_PREFIX)$(TOBEGEN).$(SHLIB_EXT).$(OGDI_MAJOR) -o $@ $^ $(LINK_LIBS) 
 	cd $(TOPDIR)/bin/$(TARGET); ln -s $(LIB_PREFIX)$(TOBEGEN).$(SHLIB_EXT).$(OGDI_MAJOR).$(OGDI_MINOR) $(LIB_PREFIX)$(TOBEGEN).$(SHLIB_EXT); \
 	ln -s $(LIB_PREFIX)$(TOBEGEN).$(SHLIB_EXT).$(OGDI_MAJOR).$(OGDI_MINOR) $(LIB_PREFIX)$(TOBEGEN).$(SHLIB_EXT).$(OGDI_MAJOR); cd $(CURDIR)
 	@echo $@ made successfully ...
 
 $(DYNAGEN): $(OBJECTS)
 	@echo Making dynamic library: $@
-	$(SHLIB_LD) $(SHLIB_LDFLAGS) $(COMMON_LDFLAGS) $(COMMON_CFLAGS) -o $@ $^ $(LINK_LIBS) 
+	$(SHLIB_LD) $(SHLIB_LDFLAGS) $(COMMON_LDFLAGS) $(LDFLAGS) $(COMMON_CFLAGS) -o $@ $^ $(LINK_LIBS) 
 	@echo $@ made successfully ...
 
 
