@@ -292,7 +292,7 @@ ecs_Result *svr_CreateServer(s,url,isLocal)
   res = s->createserver(s,url); 
   if (res == NULL) {
     res = &svr_dummy_result;
-    sprintf(buffer,"A memory error occured when creating the server for the URL \"%s\"", url);
+    sprintf(buffer,"A memory error occurred when creating the server for the URL \"%s\"", url);
     ecs_SetError(res,1,buffer);
     return res;
     }
