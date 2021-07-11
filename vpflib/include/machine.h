@@ -15,10 +15,11 @@ typedef struct
     long            output;
 } xBYTE_ORDER;
 
-#if SYS_BIG_ENDIAN == 1
-#define MACHINE_BYTE_ORDER MOST_SIGNIFICANT
-#else
+#include <endian.h>
+#if __BYTE_ORDER == __LITTLE_ENDIAN
 #define MACHINE_BYTE_ORDER LEAST_SIGNIFICANT
+#elif __BYTE_ORDER == __BIG_ENDIAN
+#define MACHINE_BYTE_ORDER MOST_SIGNIFICANT
 #endif
 
 #ifdef _WINDOWS
