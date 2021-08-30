@@ -6,11 +6,12 @@
 #ifndef _ECSH_H_RPCGEN
 #define	_ECSH_H_RPCGEN
 
-#include <rpc/rpc.h>
-
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+typedef unsigned int u_int;
+typedef unsigned long u_long;
 
 /* 
  * fichier genere par RPCGEN a partir de ecs.x
