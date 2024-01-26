@@ -234,7 +234,7 @@ int dyn_InitializeDBLink(s,l,error)
   }
 
   SQLColAttributes(apriv->odbcSqlInfo,0,SQL_COLUMN_COUNT,
-		   buffer,255,&length,(SQLINTEGER *)&(apriv->nb_field));
+		   buffer,255,&length,(SQLLEN *)&(apriv->nb_field));
   apriv->isLinked = TRUE;  
 
   return 0;
@@ -394,15 +394,15 @@ int dyn_GetColumnsInfo(s,l,columns_qty,attr,error)
 
   for(i=0;i<apriv->nb_field;++i) {
     SQLColAttributes((SQLHSTMT) apriv->odbcSqlInfo,(SQLUSMALLINT) (i+1),SQL_COLUMN_NAME,
-		     name,32,&length,&count);
+		     name,32,&length,(SQLLEN *)&count);
     SQLColAttributes((SQLHSTMT) apriv->odbcSqlInfo,(SQLUSMALLINT) (i+1),SQL_COLUMN_TYPE,
-		     buffer,513,&length,(SQLINTEGER *)&(type));
+		     buffer,513,&length,(SQLLEN *)&(type));
     SQLColAttributes((SQLHSTMT) apriv->odbcSqlInfo,(SQLUSMALLINT) (i+1),SQL_COLUMN_LENGTH,
-		     buffer,513,&length,(SQLINTEGER *)&(readlength));    
+		     buffer,513,&length,(SQLLEN *)&(readlength));
     SQLColAttributes((SQLHSTMT) apriv->odbcSqlInfo,(SQLUSMALLINT) (i+1),SQL_COLUMN_PRECISION,
-		     buffer,513,&length,(SQLINTEGER *)&(precision));
+		     buffer,513,&length,(SQLLEN *)&(precision));
     SQLColAttributes((SQLHSTMT) apriv->odbcSqlInfo,(SQLUSMALLINT) (i+1),SQL_COLUMN_NULLABLE,
-		     buffer,513,&length,(SQLINTEGER *)&(nullable));
+		     buffer,513,&length,(SQLLEN *)&(nullable));
 
     (*attr)[i].name = malloc(strlen(name)+1);
     if ((*attr)[i].name == NULL) {
@@ -525,7 +525,7 @@ int dyn_SelectAttributes(s,l,attribute_qty,attribute_list,error)
     strcpy(theKey,attribute_list[i]);
     length = SQL_NTS;
     if (SQLBindParameter(apriv->odbcSqlInfo, (SQLUSMALLINT) (i+1), SQL_PARAM_INPUT, SQL_C_CHAR, SQL_CHAR, 127, 0,
-			 (SQLPOINTER) theKey, (SQLINTEGER) 0, (SQLINTEGER *) &length) != SQL_SUCCESS) {
+			 (SQLPOINTER) theKey, (SQLINTEGER) 0, (SQLLEN *) &length) != SQL_SUCCESS) {
       SQLError(odbcEnv, apriv->odbcHandle, apriv->odbcSqlInfo, sqlstate,
 	       (SQLINTEGER *)&truc, sqlmessage, SQL_MAX_MESSAGE_LENGTH - 1,
 	       &count); 
@@ -577,9 +577,9 @@ int dyn_SelectAttributes(s,l,attribute_qty,attribute_list,error)
   if (apriv->isSelected == TRUE) {
     for(i = 0; i < apriv->nb_field; ++i) {
       SQLGetData(apriv->odbcSqlInfo,(SQLUSMALLINT) (i+1), SQL_C_CHAR,
-		 buffer2, 255, &length);
+		 buffer2, 255, (SQLLEN *)&length);
       SQLColAttributes(apriv->odbcSqlInfo,(SQLUSMALLINT) (i+1),SQL_COLUMN_TYPE,
-		       buffer,32,&collength,(SQLINTEGER *)&(type));
+		       buffer,32,&collength,(SQLLEN *)&(type));
       
       if ((type < 2) || (type > 8)) {
 	sprintf(&(buffer[strlen(buffer)]),"{%s} ",buffer2);
