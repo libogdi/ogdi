@@ -193,7 +193,7 @@ int vrf_parsePathValue(s,request,fclass,coverage,expression)
   
   arobase = strchr(temp, '@');
   if( !arobase ) {
-    sprintf(buffer,SYNTAXERRORMESSAGE,request);
+    snprintf(buffer, sizeof(buffer),SYNTAXERRORMESSAGE,request);
     ecs_SetError(&(s->result),1,buffer);
     free(temp);
     free(*expression);
@@ -208,7 +208,7 @@ int vrf_parsePathValue(s,request,fclass,coverage,expression)
   strcpy(*coverage, arobase + 1);
 
   if (strlen(*fclass) == 0) {
-    sprintf(buffer,SYNTAXERRORMESSAGE,s->pathname);
+    snprintf(buffer, sizeof(buffer),SYNTAXERRORMESSAGE,s->pathname);
     ecs_SetError(&(s->result),1,buffer);
     free(temp);
     free(*expression);
@@ -216,7 +216,7 @@ int vrf_parsePathValue(s,request,fclass,coverage,expression)
   }
 
   if (strlen(*coverage) == 0) {
-    sprintf(buffer,SYNTAXERRORMESSAGE,s->pathname);
+    snprintf(buffer, sizeof(buffer),SYNTAXERRORMESSAGE,s->pathname);
     ecs_SetError(&(s->result),1,buffer);
     free(temp);
     free(*expression);
@@ -401,9 +401,9 @@ vrf_getFileNameFromFcs(s,lpriv)
   int feature_class_pos, table1_pos, table1_key_pos, table2_pos, table2_key_pos;
   static const char* extJointTables[] = { ".pjt", ".ajt", ".ljt", ".rjt", ".njt", ".tjt"};
 
-  sprintf(buffer,"%s/%s/fcs",spriv->library,lpriv->coverage);
+  snprintf(buffer, sizeof(buffer),"%s/%s/fcs",spriv->library,lpriv->coverage);
   if (muse_access(buffer,0) != 0) {
-    sprintf(buffer,"%s/%s/FCS",spriv->library,lpriv->coverage);
+    snprintf(buffer, sizeof(buffer),"%s/%s/FCS",spriv->library,lpriv->coverage);
     if (muse_access(buffer,0) != 0) {
       ecs_SetError(&(s->result),1,"Can't open the FCS table, invalid VRF coverage");
       return 0;
@@ -442,7 +442,7 @@ vrf_getFileNameFromFcs(s,lpriv)
       {
         strcpy(tempfilename,lpriv->fclass);
         strcat(tempfilename,extJointTables[j]);
-        sprintf(buffer,"%s/%s/%s",spriv->library,lpriv->coverage,tempfilename);
+        snprintf(buffer, sizeof(buffer),"%s/%s/%s",spriv->library,lpriv->coverage,tempfilename);
         if (muse_access(buffer,0) == 0)
         {
           isJointed = TRUE;
@@ -542,9 +542,9 @@ vrf_verifyCATFile(s)
 
   /* verification code must be inserted here */
 
-  sprintf(buffer,"%s/cat",spriv->library);
+  snprintf(buffer, sizeof(buffer),"%s/cat",spriv->library);
   if (muse_access(buffer,0) != 0) {
-    sprintf(buffer,"%s/CAT",spriv->library);
+    snprintf(buffer, sizeof(buffer),"%s/CAT",spriv->library);
     if (muse_access(buffer,0) != 0) {
       ecs_SetError(&(s->result),1,"Can't open CAT file, invalid VRF database");
       return 0;
@@ -603,7 +603,7 @@ vrf_GetMetadata(s)
   row_type rowfca;
   float buffloat;
   register ServerPrivateData *spriv = s->priv;
-  char buffer[256];
+  char buffer[512];
   char tab[3][7]={"char","float","int"};
   char *covname;
 
@@ -631,7 +631,7 @@ vrf_GetMetadata(s)
 
   /* code pour recuperer les valeurs de DHT */
 
-  sprintf(buffer,"%s%sdht",spriv->database,separator);
+  snprintf(buffer, sizeof(buffer),"%s%sdht",spriv->database,separator);
 
   if (muse_access(buffer,0) ==0) {
 
@@ -759,7 +759,7 @@ vrf_GetMetadata(s)
 
   /* code pour recuperer les valeurs dans LHT */
   
-  sprintf(buffer,"%s%slht",spriv->library,separator);
+  snprintf(buffer, sizeof(buffer),"%s%slht",spriv->library,separator);
   if (muse_access(buffer,0) ==0)
     {
       rec_sprintf(spriv->metadatastring,"%sCURRENT DATABASE:%s\n\nLIBRARY LIBRARY HEADER TABLE(LHT):\n\n",spriv->metadatastring,spriv->database);
@@ -884,7 +884,7 @@ vrf_GetMetadata(s)
   /* code pour recuperer les valeurs dans GRT */
 
 	 
-  sprintf(buffer,"%s%sgrt",spriv->library,separator);
+  snprintf(buffer, sizeof(buffer),"%s%sgrt",spriv->library,separator);
 
   if (muse_access(buffer,0) ==0)
     {
@@ -983,7 +983,7 @@ vrf_GetMetadata(s)
   /* code pour recuperer les valeurs dans DQT */
 
 
-  sprintf(buffer,"%s%sdqt",spriv->library,separator);
+  snprintf(buffer, sizeof(buffer),"%s%sdqt",spriv->library,separator);
   if (muse_access(buffer,0) ==0)
     {
       rec_sprintf (spriv->metadatastring,"%s\n\n\nDATA QUALITY TABLE(DQT):\n\n",spriv->metadatastring);
@@ -1207,14 +1207,14 @@ vrf_GetMetadata(s)
     /********/
 
     /*ouvre fcs*/
-    sprintf(buffer,"%s/%s/fcs",spriv->library,covname);
+    snprintf(buffer, sizeof(buffer),"%s/%s/fcs",spriv->library,covname);
 #ifdef TESTOPENTABLE
     printf("open spriv->fcsTable:%s\n",buffer);
 #endif
     spriv->fcsTable = vpf_open_table(buffer, disk, "rb", NULL);
     
     /*ouvre fca*/
-    sprintf(buffer,"%s/%s/fca",spriv->library,covname);
+    snprintf(buffer, sizeof(buffer),"%s/%s/fca",spriv->library,covname);
     if (muse_access(buffer,0) == 0) {
 
 #ifdef TESTOPENTABLE
@@ -1309,7 +1309,7 @@ vrf_GetMetadata(s)
 	 
     for (j=0;j<3;j++)
       {
-	sprintf(buffer,"%s%s%s%s%s.vdt",spriv->library,separator,covname,separator,tab[j]);
+	snprintf(buffer, sizeof(buffer),"%s%s%s%s%s.vdt",spriv->library,separator,covname,separator,tab[j]);
 
 	if (muse_access(buffer,0) ==0)
 	  {
@@ -1346,7 +1346,7 @@ vrf_GetMetadata(s)
 		
 		if ((strnicmp ("char",tab[j],5)) ==0) {
 		  tval = (char *)get_table_element(val_pos,row,table,NULL,&n);
-		  sprintf(buffer,"    %s =  %s  \n",tval,des_buf);
+		  snprintf(buffer, sizeof(buffer),"    %s =  %s  \n",tval,des_buf);
 		  rec_sprintf(spriv->metadatastring,"%s%s",spriv->metadatastring,buffer);
 		  free(tval);
 		}
@@ -1354,7 +1354,7 @@ vrf_GetMetadata(s)
 		if ((strnicmp ("int",tab[j],6)) ==0
                     && table.header[val_pos].type == 'I' ) {
                     get_table_element(val_pos,row,table,&intval,&n);   
-                    sprintf(buffer,"    %12ld =  %s  \n",
+                    snprintf(buffer, sizeof(buffer),"    %12ld =  %s  \n",
                             (long)intval,des_buf);
                     rec_sprintf(spriv->metadatastring,"%s%s",
                             spriv->metadatastring,buffer);
@@ -1365,7 +1365,7 @@ vrf_GetMetadata(s)
                     short	short_val;
 
                     get_table_element(val_pos,row,table,&short_val,&n);   
-                    sprintf(buffer,"    %12ld =  %s  \n",
+                    snprintf(buffer, sizeof(buffer),"    %12ld =  %s  \n",
                             (long)short_val,des_buf);
                     rec_sprintf(spriv->metadatastring,"%s%s",
                             spriv->metadatastring,buffer);
@@ -1374,7 +1374,7 @@ vrf_GetMetadata(s)
 
 		if ((strnicmp ("float",tab[j],6) ==0)) {
 		  get_table_element(val_pos,row,table,&fval,&n);
-		  sprintf(buffer,"    %12f =  %s  \n",fval,des_buf);
+		  snprintf(buffer, sizeof(buffer),"    %12f =  %s  \n",fval,des_buf);
 		  rec_sprintf(spriv->metadatastring,"%s%s",spriv->metadatastring,buffer);
 		}
 	    
@@ -1479,16 +1479,16 @@ int
 vrf_initTiling(s)
      ecs_Server *s;
 {
-  char buffer[256];
+  char buffer[512];
   int i;
   int32 fac_id,count;
   void *dummy = NULL;
   vpf_table_type tile_table, mbr_tile_table;
   register ServerPrivateData *spriv = s->priv;
   
-  sprintf(buffer,"%s/tileref/tileref.aft",spriv->library);
+  snprintf(buffer, sizeof(buffer),"%s/tileref/tileref.aft",spriv->library);
   if (muse_access(buffer,0)!=0) {
-    sprintf(buffer,"%s/TILEREF/TILEREF.AFT",spriv->library);
+    snprintf(buffer, sizeof(buffer),"%s/TILEREF/TILEREF.AFT",spriv->library);
     if (muse_access(buffer,0)!=0) {
       spriv->isTiled = 0;
       spriv->tile = (VRFTile *) malloc(sizeof(VRFTile));
@@ -1523,9 +1523,9 @@ vrf_initTiling(s)
   }
   memset( spriv->tile, 0, sizeof(VRFTile) * tile_table.nrows );
 
-  sprintf(buffer,"%s/tileref/fbr",spriv->library);
+  snprintf(buffer, sizeof(buffer),"%s/tileref/fbr",spriv->library);
   if (muse_access(buffer,0)!=0) {
-    sprintf(buffer,"%s/TILEREF/FBR",spriv->library);
+    snprintf(buffer, sizeof(buffer),"%s/TILEREF/FBR",spriv->library);
     if (muse_access(buffer,0)!=0) {
 #ifdef TESTOPENTABLE
       printf("close: tile_table\n");
@@ -1604,14 +1604,14 @@ void vrf_AllFClass(s,coverage)
   char *name, *fclass, **list;
   char ftype[8] = {'A', 'L', 'T', 'P', 'a', 'l', 't', 'p' };
   BOOLEAN found;
-  char buffer[256];
+  char buffer[768];
   register ServerPrivateData *spriv = s->priv;
 
   /* Build path to feature class atrribute table */
 
-  sprintf(buffer,"%s/%s/fcs",spriv->library,coverage);
+  snprintf(buffer, sizeof(buffer),"%s/%s/fcs",spriv->library,coverage);
   if (muse_access(buffer,0) != 0) {
-    sprintf(buffer,"%s/%s/FCS",spriv->library,coverage);
+    snprintf(buffer, sizeof(buffer),"%s/%s/FCS",spriv->library,coverage);
   }
 
   if (muse_access(buffer,0) == 0) {
@@ -1723,13 +1723,13 @@ int vrf_feature_class_dictionary(s,request)
 {
   int                i,k,it_pos,val_pos,des_pos,att_pos;
   short int sintval;
-  char               *line,temp[128],temp2[128],*item_buf, *att_buf, *des_buf, *tval;
+  char               *line,temp[512],temp2[128],*item_buf, *att_buf, *des_buf, *tval;
   vpf_table_type     ft,table,nar,fcstable;
   storage_type       stor = disk;
   row_type           row;
   float              fval;
   int32           ival,n;
-  char buffer[128];
+  char buffer[512];
   register ServerPrivateData *spriv = s->priv;
   char *buf1;
   int found  = 0;
@@ -1750,7 +1750,7 @@ int vrf_feature_class_dictionary(s,request)
      Print the main informations in the dictionary
      */
 
-  sprintf(buffer,"FEATURE CLASS: %s \nCOVERAGE     : %s \n",fclass,coverage);
+  snprintf(buffer, sizeof(buffer),"FEATURE CLASS: %s \nCOVERAGE     : %s \n",fclass,coverage);
   if (!ecs_SetText(&(s->result),buffer)) {
     free(fclass); free(coverage); free(expression); return FALSE;
   }
@@ -1759,9 +1759,9 @@ int vrf_feature_class_dictionary(s,request)
     Found in the FCS the tables
     */
 
-  sprintf(buffer,"%s/%s/fcs",spriv->library,coverage);
+  snprintf(buffer, sizeof(buffer),"%s/%s/fcs",spriv->library,coverage);
   if (muse_access(buffer,0) != 0) {
-    sprintf(buffer,"%s/%s/FCS",spriv->library,coverage);
+    snprintf(buffer, sizeof(buffer),"%s/%s/FCS",spriv->library,coverage);
     if (muse_access(buffer,0) != 0) {
       ecs_SetError(&(s->result),1,"Can't open the FCS table, invalid VRF coverage");
       free(fclass); free(coverage); free(expression); 
@@ -1787,7 +1787,7 @@ int vrf_feature_class_dictionary(s,request)
     if (stricmp(buf1,fclass) == 0) {
       found = 1;
       featureTableName = justify((char *)get_table_element(2, row, fcstable, NULL, &count));
-      sprintf(buffer,"%s/%s/%s",spriv->library,coverage,featureTableName);	 
+      snprintf(buffer, sizeof(buffer),"%s/%s/%s",spriv->library,coverage,featureTableName);	 
       free(featureTableName);
     }
     free(buf1);
@@ -1810,13 +1810,13 @@ int vrf_feature_class_dictionary(s,request)
   
   ft = vpf_open_table(buffer,stor,"rb",NULL);
   
-  sprintf(buffer,"ATTRIBUTES:\n");
+  snprintf(buffer, sizeof(buffer),"ATTRIBUTES:\n");
   if (!ecs_AddText(&(s->result),buffer)) {
     free(fclass); free(coverage); free(expression); return FALSE;
   }
    
   for(i=0;i<ft.nfields;i++) {
-    sprintf(buffer,"   %s - %s \n",ft.header[i].name,ft.header[i].description);
+    snprintf(buffer, sizeof(buffer),"   %s - %s \n",ft.header[i].name,ft.header[i].description);
     if (!ecs_AddText(&(s->result),buffer)) {
       free(fclass); free(coverage); free(expression); return FALSE;
     }
@@ -1859,28 +1859,28 @@ int vrf_feature_class_dictionary(s,request)
 	      case 'T':
           case 'L':
 		tval = (char *)get_table_element(val_pos,row,table,NULL,&n);
-		sprintf(buffer,"    %s =  %s  \n",tval,des_buf);
+		snprintf(buffer, sizeof(buffer),"    %s =  %s  \n",tval,des_buf);
 		if (!ecs_AddText(&(s->result),buffer)) {
 		  free(fclass); free(coverage); free(expression); return FALSE;
 		}
 		free(tval);break;
 	      case 'I':
 		get_table_element(val_pos,row,table,&ival,&n);
-		sprintf(buffer,"    %12d =  %s  \n",ival,des_buf);
+		snprintf(buffer, sizeof(buffer),"    %12d =  %s  \n",ival,des_buf);
 		if (!ecs_AddText(&(s->result),buffer)) {
 		  free(fclass); free(coverage); free(expression); return FALSE;
 		}
 		break;
 	      case 'S':
 		get_table_element(val_pos,row,table,&sintval,&n);
-		sprintf(buffer,"    %d =  %s  \n",sintval,des_buf);
+		snprintf(buffer, sizeof(buffer),"    %d =  %s  \n",sintval,des_buf);
 		if (!ecs_AddText(&(s->result),buffer)) {
 		  free(fclass); free(coverage); free(expression); return FALSE;
 		}
 		break;
 	      case 'F':
 		get_table_element(val_pos,row,table,&fval,&n);
-		sprintf(buffer,"    %12f =  %s  \n",fval,des_buf);
+		snprintf(buffer, sizeof(buffer),"    %12f =  %s  \n",fval,des_buf);
 		if (!ecs_AddText(&(s->result),buffer)) {
 		  free(fclass); free(coverage); free(expression); return FALSE;
 		}
@@ -1905,7 +1905,7 @@ int vrf_feature_class_dictionary(s,request)
   if(ft.narrative[0] != '\0') {
     sprintf(temp,"%s%s",ft.path,ft.narrative);
     if (muse_access(temp,0)==0) {
-      sprintf(buffer,"\n\n");
+      snprintf(buffer, sizeof(buffer),"\n\n");
       if (!ecs_AddText(&(s->result),buffer)) {
 	free(fclass); free(coverage); free(expression); return FALSE;
       }
@@ -1917,7 +1917,7 @@ int vrf_feature_class_dictionary(s,request)
 	row = read_next_row(nar);
 	line = (char *)get_table_element(1,row,nar,NULL,&n);
 	rightjust(line);
-	sprintf(buffer,"%s\n",line);
+	snprintf(buffer, sizeof(buffer),"%s\n",line);
 	if (!ecs_AddText(&(s->result),buffer)) {
 	  free(fclass); free(coverage); free(expression); return FALSE;
 	}
@@ -2034,14 +2034,14 @@ vrf_build_coverage_capabilities( ecs_Server *s, const char *coverage)
     row_type row;
     unsigned int i, n;
     char *name, *fclass;
-    char buffer[256];
+    char buffer[758];
     register ServerPrivateData *spriv = s->priv;
 
     /* Build path to feature class atrribute table */
 
-    sprintf(buffer,"%s/%s/fcs",spriv->library,coverage);
+    snprintf(buffer, sizeof(buffer),"%s/%s/fcs",spriv->library,coverage);
     if (muse_access(buffer,0) != 0) {
-        sprintf(buffer,"%s/%s/FCS",spriv->library,coverage);
+        snprintf(buffer, sizeof(buffer),"%s/%s/FCS",spriv->library,coverage);
     }
 
     if (muse_access(buffer,0) == 0) {

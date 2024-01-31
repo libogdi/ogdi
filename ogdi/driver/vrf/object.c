@@ -593,7 +593,7 @@ retry:
 
   /* Add the identifier to the object */
 
-  sprintf(buffer,"%d",(int) area_id);
+  snprintf(buffer, sizeof(buffer),"%d",(int) area_id);
   ecs_SetObjectId(&(s->result),buffer);
 
   /* Add the attributes to the object */
@@ -756,7 +756,7 @@ _getObjectIdArea(s,l,coord)
     return;
   }
 
-  sprintf(buffer,"%d",feature_id);
+  snprintf(buffer, sizeof(buffer),"%d",feature_id);
   ecs_SetText(&(s->result),buffer);
   ecs_SetSuccess(&(s->result));
 }
@@ -771,7 +771,7 @@ _selectTileArea(s,l,tile_id)
 {
   register LayerPrivateData *lpriv = (LayerPrivateData *) l->priv;
   register ServerPrivateData *spriv = (ServerPrivateData *) s->priv;
-  char buffer[256];
+  char buffer[512];
 
   if (lpriv->isTiled) {
     if (lpriv->current_tileid != tile_id) {
@@ -800,50 +800,50 @@ _selectTileArea(s,l,tile_id)
 #endif
   
       if (tile_id != 0) {
-	sprintf(buffer,"%s/%s/%s/fac",spriv->library,lpriv->coverage,
+	snprintf(buffer, sizeof(buffer),"%s/%s/%s/fac",spriv->library,lpriv->coverage,
 		spriv->tile[tile_id-1].path);
 	if (muse_access(buffer,0) != 0 ) {
-	  sprintf(buffer,"%s/%s/%s/FAC",spriv->library,lpriv->coverage,
+	  snprintf(buffer, sizeof(buffer),"%s/%s/%s/FAC",spriv->library,lpriv->coverage,
 		  spriv->tile[tile_id-1].path);
 	}
 	lpriv->l.area.faceTable = vpf_open_table(buffer, disk, "rb", NULL);
-	sprintf(buffer,"%s/%s/%s/edg",spriv->library,lpriv->coverage,
+	snprintf(buffer, sizeof(buffer),"%s/%s/%s/edg",spriv->library,lpriv->coverage,
 		spriv->tile[tile_id-1].path);
 	if (muse_access(buffer,0) != 0 ) {
-	  sprintf(buffer,"%s/%s/%s/EDG",spriv->library,lpriv->coverage,
+	  snprintf(buffer, sizeof(buffer),"%s/%s/%s/EDG",spriv->library,lpriv->coverage,
 		  spriv->tile[tile_id-1].path);
 	}
 	lpriv->l.area.edgeTable = vpf_open_table(buffer, disk, "rb", NULL);
-	sprintf(buffer,"%s/%s/%s/rng",spriv->library,lpriv->coverage,
+	snprintf(buffer, sizeof(buffer),"%s/%s/%s/rng",spriv->library,lpriv->coverage,
 		spriv->tile[tile_id-1].path);
 	if (muse_access(buffer,0) != 0 ) {
-	  sprintf(buffer,"%s/%s/%s/RNG",spriv->library,lpriv->coverage,
+	  snprintf(buffer, sizeof(buffer),"%s/%s/%s/RNG",spriv->library,lpriv->coverage,
 		  spriv->tile[tile_id-1].path);
 	}
 	lpriv->l.area.ringTable = vpf_open_table(buffer, disk, "rb", NULL);
-	sprintf(buffer,"%s/%s/%s/fbr",spriv->library,lpriv->coverage,
+	snprintf(buffer, sizeof(buffer),"%s/%s/%s/fbr",spriv->library,lpriv->coverage,
 		spriv->tile[tile_id-1].path);
 	if (muse_access(buffer,0) != 0 ) {
-	  sprintf(buffer,"%s/%s/%s/FBR",spriv->library,lpriv->coverage,
+	  snprintf(buffer, sizeof(buffer),"%s/%s/%s/FBR",spriv->library,lpriv->coverage,
 		  spriv->tile[tile_id-1].path);
 	}
 	lpriv->l.area.mbrTable = vpf_open_table(buffer, disk, "rb", NULL);
       } else {
-	sprintf(buffer,"%s/%s/%s",spriv->library,lpriv->coverage,lpriv->primitiveTableName);
+	snprintf(buffer, sizeof(buffer),"%s/%s/%s",spriv->library,lpriv->coverage,lpriv->primitiveTableName);
 	lpriv->l.area.faceTable = vpf_open_table(buffer, disk, "rb", NULL);
-	sprintf(buffer,"%s/%s/edg",spriv->library,lpriv->coverage);
+	snprintf(buffer, sizeof(buffer),"%s/%s/edg",spriv->library,lpriv->coverage);
 	if (muse_access(buffer,0) != 0 ) {
-	  sprintf(buffer,"%s/%s/EDG",spriv->library,lpriv->coverage);
+	  snprintf(buffer, sizeof(buffer),"%s/%s/EDG",spriv->library,lpriv->coverage);
 	}
 	lpriv->l.area.edgeTable = vpf_open_table(buffer, disk, "rb", NULL);
-	sprintf(buffer,"%s/%s/rng",spriv->library,lpriv->coverage);
+	snprintf(buffer, sizeof(buffer),"%s/%s/rng",spriv->library,lpriv->coverage);
 	if (muse_access(buffer,0) != 0 ) {
-	  sprintf(buffer,"%s/%s/RNG",spriv->library,lpriv->coverage);
+	  snprintf(buffer, sizeof(buffer),"%s/%s/RNG",spriv->library,lpriv->coverage);
 	}
 	lpriv->l.area.ringTable = vpf_open_table(buffer, disk, "rb", NULL);
-	sprintf(buffer,"%s/%s/fbr",spriv->library,lpriv->coverage);
+	snprintf(buffer, sizeof(buffer),"%s/%s/fbr",spriv->library,lpriv->coverage);
 	if (muse_access(buffer,0) != 0 ) {
-	  sprintf(buffer,"%s/%s/FBR",spriv->library,lpriv->coverage);
+	  snprintf(buffer, sizeof(buffer),"%s/%s/FBR",spriv->library,lpriv->coverage);
 	}
 	lpriv->l.area.mbrTable = vpf_open_table(buffer, disk, "rb", NULL);
       }
@@ -862,21 +862,21 @@ _selectTileArea(s,l,tile_id)
       printf("open lpriv->l.area.mbrTable\n");
 #endif
 
-      sprintf(buffer,"%s/%s/%s",spriv->library,lpriv->coverage,lpriv->primitiveTableName);
+      snprintf(buffer, sizeof(buffer),"%s/%s/%s",spriv->library,lpriv->coverage,lpriv->primitiveTableName);
       lpriv->l.area.faceTable = vpf_open_table(buffer, disk, "rb", NULL);
-      sprintf(buffer,"%s/%s/edg",spriv->library,lpriv->coverage);
+      snprintf(buffer, sizeof(buffer),"%s/%s/edg",spriv->library,lpriv->coverage);
       if (muse_access(buffer,0) != 0 ) {
-	sprintf(buffer,"%s/%s/EDG",spriv->library,lpriv->coverage);
+	snprintf(buffer, sizeof(buffer),"%s/%s/EDG",spriv->library,lpriv->coverage);
       }
       lpriv->l.area.edgeTable = vpf_open_table(buffer, disk, "rb", NULL);
-      sprintf(buffer,"%s/%s/rng",spriv->library,lpriv->coverage);
+      snprintf(buffer, sizeof(buffer),"%s/%s/rng",spriv->library,lpriv->coverage);
       if (muse_access(buffer,0) != 0 ) {
-	sprintf(buffer,"%s/%s/RNG",spriv->library,lpriv->coverage);
+	snprintf(buffer, sizeof(buffer),"%s/%s/RNG",spriv->library,lpriv->coverage);
       }
       lpriv->l.area.ringTable = vpf_open_table(buffer, disk, "rb", NULL);
-      sprintf(buffer,"%s/%s/fbr",spriv->library,lpriv->coverage);
+      snprintf(buffer, sizeof(buffer),"%s/%s/fbr",spriv->library,lpriv->coverage);
       if (muse_access(buffer,0) != 0 ) {
-	sprintf(buffer,"%s/%s/FBR",spriv->library,lpriv->coverage);
+	snprintf(buffer, sizeof(buffer),"%s/%s/FBR",spriv->library,lpriv->coverage);
       }
       lpriv->l.area.mbrTable = vpf_open_table(buffer, disk, "rb", NULL);
 
@@ -986,7 +986,7 @@ retry:
 
   /* Add the identifier to the object */
 
-  sprintf(buffer,"%d", (int) line_id);
+  snprintf(buffer, sizeof(buffer),"%d", (int) line_id);
   ecs_SetObjectId(&(s->result),buffer);
 
   /* Add the bounding box to the object */
@@ -1123,7 +1123,7 @@ _getObjectIdLine(s,l,coord)
   free(primList);
   free(tileList);
 
-  sprintf(buffer,"%d",feature_id);
+  snprintf(buffer, sizeof(buffer),"%d",feature_id);
   ecs_SetText(&(s->result),buffer);
   ecs_SetSuccess(&(s->result));
 }
@@ -1147,7 +1147,7 @@ _selectTileLineWithRet(s,l,tile_id)
 {
   register LayerPrivateData *lpriv = (LayerPrivateData *) l->priv;
   register ServerPrivateData *spriv = (ServerPrivateData *) s->priv;
-  char buffer[256];
+  char buffer[512];
 
   if (lpriv->isTiled) {
     if( tile_id < 1 || tile_id > spriv->nbTile )
@@ -1178,22 +1178,22 @@ _selectTileLineWithRet(s,l,tile_id)
 #endif
 
       if (tile_id != 0) {
-	sprintf(buffer,"%s/%s/%s/%s",spriv->library,lpriv->coverage,
+	snprintf(buffer, sizeof(buffer),"%s/%s/%s/%s",spriv->library,lpriv->coverage,
 		spriv->tile[tile_id-1].path,lpriv->primitiveTableName);
 	lpriv->l.line.edgeTable = vpf_open_table(buffer, disk, "rb", NULL);
-	sprintf(buffer,"%s/%s/%s/ebr",spriv->library,lpriv->coverage,
+	snprintf(buffer, sizeof(buffer),"%s/%s/%s/ebr",spriv->library,lpriv->coverage,
 		spriv->tile[tile_id-1].path);
 	if (muse_access(buffer,0) != 0 ) {
-	  sprintf(buffer,"%s/%s/%s/EBR",spriv->library,lpriv->coverage,
+	  snprintf(buffer, sizeof(buffer),"%s/%s/%s/EBR",spriv->library,lpriv->coverage,
 		  spriv->tile[tile_id-1].path);
 	}
 	lpriv->l.line.mbrTable = vpf_open_table(buffer, disk, "rb", NULL);
       } else {
-	sprintf(buffer,"%s/%s/%s",spriv->library,lpriv->coverage,lpriv->primitiveTableName);
+	snprintf(buffer, sizeof(buffer),"%s/%s/%s",spriv->library,lpriv->coverage,lpriv->primitiveTableName);
 	lpriv->l.line.edgeTable = vpf_open_table(buffer, disk, "rb", NULL);
-	sprintf(buffer,"%s/%s/ebr",spriv->library,lpriv->coverage);
+	snprintf(buffer, sizeof(buffer),"%s/%s/ebr",spriv->library,lpriv->coverage);
 	if (muse_access(buffer,0) != 0 ) {
-	  sprintf(buffer,"%s/%s/EBR",spriv->library,lpriv->coverage);
+	  snprintf(buffer, sizeof(buffer),"%s/%s/EBR",spriv->library,lpriv->coverage);
 	}
 	lpriv->l.line.mbrTable = vpf_open_table(buffer, disk, "rb", NULL);
       }
@@ -1212,11 +1212,11 @@ _selectTileLineWithRet(s,l,tile_id)
       printf("open lpriv->l.line.mbrTable\n");
 #endif
 
-      sprintf(buffer,"%s/%s/%s",spriv->library,lpriv->coverage,lpriv->primitiveTableName);
+      snprintf(buffer, sizeof(buffer),"%s/%s/%s",spriv->library,lpriv->coverage,lpriv->primitiveTableName);
       lpriv->l.line.edgeTable = vpf_open_table(buffer, disk, "rb", NULL);
-      sprintf(buffer,"%s/%s/ebr",spriv->library,lpriv->coverage);
+      snprintf(buffer, sizeof(buffer),"%s/%s/ebr",spriv->library,lpriv->coverage);
       if (muse_access(buffer,0) != 0 ) {
-	sprintf(buffer,"%s/%s/EBR",spriv->library,lpriv->coverage);
+	snprintf(buffer, sizeof(buffer),"%s/%s/EBR",spriv->library,lpriv->coverage);
       }
       lpriv->l.line.mbrTable = vpf_open_table(buffer, disk, "rb", NULL);
 
@@ -1323,7 +1323,7 @@ _getNextObjectPoint(s,l)
 
   /* Add the identifier to the object */
 
-  sprintf(buffer,"%d",(int) point_id+1);
+  snprintf(buffer, sizeof(buffer),"%d",(int) point_id+1);
   ecs_SetObjectId(&(s->result),buffer);
 
   /* Add the bounding box to the object */
@@ -1474,7 +1474,7 @@ _getObjectIdPoint(s,l,coord)
     return;
   }
 
-  sprintf(buffer,"%d",feature_id);
+  snprintf(buffer, sizeof(buffer),"%d",feature_id);
   ecs_SetText(&(s->result),buffer);
   ecs_SetSuccess(&(s->result));
 }
@@ -1489,7 +1489,7 @@ _selectTilePoint(s,l,tile_id)
 {
   register LayerPrivateData *lpriv = (LayerPrivateData *) l->priv;
   register ServerPrivateData *spriv = (ServerPrivateData *) s->priv;
-  char buffer[256];
+  char buffer[512];
 
   if (lpriv->isTiled) {
     if (lpriv->current_tileid != tile_id) {
@@ -1507,11 +1507,11 @@ _selectTilePoint(s,l,tile_id)
 #endif
 
       if (tile_id != 0) {
-	sprintf(buffer,"%s/%s/%s/%s",spriv->library,lpriv->coverage,
+	snprintf(buffer, sizeof(buffer),"%s/%s/%s/%s",spriv->library,lpriv->coverage,
 		spriv->tile[tile_id-1].path,lpriv->primitiveTableName);
 	lpriv->l.point.primTable = vpf_open_table(buffer, disk, "rb", NULL);
       } else {
-	sprintf(buffer,"%s/%s/%s",spriv->library,lpriv->coverage,
+	snprintf(buffer, sizeof(buffer),"%s/%s/%s",spriv->library,lpriv->coverage,
 		lpriv->primitiveTableName);
 	lpriv->l.point.primTable = vpf_open_table(buffer, disk, "rb", NULL);
       }
@@ -1526,7 +1526,7 @@ _selectTilePoint(s,l,tile_id)
       printf("open lpriv->l.point.primTable\n");
 #endif
 
-      sprintf(buffer,"%s/%s/%s",spriv->library,
+      snprintf(buffer, sizeof(buffer),"%s/%s/%s",spriv->library,
 	      lpriv->coverage,lpriv->primitiveTableName);
       lpriv->l.point.primTable = vpf_open_table(buffer, disk, "rb", NULL);
 
@@ -1635,7 +1635,7 @@ _getNextObjectText(s,l)
 
   /* Add the identifier to the object */
 
-  sprintf(buffer,"%d", (int) text_id);
+  snprintf(buffer, sizeof(buffer),"%d", (int) text_id);
   ecs_SetObjectId(&(s->result),buffer);
 
   /* Add the bounding box to the object */
@@ -1787,7 +1787,7 @@ _getObjectIdText(s,l,coord)
     return;
   }
 
-  sprintf(buffer,"%d",feature_id);
+  snprintf(buffer, sizeof(buffer),"%d",feature_id);
   ecs_SetText(&(s->result),buffer);
   ecs_SetSuccess(&(s->result));
 }
@@ -1802,7 +1802,7 @@ _selectTileText(s,l,tile_id)
 {
   register LayerPrivateData *lpriv = (LayerPrivateData *) l->priv;
   register ServerPrivateData *spriv = (ServerPrivateData *) s->priv;
-  char buffer[256];
+  char buffer[512];
 
   if (lpriv->isTiled) {
     if (lpriv->current_tileid != tile_id) {
@@ -1816,11 +1816,11 @@ _selectTileText(s,l,tile_id)
       /* ouverture des tables de primitives dans la bonne tuile */
 
       if (tile_id != 0) {
-	sprintf(buffer,"%s/%s/%s/%s",spriv->library,lpriv->coverage,spriv->tile[tile_id-1].path,lpriv->primitiveTableName);
+	snprintf(buffer, sizeof(buffer),"%s/%s/%s/%s",spriv->library,lpriv->coverage,spriv->tile[tile_id-1].path,lpriv->primitiveTableName);
       } else {
-	sprintf(buffer,"%s/%s/txt",spriv->library,lpriv->coverage);
+	snprintf(buffer, sizeof(buffer),"%s/%s/txt",spriv->library,lpriv->coverage);
 	if (muse_access(buffer,0) != 0 ) {
-	  sprintf(buffer,"%s/%s/TXT",spriv->library,lpriv->coverage);
+	  snprintf(buffer, sizeof(buffer),"%s/%s/TXT",spriv->library,lpriv->coverage);
 	}
       }
 #ifdef TESTOPENTABLE
@@ -1838,7 +1838,7 @@ _selectTileText(s,l,tile_id)
 #endif
       /* ouverture des tables de primitives non-tuilees */
 
-      sprintf(buffer,"%s/%s/%s",spriv->library,lpriv->coverage,lpriv->primitiveTableName);
+      snprintf(buffer, sizeof(buffer),"%s/%s/%s",spriv->library,lpriv->coverage,lpriv->primitiveTableName);
       lpriv->l.text.textTable = vpf_open_table(buffer, disk, "rb", NULL);
 
       lpriv->current_tileid = 1;			
@@ -1869,14 +1869,10 @@ void _closeLayerTable(s,l)
     printf("close: lpriv->l.area.ringTable\n");
     printf("close: lpriv->l.area.edgeTable\n");
 #endif
-    if (&(lpriv->l.area.faceTable) != NULL)
-      vpf_close_table(&(lpriv->l.area.faceTable));
-    if (&(lpriv->l.area.mbrTable) != NULL)
-      vpf_close_table(&(lpriv->l.area.mbrTable));
-    if (&(lpriv->l.area.ringTable) != NULL)
-      vpf_close_table(&(lpriv->l.area.ringTable));
-    if (&(lpriv->l.area.edgeTable) != NULL)
-      vpf_close_table(&(lpriv->l.area.edgeTable));
+    vpf_close_table(&(lpriv->l.area.faceTable));
+    vpf_close_table(&(lpriv->l.area.mbrTable));
+    vpf_close_table(&(lpriv->l.area.ringTable));
+    vpf_close_table(&(lpriv->l.area.edgeTable));
 
     break;
   case Line:
@@ -1884,24 +1880,20 @@ void _closeLayerTable(s,l)
     printf("close: lpriv->l.line.edgeTable\n");
     printf("close: lpriv->l.line.mbrTable\n");
 #endif
-    if (&(lpriv->l.line.edgeTable) != NULL)
-      vpf_close_table(&(lpriv->l.line.edgeTable));
-    if (&(lpriv->l.line.mbrTable) != NULL)
-      vpf_close_table(&(lpriv->l.line.mbrTable));
+    vpf_close_table(&(lpriv->l.line.edgeTable));
+    vpf_close_table(&(lpriv->l.line.mbrTable));
     break;
   case Point:
 #ifdef TESTOPENTABLE
     printf("close: lpriv->l.point.primTable\n");
 #endif
-    if (&(lpriv->l.point.primTable) != NULL)
-      vpf_close_table(&(lpriv->l.point.primTable));
+    vpf_close_table(&(lpriv->l.point.primTable));
     break;
   case Text:
 #ifdef TESTOPENTABLE
     printf("close: lpriv->l.text.textTable\n");
 #endif
-    if (&(lpriv->l.text.textTable) != NULL)
-      vpf_close_table(&(lpriv->l.text.textTable));
+    vpf_close_table(&(lpriv->l.text.textTable));
     break;
   default:
     return;
