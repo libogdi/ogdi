@@ -440,7 +440,7 @@ int32 tile_id;
 
    if (table2.header[KEY2_].type == 'T')
       {
-      keystring = (char*)xvt_malloc (strlen((char*)keyval1));
+      keystring = (char*)xvt_malloc (1+strlen((char*)keyval1));
       strcpy (keystring, (char*)keyval1);
 
       rightjust(keystring);
@@ -669,7 +669,7 @@ int32 tile_id;
 
    if (table2.header[KEY2_].type == 'T')
       {
-      keystring = (char*)xvt_malloc (strlen ((char*)keyval1));
+      keystring = (char*)xvt_malloc (1+strlen ((char*)keyval1));
       strcpy (keystring, (char*)keyval1);
 
       rightjust(keystring);
