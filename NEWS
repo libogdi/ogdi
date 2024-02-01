@@ -3,6 +3,16 @@
 
 The NEWS file is just used to sumarize major changes, and new features. 
 
+4.1.1
+=====
+
+ o  Fix various compiler warnings, in particular for gcc 14 (fixes #23)
+ o  Remove ogdi/attr_driver subdirectory (ODBC stuff) (fixes #23)
+ o  Support GNU Hurd
+ o  Support hardening buildflags set in the environment
+ o  contrib/gdal: Fix C99 compatibility issue
+ o  Add link libraries accordingly: $(EXPAT_LINKLIB), etc. (PR #16)
+
 4.1.0
 =====
 

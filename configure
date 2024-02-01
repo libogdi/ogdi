@@ -2078,7 +2078,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 
-OGDI_VERSION=4.1.0
+OGDI_VERSION=4.1.1
 OGDI_MAJOR=4
 OGDI_MINOR=1
 

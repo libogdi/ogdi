@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 AC_INIT(config/unix.mak)
 
-OGDI_VERSION=4.1.0
+OGDI_VERSION=4.1.1
 OGDI_MAJOR=4
 OGDI_MINOR=1
 
