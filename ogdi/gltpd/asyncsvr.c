@@ -454,7 +454,10 @@ dispatchno_1(rqstp, transp)
     }
     
     /* Reap zombie children */
-    while (waitpid(-1, NULL, WNOHANG) > 0);
+    while (waitpid(-1, NULL, WNOHANG) > 0)
+    {
+        /* wait */
+    }
     ogdi_system(temp);
 
     /* Rtourner le resultat au client, mais auparavent on laisse le

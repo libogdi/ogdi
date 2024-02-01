@@ -1784,9 +1784,9 @@ int cln_PointValid(ClientID, x, y)
   if (oy<0)
     oy*=-1;
 
-    if (((dx/ox) > COMPARETOLERANCE) || ((dy/oy) > COMPARETOLERANCE)) {
+  if (((dx/ox) > COMPARETOLERANCE) || ((dy/oy) > COMPARETOLERANCE)) {
       return FALSE;
-    }
+  }
 
   return TRUE;
 }
