@@ -840,7 +840,8 @@ Set the case of the filename for the current operating system.
 #endif
 
 {
-  int32 ncov,i,j,k,n;
+  char ncov;
+  int32 i,j,k,n;
   char path[255];
   char **ptr, **coverages, **subset, **fcnames=(char **)NULL;
 
@@ -1446,7 +1447,7 @@ Set the case of the filename for the current operating system.
                  int32 *nfc )
 #else
    char **coverage_feature_class_names (library_path, coverage, nfc)
-      char *library_path, coverage;
+      char *library_path, *coverage;
       int32 *nfc;
 #endif
 
